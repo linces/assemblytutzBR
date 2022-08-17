@@ -1,0 +1,164 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 3)
+                                Aula nr. 6 de 26
+
+    Instru‡”es aritim‚ticas  s„o  o  t¢pico  de  hoje.   J  discuti,
+brevemente,  os  flags  e  os  sistemas  de numera‡„o.  Aqui vai uma
+aplica‡„o pr tica:
+
+ ş Soma:
+
+    A  soma  ‚  feita atrav‚s das instru‡”es ADD e ADC.  A diferen‡a
+entre elas ‚ que uma faz  a  soma  normalmente e a outra faz a mesma
+coisa acrecentando o conte£do do flag CARRY. Eis a sintaxe:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ADD AL,10h                                                     ³
+ ³  ADC AH,22h                                                     ³
+ ³                                                                 ³
+ ³  ADD AX,2210h                                                   ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    As duas primeiras instru‡”es fazem exatamente a mesma coisa  que
+a  terceira.  Note que na primeiria somamos AL com 10h e o resultado
+ficar  em AL (se  ocorrer  "vai  um"  nesta  soma  o flag CARRY ser 
+setado).   A  segunda  instru‡„o  soma  AH  com  22h  MAIS  o  carry
+resultante  da  primeira  instru‡„o  e  o  resultado  ficar   em  AH
+(novamente  setando  o  flag  carry  se  houver outro "vai um"!).  A
+terceira instru‡„o faz a mesma coisa porque soma 2210h a AX, ficando
+o resultado em AX e o poss¡vel "vai um" no carry.
+
+    Todos  os  flags  s„o  afetados  ap¢s  a  execu‡„o  de  uma  das
+instru‡”es de soma, exceto: I, D e Trap.
+
+
+ ş Subtra‡„o
+
+    Semelhante as instru‡”es  de  soma,  existem  duas instru‡”es de
+subtra‡„o: SUB e SBB.  A  primeira  faz  a  subtra‡„o  simples  e  a
+segunda  faz  a  mesma  coisa subtraindo tamb‚m o conte£do pr‚vio do
+flag CARRY (como ‚ uma subtra‡„o o CARRY ‚ conhecido como BORROW!).
+
+    A sintaxe:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  SUB AL,1                                                       ³
+ ³  SBB AH,0                                                       ³
+ ³                                                                 ³
+ ³  SUB AX,1                                                       ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Como no exemplo  anterior,  as  duas  primeiras instru‡”es fazem
+exatamente o que a terceira faz...  Os flags afetados seguem a mesma
+regra das instru‡”es de soma!
+
+
+ ş Incremento e decremento:
+
+    As instru‡”es INC e DEC s„o usadas no lugar  de  ADD  e  SUB  se
+quisermos incrementar ou decrementar o conte£do de algum registrador
+(ou de uma posi‡„o de mem¢ria) de uma unidade. A sintaxe ‚ simples:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  DEC AX                                                        ³
+ ³  INC BL                                                        ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Os  flags afetados seguem a mesma regra de uma instru‡„o de soma
+ou uma de subtra‡„o!
+
+
+ ş Multiplica‡„o:
+
+    Os  processadores  da   fam¡lia   80x86  possuem  instru‡”es  de
+multiplica‡„o e divis„o  inteiras  (ponto  flutuante fica pro 8087).
+Alguns cuidados devem ser tomados quando usarmos  uma  instru‡„o  de
+divis„o (que ser  vista mais adiante!).
+
+    Uma   coisa   interessante   com   a   multiplica‡„o  ‚  que  se
+multiplicarmos dois registradores de  16  bits obteremos o resultado
+necessariamente em 32 bits.   O  par  de  registradores  DX e AX s„o
+usados para armazenar esse n£mero de 32 bits da seguinte  forma:  DX
+ser  a word mais significativa e AX a menos significativa.
+
+    Por exemplo, se  multiplicarmos  0FFFFh  por  0FFFFh  obteremos:
+0FFFE0001h (DX = 0FFFEh e AX = 0001h).
+
+    Eis  a  regra  para  descobrir  o  tamanho  do restultado de uma
+opera‡„o de multiplica‡„o:
+
+                ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+                ³             A * B = M           ³
+                ÃÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ´
+                ³    A     ³     B     ³     M    ³
+                ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄ´
+                ³  8 bits  ³   8 bits  ³  16 bits ³
+                ³          ³           ³          ³
+                ³ 16 bits  ³  16 bits  ³  32 bits ³
+                ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÙ
+
+    A multiplica‡„o sempre ocorrer  entre  o acumulador (AL ou AX) e
+um outro operando. Eis a sintaxe das instru‡”es:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MUL BL      ; AX = AL * BL                                    ³
+ ³  IMUL CX     ; DX:AX = AX * CX                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A primeira instru‡„o (MUL) n„o considera o sinal dos  operandos.
+Neste  caso, como BL ‚ de 8 bits, a multiplica‡„o se dar  entre BL e
+AL e o resultado ser  armazenado em AX.
+
+    A segunda instru‡„o leva  em  considera‡„o o sinal dos operandos
+e, como CX ‚ de 16 bits, a multiplica‡„o se dar  entre CX e AX  e  o
+restultado  ser  armazenado em DX e AX.  Lembrando que o sinal de um
+n£mero inteiro depende do seu bit mais significativo!
+
+
+ ş Divis„o:
+
+    Precisamos tomar cuidado com a  divis„o pelo seguinte motivo: Se
+o resultado n„o couber no  registrador destino, um erro de "Division
+by zero" ocorrer   (isto  n„o  est   perfeitamente  documentado  nos
+diversos  manuais  que li enquanto estudava assembly 80x86...  Vim a
+descobrir este 'macete' numa  antiga  edi‡„o  da revista PC MAGAZINE
+americana).  Outro cuidado ‚ com o divisor...  se for 0 o mesmo erro
+ocorrer !
+
+    A  divis„o  pode ser feita entre um n£mero de 32 bits e um de 16
+ou entre um de 16 e um de 8, veja a tabela:
+
+                ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+                ³        A / B = Q e resto       ³
+                ÃÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄ´
+                ³    A     ³     B     ³Q e resto³
+                ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄ´
+                ³ 32 bits  ³  16 bits  ³ 16 bits ³
+                ³          ³           ³         ³
+                ³ 16 bits  ³   8 bits  ³  8 bits ³
+                ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÙ
+
+    Assim como na multiplica‡„o  o  n£mero  (dividendo) de 32 bits ‚
+armazenado em DX e AX.
+
+    Depois da divis„o o quociente ‚ armazenado em AL e o resto em AH
+(no caso de divis„o 16/8 bits) ou o quociente fica em AX e  o  resto
+em DX (no caso de divis„o 32/8 bits).
+
+    Exemplo da sintaxe:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  DIV CX      ; AX=DX:AX / CX, DX=resto                          ³
+ ³  IDIV BL     ; AL=AX / BL, AH=resto                             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O  primeiro  caso ‚ uma divis„o sem sinal e o segundo com sinal.
+Note os divisores (CX e BL no nosso exemplo).
+
+    Na divis„o 16/8 bits o dividendo ‚ armazenado  em  AX  antes  da
+divis„o... No caso de 32/8 bits DX e AX s„o usados...
+
+    Mais  um  detalhe:  Os  flags,  depois  de  uma multiplica‡„o ou
+divis„o n„o devem ser considerados.
+                                                   

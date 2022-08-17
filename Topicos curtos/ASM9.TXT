@@ -1,0 +1,54 @@
+
+                               úAúSúSúEúMúBúLúYú
+                                  Interrup‡”es
+                                Aula nr. 9 de 26
+
+    O assunto desta  aula  ‚ INTERRUP€™ES.  Como j  disse antes, uma
+interrup‡„o ‚ uma requisi‡„o da aten‡„o da CPU  por  um  dispositivo
+(por  exemplo  o  teclado,  quando  apertamos  uma  tecla!).   A CPU
+INTERROMPE o processamento normal e  salta para a rotina que "serve"
+a interrup‡„o requisitada, retornando ao ponto em que  estava  ANTES
+da  interrup‡„o  quando  finalizar  a  rotina de interrup‡„o.  Assim
+funciona a n¡vel de hardware.
+
+    A novidade nos processadores INTEL  da s‚rie 80x86 ‚ que existem
+instru‡”es assembly que  EMULAM  a  requisi‡„o  de  uma  interru‡„o.
+Essas  instru‡”es  nada  mais  s„o  que  um  "CALL", mas ao inv‚s de
+usarmos um endere‡o para  uma  subrotina,  informamos o ¡ndice (ou o
+c¢digo) da interrup‡„o requisitada e a CPU se comportar  como se  um
+dispositivo tivesse requisitado a interrup‡„o...
+
+    As  rotinas  do DOS e da BIOS s„o chamadas por essas instru‡”es.
+Na realidade,  este  artificio  da  fam¡lia  INTEL  facilita muito o
+trabalho dos programadores  porque  n„o  precisamos  saber  onde  se
+encontram  as  rotinas  da  BIOS  e do DOS na mem¢ria...  Precisamos
+saber apenas o ¡ndice da  interrup‡„o  de cada uma das rotinas...  o
+endere‡o a CPU calcula para n¢s!
+
+    Eis a sintaxe da instru‡„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  INT 21h                                                         ³
+ ³  INT 10h                                                         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Onde 21h e 10h s„o ¡ndices.
+
+    A CPU sabe para onde saltar porque no inicio da mem¢ria de  todo
+PC   tem   uma   tabela   conhecida  como  "Tabela  dos  vetores  de
+interrup‡„o".  A CPU  pega  o  ¡ndice  na  instru‡„o  INT e "pega" o
+endere‡o correspondente a esse ¡ndice nessa tabela e efetua um  CALL
+diferente  (porque  o  fim  de  uma  rotina  de  interrup‡„o tem que
+terminar em  IRET  e  n„o  em  RET  -  IRET  ‚  o  RET  da rotina de
+interrup‡„o - Interrupt RETurn).
+
+    Uma descri‡„o completa sobre as interrup‡”es dispon¡veis nos PCs
+compat¡veis est  dispon¡vel no livro "Guia do programador para PC  e
+PS/2" de Peter Norton (recomendo  a aquisi‡„o deste livro!).  Ou, se
+preferir "literatura  eletronica"  recomendo  o  arquivo HELP_PC.ZIP
+(v2.0), disponivel em qualquer bom BBS...
+
+    Quanto as interru‡”es de hardware...  ‚ assunto meio complexo no
+momento e requer um  bom  conhecimento  de eletronica digital...  no
+futuro (pr¢ximo, espero!) abordarei esse assunto.
+                     

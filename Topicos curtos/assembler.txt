@@ -1,0 +1,4048 @@
+			   University of Guadalajara 
+		  Information Sistems General Coordination.
+			  Culture and Entertainment Web
+				 
+ June 12th 1995
+Copyright(C)1995-1996
+
+*****************************************************************************
+*     Este tutorial foi traduzido para o Portuguàs por Jeferson Amaral.     *
+*                       e-mail: amaral@inf.ufsm.br                          *
+*****************************************************************************
+
+        Este tutorial tem o intuito de apenas introduzir o leitor ao mundo
+da programacao em Linguagem Assembly, nao tem, portanto e de forma alguma,
+plano de esgotar o assunto.
+
+Copyright (C) 1995-1996, Hugo Perez Perez.
+Anyone  may  reproduce  this document,  in  whole  or  in  part,
+provided  that:
+
+(1) any copy or republication of the entire document must show University of
+    Guadalajara as the source, and must include this notice; and
+(2) any other use of this material must reference this manual and University
+    of Guadalajara, and the fact that the material is copyright by Hugo Perez
+    and is used by permission.
+
+****************************************************************************
+
+          T U T O R I A L   D E   L I N G U A G E M   A S S E M B L Y
+          ---------------   ---   -----------------   ---------------
+
+                                  Conte£do:
+
+           1.Introduá∆o 
+           2.Conceitos B†sicos
+           3.Programaá∆o Assembly 
+           4.Instruá‰es Assembly
+           5.Interrupá‰es e gerància de arquivos
+           6.Macros e procedimentos 
+           7.Exemplos de programas
+           8.Bibliografia
+ 
+ 
+*****************************************************************************
+
+                           CAP÷TULO 1: INTRODUÄ«O
+
+Conte£do:
+
+1.1.O que h† de novo neste material
+1.2.Apresentaá∆o
+1.3.Por que aprender Assembly?
+1.4.N¢s precisamos da sua opini∆o
+
+                    --------------- // ---------------
+
+1.1.O que h† de novo neste material:
+
+Ap¢s um ano da realizaá∆o da primeira vers∆o do tutorial, e atravÇs das
+opini‰es recebidas por e-mail, resolvemos ter por disposiá∆o todos estes
+coment†rios e sugest‰es. Esperamos que atravÇs deste novo material Assembly,
+as pessoas que se mostrarem interessadas possam aprender mais sobre o seu
+IBM PC. Esta nova ediá∆o do tutorial inclui:
+
+Uma seá∆o completa sobre como usar o programa debug.
+Mais exemplos de programas.
+Um motor de pesquisa, para qualquer t¢pico ou item relacionado Ö esta
+nova vers∆o.
+Consider†vel reorganizaá∆o e revis∆o do material Assembly.
+Em cada seá∆o, h† um link para o Dicion†rio On-line de Computaá∆o de
+Dennis Howe.
+
+
+1.2.Apresentaá∆o:
+
+Este tutorial destina-se Öquelas pessoas que nunca tiveram contato com a
+Linguagem Assembly.
+
+O tutorial est† completamente focado em computadores com processadores 80x86
+da fam°lia Intel, e considerando que a base da linguagem Ç o funcionamento
+dos recursos internos do processador, os exemplos descritos n∆o s∆o
+compat°veis com qualquer outra arquitetura.
+
+As informaá‰es est∆o dispostas em unidades ordenadas para permitir f†cil
+acesso a cada t¢pico, bem como uma melhor navegaá∆o pelo tutorial.
+
+Na seá∆o introdut¢ria s∆o mencionados alguns conceitos elementares sobre
+computadores e a Linguagem Assembly em si.
+
+
+1.3.Por que aprender Assembly?
+
+A primeira raz∆o para se trabalhar com o assembler Ç a oportunidade de
+conhecer melhor o funcionamento do seu PC, o que permite o desenvolvimento
+de programas de forma mais consistente.
+
+A segunda raz∆o Ç que vocà pode ter um controle total sobre o PC ao fazer
+uso do assembler.
+
+Uma outra raz∆o Ç que programas assembly s∆o mais r†pidos, menores e mais
+poderosos do que os criados com outras linguagens.
+
+Ultimamente, o assembler (montador) permite uma otimizaá∆o ideal nos
+programas, seja no seu tamanho ou execuá∆o.
+
+                              
+1.4.N¢s precisamos da sua opini∆o:
+
+Nosso intuito Ç oferecer um modo simples para que vocà consiga aprender
+Assembly por si mesmo. Por tanto, qualquer coment†rio ou sugest∆o ser†
+bem-vinda.
+                           
+
+*****************************************************************************
+
+                           CAP÷TULO 2: CONCEITOS BµSICOS
+ Conte£do:
+
+ 2.1.Descriá∆o b†sica de um sistema computacional.
+ 2.2.Conceitos b†sicos da Linguagem Assembly
+ 2.3.Usando o programa debug
+
+			--------------- // ---------------
+                             
+Esta seá∆o tem o prop¢sito de fazer um breve coment†rio a respeito dos
+principais componentes de um sistema computacional, o que ir† permitir ao
+usu†rio uma melhor compreens∆o dos conceitos propostos no decorrer do
+tutorial.
+
+      
+2.1.DESCRIÄ«O DE UM SISTEMA COMPUTACIONAL
+                             
+Conte£do:
+
+2.1.1.Processador Central
+2.1.2.Mem¢ria Principal
+2.1.3.Unidades de Entrada e Sa°da
+2.1.4.Unidades de Mem¢ria Auxiliar
+                                   
+
+Sistema Computacional.
+
+Chamamos de Sistema Computacional a completa configuraá∆o de um computador,
+incluindo os perifÇricos e o sistema operacional.
+
+                                   
+2.1.1.Processador Central.
+
+ê tambÇm conhecido por CPU ou Unidade Central de Processamento, que por sua
+vez Ç composta pela unidade de controle e unidade de l¢gica e aritmÇtica.
+Sua funá∆o consiste na leitura e escrita do conte£do das cÇlulas de mem¢ria,
+regular o tr†fego de dados entre as cÇlulas de mem¢ria e registradores
+especiais, e decodificar e executar as instruá‰es de um programa.
+
+O processador tem uma sÇrie de cÇlulas de mem¢ria usadas com freqÅància e,
+dessa forma, s∆o partes da CPU. Estas cÇlulas s∆o conhecidas com o nome de
+registradores. Um processador de um PC possui cerca de 14 registradores.
+Como os PCs tem sofrido evoluá∆o veremos que podemos manipular registradores
+de 16 ou 32 bits.
+
+A unidade de l¢gica e aritmÇtica da CPU realiza as operaá‰es relacionadas ao
+c†lculo simb¢lico e numÇrico. Tipicamente estas unidades apenas s∆o capazes
+de realizar operaá‰es elementares, tais como: adiá∆o e subtraá∆o de dois
+n£meros inteiros, multiplicaá∆o e divis∆o de n£mero inteiro, manuseio de
+bits de registradores e comparaá∆o do conte£do de dois registradores.
+
+Computadores pessoais podem ser classificados pelo que Ç conhecido como
+tamanho da palavra, isto Ç, a quantidade de bits que o processador Ç capaz
+de manusear de uma s¢ vez.
+
+                              
+2.1.2.Mem¢ria Principal.
+
+ê um grupo de cÇlulas, agora sendo fabricada com semi-condutores, usada para
+processamentos gerais, tais como a execuá∆o de programas e o armazenamento
+de informaá‰es para operaá‰es.
+
+Cada uma das cÇlulas pode conter um valor numÇrico e Ç capaz de ser
+endereáada, isto Ç, pode ser identificada de forma singular em relaá∆o Ös
+outras cÇlulas pelo uso de um n£mero ou endereáo.
+
+O nome genÇrico destas mem¢rias Ç Random Access Memory ou RAM. A principal
+desvantagem deste tipo de mem¢ria Ç o fato de que seus circuitos integrados
+perdem a informaá∆o que armazenavam quando a energia elÇtrica for
+interrompida, ou seja, ela Ç vol†til. Este foi o motivo que levou Ö criaá∆o
+de um outro tipo de mem¢ria cuja informaá∆o n∆o Ç perdida quando o sistema Ç
+desligado. Estas mem¢rias receberam o nome de Read Only Memory ou ROM.
+
+
+2.1.3.Unidades de Entrada e Sa°da.
+
+Para que o computador possa ser £til para n¢s se faz necess†rio que o
+processador se comunique com o exterior atravÇs de interfaces que permitem a
+entrada e a sa°da de informaá∆o entre ele e a mem¢ria. AtravÇs do uso destas
+comunicaá‰es Ç poss°vel introduzir informaá∆o a ser processada e mais tarde
+visualizar os dados processados.
+
+Algumas das mais comuns unidades de entrada s∆o o teclado e o mouse. As mais
+comuns unidades de sa°da s∆o a tela do monitor e a impressora.
+
+                              
+2.1.4.Unidades de Mem¢ria Auxiliar.
+
+Considerando o alto custo da mem¢ria principal e tambÇm o tamanho das
+aplicaá‰es atualmente, vemos que ela Ç muito limitada. Logo, surgiu a
+necessidade da criaá∆o de dispositivos de armazenamento pr†ticos e
+econìmicos.
+
+Estes e outros inconvenientes deram lugar Ös unidades de mem¢ria auxiliar,
+perifÇricos. As mais comuns s∆o as fitas e os discos magnÇticos.
+
+A informaá∆o ali armazenada ser† dividida em arquivos. Um arquivo Ç feito de
+um n£mero vari†vel de registros, geralmente de tamanho fixo, podendo conter
+informaá∆o ou programas.
+
+
+			--------------- // ---------------
+                                   
+2.2.CONCEITOS BµSICOS
+
+Conte£do:
+
+2.2.1.Informaá‰es nos computadores
+2.2.2.MÇtodos de representaá∆o de dados
+                                   
+
+2.2.1.Informaá∆o no computador:
+
+	2.2.1.1.Unidades de informaá∆o
+	2.2.1.2.Sistemas numÇricos
+	2.2.1.3.Convertendo n£meros bin†rios para decimais
+	2.2.1.4.Convertendo n£meros decimais para bin†rios
+	2.2.1.5.Sistema hexadecimal
+
+                                   
+
+2.2.1.1.Unidades de informaá∆o
+
+Para o PC processar a informaá∆o, Ç necess†rio que ela esteja em cÇlulas
+especiais, chamadas registradores.
+
+Os registradores s∆o grupos de 8 ou 16 flip-flops.
+
+Um flip-flop Ç um dispositivo capaz de armazenar 2 n°veis de voltagem, um
+baixo, geralmente 0.5 volts, e outro comumente de 5 volts. O n°vel baixo de
+energia no flip-flop Ç interpretado como desligado ou 0, e o n°vel alto,
+como ligado ou 1. Estes estados s∆o geralmente conhecidos como bits, que s∆o
+a menor unidade de informaá∆o num computador.
+
+Um grupo de 16 bits Ç conhecido como palavra; uma palavra pode ser dividida
+em grupos de 8 bits chamados bytes, e grupos de 4 bits chamados nibbles.
+
+
+
+2.2.1.2.Sistemas numÇricos
+
+O sistema numÇrico que n¢s usamos diariamente Ç o decimal, mas este sistema
+n∆o Ç conveniente para m†quinas, pois ali as informaá‰es tàm que ser
+codificadas de modo a interpretar os estados da corrente (ligado-desligado);
+este modo de c¢digo faz com que tenhamos que conhecer o c†lculo posicional
+que nos permitir† expressar um n£mero em qualquer base onde precisarmos
+dele.
+
+ê poss°vel representar um determinado n£mero em qualquer base atravÇs da
+seguinte f¢rmula:
+
+                                   
+Onde n Ç a posiá∆o do d°gito, iniciando da direita para a esquerda e
+numerando de 0. D Ç o d°gito sobre o qual n¢s operamos e B Ç a base numÇrica
+usada.
+
+                             
+2.2.1.3.Convertendo n£meros bin†rios para decimais
+
+Quando trabalhamos com a Linguagem Assembly encontramos por acaso a
+necessidade de converter n£meros de um sistema bin†rio, que Ç usado em
+computadores, para o sistema decimal usado pelas pessoas.
+
+O sistema bin†rio Ç baseado em apenas duas condiá‰es ou estados, estar
+ligado(1), ou desligado(0), portanto sua base Ç dois.
+
+Para a convers∆o, podemos usar a f¢rmula de valor posicional:
+
+Por exemplo, se tivermos o n£mero bin†rio 10011, tomamos cada d°gito da
+direita para a esquerda e o multiplicamos pela base, elevando Ö potància
+correspondente Ö sua posiá∆o relativa:
+
+Binary:         1         1       0       0       1
+
+Decimal:       1*2^0  + 1*2^1 + 0*2^2 + 0*2^3 + 1*2^4
+
+            =   1     +   2   +   0   +   0   +  16  = 19 decimal.
+
+O caracter ^ Ç usado em computaá∆o como s°mbolo para potància e * para a
+multiplicaá∆o.
+
+
+2.2.1.4.Convertendo n£meros decimais para bin†rio
+
+H† v†rios mÇtodos para se converter n£meros decimais para bin†rio; apenas um
+ser† analizado aqui. Naturalmente a convers∆o com uma calculadora cient°fica
+Ç muito mais f†cil, mas nem sempre podemos contar com isso, logo o mais
+conveniente Ç, ao menos, sabermos uma f¢rmula para fazà-la.
+
+O mÇtodo resume-se na aplicaá∆o de divis‰es sucessivas por 2, mantendo o
+resto como o d°gito bin†rio e o resultado como o pr¢ximo n£mero a ser
+dividido.
+
+Tomemos como exemplo o n£mero decimal 43.
+
+43/2=21 e o resto Ç 1; 21/2=10 e o resto Ç 1; 10/2=5 e o resto Ç 0;
+5/2=2 e o resto Ç 1; 2/2=1 e o resto Ç 0; 1/2=0 e o resto Ç 1.
+
+Para construir o equivalente bin†rio de 43, vamos pegar os restos obtidos de
+baixo para cima, assim temos 101011.
+
+
+2.2.1.5.Sistema hexadecimal
+
+Na base hexadecimal temos 16 d°gitos, que v∆o de 0 a 9 e da letra A atÇ a F,
+estas letras representam os n£meros de 10 a 15. Portanto contamos:
+0,1,2,3,4,5,6,7,8,9,A,B,C,D,E, e F.
+
+A convers∆o entre n£meros bin†rios e hexadecimais Ç f†cil. A primeira coisa
+a fazer Ç dividir o n£mero bin†rio em grupos de 4 bits, comeáando da direita
+para a esquerda. Se no grupo mais Ö direita sobrarem d°gitos, completamos
+com zeros.
+
+Tomando como exemplo o n£mero bin†rio 101011, vamos dividi-lo em grupos de 4
+bits:
+
+10;1011
+
+Preenchendo o £ltimo grupo com zeros (o um mais Ö esquerda):
+
+0010;1011
+
+A seguir, tomamos cada grupo como um n£mero independente e consideramos o
+seu valor decimal:
+
+0010=2;1011=11
+
+Entretanto, observa-se que n∆o podemos representar este n£mero como 211,
+isto seria um erro, uma vez que os n£meros em hexa maiores que 9 e menores
+que 16 s∆o representados pelas letras A,B,...,F. Logo, obtemos como
+resultado:
+
+2Bh, onde o "h" representa a base hexadecimal.
+
+Para a convers∆o de um n£mero hexadecimal em bin†rio Ç apenas necess†rio
+inverter os passos: tomamos o primeiro d°gito hexadecimal e o convertemos
+para bin†rio, a seguir o segundo, e assim por diante.
+
+                                   
+			--------------- // ---------------
+
+
+2.2.2.MÇtodos de representaá∆o de dados num computador.
+
+	2.2.2.1.C¢digo ASCII
+	2.2.2.2.MÇtodo BCD
+	2.2.2.3.Representaá∆o de ponto flutuante
+
+                            
+
+2.2.2.1.C¢digo ASCII
+
+ASCII significa American Standard Code for Information Interchange. Este
+c¢digo contÇm as letras do alfabeto, d°gitos decimais de 0 a 9 e alguns
+s°mbolos adicionais como um n£mero bin†rio de 7 bits, tendo o oitavo bit em
+0, ou seja, desligado.
+
+Deste modo, cada letra, d°gito ou caracter especial ocupa 1 byte na mem¢ria
+do computador.
+
+Podemos observar que este mÇtodo de representaá∆o de dados Ç muito
+ineficiente no aspecto numÇrico, uma vez que no formato bin†rio 1 byte n∆o Ç
+suficiente para representar n£meros de 0 a 255, com o ASCII podemos
+representar apenas um d°gito.
+
+Devido a esta ineficiància, o c¢digo ASCII Ç usado, principalmente, para a
+representaá∆o de textos.
+
+
+                                
+2.2.2.2.MÇtodo BCD
+
+BCD significa Binary Coded Decimal.
+
+Neste mÇtodo grupos de 4 bits s∆o usados para representar cada d°gito
+decimal de 0 a 9. Com este mÇtodo podemos representar 2 d°gitos por byte de
+informaá∆o.
+
+Vemos que este mÇtodo vem a ser muito mais pr†tico para representaá∆o
+numÇrica do que o c¢digo ASCII. Embora ainda menos pr†tico do que o bin†rio,
+com o mÇtodo BCD podemos representar d°gitos de 0 a 99. Com o bin†rio, vemos
+que o alcance Ç maior, de 0 a 255.
+
+Este formato (BCD) Ç principalmente usado na representaá∆o de n£meros
+grandes, aplicaá‰es comerciais, devido Ös suas facilidades de operaá∆o.
+
+                                 
+2.2.2.3.Representaá∆o de ponto flutuante
+
+Esta representaá∆o Ç baseada em notaá∆o cient°fica, isto Ç, representar um
+n£mero em 2 partes: sua base e seu expoente.
+
+Por exemplo o n£mero decimal 1234000, Ç representado como 1.234*10^6,
+observamos que o expoente ir† indicar o n£mero de casas que o ponto decimal
+deve ser movido para a direita, a fim de obtermos o n£mero original.
+
+O expoente negativo, por outro lado, indica o n£mero de casas que o ponto
+decimal deve se locomover para a esquerda.
+
+    
+
+			--------------- // ---------------
+
+2.3.PROGRAMA DEBUG
+                   
+Conte£do:
+
+2.3.1.Processo de criaá∆o de programas
+2.3.2.Registradores da CPU
+2.3.3.Programa debug
+2.3.4.Estrutura Assembly
+2.3.5.Criando um programa assembly simples
+2.3.6.Armazenando e carregando os programas
+
+                                   
+
+2.3.1.Processo de criaá∆o de programas.
+
+Para a criaá∆o de programas s∆o necess†rios os seguintes passos:
+
+   * Desenvolvimento do algoritmo, est†gio em que o problema a ser
+     solucionado Ç estabelecido e a melhor soluá∆o Ç proposta, criaá∆o de
+     diagramas esquem†ticos relativos Ö melhor soluá∆o proposta.
+   * Codificaá∆o do algoritmo, o que consiste em escrever o programa
+     em alguma linguagem de programaá∆o; linguagem assembly neste caso
+     espec°fico, tomando como base a soluá∆o proposta no passo anterior.
+   * A transformaá∆o para a linguagem de m†quina, ou seja, a criaá∆o
+     do programa objeto, escrito como uma seqÅància de zeros e uns que podem
+     ser interpretados pelo processador.
+   * O £ltimo est†gio Ç a eliminaá∆o de erros detectados no programa
+     na fase de teste. A correá∆o normalmente requer a repetiá∆o de todos os
+     passos, com observaá∆o atenta.
+
+
+              
+2.3.2.Registradores da CPU.
+
+Para o prop¢sito did†tico, vamos focar registradores de 16 bits. A CPU
+possui 4 registradores internos, cada um de 16 bits. S∆o eles AX, BX, CX e
+DX. S∆o registradores de uso geral e tambÇm podem ser usados como
+registradores de 8 bits. Para tanto devemos referenci†-los como, por
+exemplo, AH e AL, que s∆o, respectivamente, o byte high e o low do
+registrador AX. Esta nomenclatura tambÇm se aplica para os registradores BX,
+CX e DX.
+
+Os registradores, segundo seus respectivos nomes:
+
+ AX Registrador Acumulador
+ BX Registrador Base
+ CX Registrador Contador
+ DX Registrador de Dados
+ DS Registrador de Segmento de Dados
+ ES Registrador de Segmento Extra
+ SS Registrador de Segmento de Pilha
+ CS Registrador de Segmento de C¢digo
+ BP Registrador Apontador da Base
+ SI Registrador de ÷ndice Fonte
+ DI Registrador de ÷ndice Destino
+ SP Registrador Apontador de Pilha
+ IP Registrador Apontador da Pr¢xima Instruá∆o
+ F Registrador de Flag
+
+
+                         
+2.3.3.Programa Debug.
+
+Para a criaá∆o de um programa em assembler existem 2 opá‰es: usar o TASM -
+Turbo Assembler da Borland, ou o DEBUGGER. Nesta primeira seá∆o vamos usar o
+debug, uma vez que podemos encontr†-lo em qualquer PC com o MS-DOS.
+
+Debug pode apenas criar arquivos com a extens∆o .COM, e por causa das
+caracter°sticas deste tipo de programa, eles n∆o podem exceder os 64 Kb, e
+tambÇm devem iniciar no endereáo de mem¢ria 0100H dentro do segmento
+espec°fico. ê importante observar isso, pois deste modo os programas .COM
+n∆o s∆o reloc†veis.
+
+Os principais comandos do programa debug s∆o:
+
+A Montar instruá‰es simb¢licas em c¢digo de m†quina
+D Mostrar o conte£do de uma †rea da mem¢ria
+E Entrar dados na mem¢ria, iniciando num endereáo espec°fico
+G Rodar um programa execut†vel na mem¢ria
+N Dar nome a um programa
+P Proceder, ou executar um conjunto de instruá‰es relacionadas
+Q Sair do programa debug
+R Mostrar o conte£do de um ou mais registradores
+T Executar passo a passo as instruá‰es
+U Desmontar o c¢digo de m†quina em instruá‰es simb¢licas
+W Gravar um programa em disco
+
+ê poss°vel visualizar os valores dos registradores internos da CPU usando o
+programa Debug. Debug Ç um programa que faz parte do pacote do DOS, e pode
+ser encontrado normalmente no diret¢rio C:\DOS. Para inici†-lo, basta
+digitar Debug na linha de comando:
+
+C:/>Debug [Enter]
+-
+
+Vocà notar† ent∆o a presenáa de um h°fen no canto inferior esquerdo da tela.
+N∆o se espante, este Ç o prompt do programa. Para visualizar o conte£do dos
+registradores, experimente:
+
+-r[Enter]
+
+AX=0000  BX=0000  CX=0000  DX=0000  SP=FFEE  BP=0000  SI=0000  DI=0000
+DS=0D62  ES=0D62  SS=0D62  CS=0D62  IP=0100   NV UP EI PL NZ NA PO NC
+0D62:0100 2E            CS:
+0D62:0101 803ED3DF00    CMP     BYTE PTR [DFD3],00                 CS:DFD3=03
+
+ê mostrado o conte£do de todos os registradores internos da CPU; um modo
+alternativo para visualizar um £nico registrador Ç usar o camando "r"
+seguido do parÉmetro que faz referància ao nome do registrador:
+
+-rbx
+BX 0000
+:
+
+Esta instruá∆o mostrar† o conte£do do registrador BX e mudar† o indicador do
+Debug de "-" para ":"
+
+Quando o prompt assim se tornar, significa que Ç poss°vel, embora n∆o
+obrigat¢ria, a mudanáa do valor contido no registrador, bastando digitar o
+novo valor e pressionar [Enter]. Se vocà simplesmente pressionar [Enter] o
+valor antigo se mantÇm.
+
+
+2.3.4.Estrutura Assembly.
+
+Nas linhas do c¢digo em Linguagem Assembly h† duas partes: a primeira Ç o
+nome da instruá∆o a ser executada; a segunda, os parÉmetros do comando. Por
+exemplo:
+
+add ah bh
+
+Aqui "add" Ç o comando a ser executado, neste caso uma adiá∆o, e "ah" bem
+como "bh" s∆o os parÉmetros.
+
+Por exemplo:
+
+mov al, 25
+
+No exemplo acima, estamos usando a instruá∆o mov, que significa mover o
+valor 25 para o registrador al.
+
+O nome das instruá‰es nesta linguagem Ç constitu°do de 2, 3 ou 4 letras.
+Estas instruá‰es s∆o chamadas mnemìnicos ou c¢digos de operaá∆o,
+representando a funá∆o que o processador executar†.
+
+∑s vezes instruá‰es aparecem assim:
+
+add al,[170]
+
+Os colchetes no segundo parÉmetro indica-nos que vamos trabalhar com o
+conte£do da cÇlula de mem¢ria de n£mero 170, ou seja, com o valor contido no
+endereáo 170 da mem¢ria e n∆o com o valor 170, isto Ç conhecido como
+"endereáamento direto".
+
+
+                                   
+2.3.5.Criando um programa simples em assembly.
+
+N∆o nos responsabilizaremos pela m† execuá∆o ou poss°veis danos causados por
+quaisquer exemplos que de agora em diante aparecer∆o, uma vez que os mesmos,
+apesar de testados, s∆o de car†ter did†tico. Vamos, ent∆o, criar um programa
+para ilustrar o que vimos atÇ agora. Adicionaremos dois valores:
+
+O primeiro passo Ç iniciar o Debug, o que j† vimos como fazer anteriormente.
+
+Para montar um programa no Debug, Ç usado o comando "a" (assemble); quando
+usamos este comando, podemos especificar um endereáo inicial para o nosso
+programa como o parÉmetro, mas Ç opcional. No caso de omiss∆o, o endereáo
+inicial Ç o especificado pelos registradores CS:IP, geralmente 0100h, o
+local em que programas com extens∆o .COM devem iniciar. E ser† este o local
+que usaremos, uma vez que o Debug s¢ pode criar este tipo de programa.
+
+Embora neste momento n∆o seja necess†rio darmos um parÉmetro ao comando "a",
+isso Ç recomend†vel para evitar problemas, logo:
+
+a 100[enter]
+mov ax,0002[enter]
+mov bx,0004[enter]
+add ax,bx[enter]
+nop[enter][enter]
+
+O que o programa faz? Move o valor 0002 para o registrador ax, move o valor
+0004 para o registrador bx, adiciona o conte£do dos registradores ax e bx,
+guardando o resultado em ax e finalmente a instruá∆o nop (nenhuma operaá∆o)
+finaliza o programa.
+
+No programa debug, a tela se parecer† com:
+
+C:\>debug
+-a 100
+0D62:0100 mov ax,0002
+0D62:0103 mov bx,0004
+0D62:0106 add ax,bx
+0D62:0108 nop
+0D62:0109
+
+Entramos com o comando "t" para executar passo a passo as instruá‰es:
+
+-t
+
+AX=0002  BX=0000  CX=0000  DX=0000  SP=FFEE  BP=0000  SI=0000  DI=0000
+DS=0D62  ES=0D62  SS=0D62  CS=0D62  IP=0103   NV UP EI PL NZ NA PO NC
+0D62:0103 BB0400        MOV     BX,0004
+
+Vemos o valor 0002 no registrador AX. Teclamos "t" para executar a segunda
+instruá∆o:
+
+-t
+
+AX=0002  BX=0004  CX=0000  DX=0000  SP=FFEE  BP=0000  SI=0000  DI=0000
+DS=0D62  ES=0D62  SS=0D62  CS=0D62  IP=0106   NV UP EI PL NZ NA PO NC
+0D62:0106 01D8          ADD     AX,BX
+
+Teclando "t" novamente para ver o resultado da instruá∆o add:
+
+-t
+
+AX=0006  BX=0004  CX=0000  DX=0000  SP=FFEE  BP=0000  SI=0000  DI=0000
+DS=0D62  ES=0D62  SS=0D62  CS=0D62  IP=0108   NV UP EI PL NZ NA PE NC
+0D62:0108 90            NOP
+
+A possibilidade dos registradores conterem valores diferentes existe, mas AX
+e BX devem conter os mesmos valores acima descritos.
+
+Para sair do Debug usamos o comando "q" (quit).
+
+                                   
+
+2.3.6.Armazenando e carregando os programas.
+
+N∆o seria pr†tico ter que digitar o programa cada vez que inici†ssemos o
+Debug. Ao invÇs disso, podemos armazen†-lo no disco. S¢ que o mais
+interessante nisso Ç que um simples comando de salvar cria um arquivo com a
+extens∆o .COM, ou seja, execut†vel - sem precisarmos efetuar os processos de
+montagem e ligaá∆o, como veremos posteriormente com o TASM.
+
+Eis os passos para salvar um programa que j† esteja na mem¢ria:
+
+      * Obter o tamnho do programa subtraindo o endereáo final do
+        endereáo inicial, naturalmente que no sistema hexadecimal.
+      * Dar um nome ao programa.
+      * Colocar o tamanho do programa no registrador CX.
+      * Mandar o debug gravar o programa em disco.
+
+Usando como exemplo o seguinte programa, vamos clarear a idÇia de como
+realizar os passos acima descritos:
+
+0C1B:0100 mov ax,0002
+0C1B:0103 mov bx,0004
+0C1B:0106 add ax,bx
+0C1B:0108 int 20
+0C1B:010A
+
+Para obter o tamanho de um programa, o comando "h" Ç usado, j† que ele nos
+mostra a adiá∆o e subtraá∆o de dois n£meros em hexadecimal. Para obter o
+tamanho do programa em quest∆o, damos como parÉmetro o valor do endereáo
+final do nosso programa (10A), e o endereáo inicial (100). O primeiro
+resultado mostra-nos a soma dos endereáos, o segundo, a subtraá∆o.
+
+-h 10a 100
+020a 000a
+
+O comando "n" permite-nos nomear o programa.
+
+-n test.com
+
+O comando "rcx" permite-nos mudar o conte£do do registrador CX para o valor
+obtido como tamanho do arquivo com o comando "h", neste caso 000a.
+
+-rcx
+CX 0000
+:000a
+
+Finalmente, o comando "w" grava nosso programa no disco, indicando quantos
+bytes gravou.
+
+-w
+Writing 000A bytes
+
+Para j† salvar um arquivo quando carreg†-lo, 2 passos s∆o necess†rios:
+
+      Dar o nome do arquivo a ser carregado.
+      Carreg†-lo usando o comando "l" (load).
+
+Para obter o resultado correto destes passos, Ç necess†rio que o programa
+acima j† esteja criado.
+
+Dentro do Debug, escrevemos o seguinte:
+
+-n test.com
+-l
+-u 100 109
+0C3D:0100 B80200 MOV AX,0002
+0C3D:0103 BB0400 MOV BX,0004
+0C3D:0106 01D8 ADD AX,BX
+0C3D:0108 CD20 INT 20
+
+O £ltimo comando "u" Ç usado para verificar que o programa foi carregado na
+mem¢ria. O que ele faz Ç desmontar o c¢digo e mostr†-lo em assembly. Os
+parÉmetros indicam ao Debug os endereáos inicial e final a serem
+desmontados.
+
+O Debug sempre carrega os programas na mem¢ria no endereáo 100h, conforme j†
+comentamos.
+
+
+*****************************************************************************
+
+                           CAP÷TULO 3: PROGRAMAÄ«O ASSEMBLY
+                         
+Conte£do:
+
+3.1.Construindo programas em Assembly
+3.2.Processo Assembly
+3.3.Pequenos programas em Assembly
+3.4.Tipos de instruá‰es
+
+			--------------- // ---------------
+                             
+3.1.Construindo programas em Assembly.
+
+3.1.1.Software necess†rio
+3.1.2.Programaá∆o Assembly
+
+                       
+3.1.1.SOFTWARE NECESSµRIO
+
+Para que possamos criar um programa, precisamos de algumas ferramentas:
+
+Primeiro de um editor para criar o programa fonte. Segundo de um montador,
+um programa que ir† transformar nosso fonte num programa objeto. E,
+terceiro, de um linker (ligador) que ir† gerar o programa execut†vel a
+partir do programa objeto.
+
+O editor pode ser qualquer um que dispusermos. O montador ser† o TASM macro
+assembler da Borland, e o linker ser† o TLINK, tambÇm da Borland.
+
+N¢s devemos criar os programas fonte com a extens∆o .ASM para que o TASM
+reconheáa e o transforme no programa objeto, um "formato intermedi†rio" do
+programa, assim chamado porque ainda n∆o Ç um programa execut†vel e t∆o
+pouco um programa fonte. O linker gera a partir de um programa .OBJ, ou da
+combinaá∆o de v†rios deles, um programa execut†vel, cuja extens∆o Ç
+normalmente .EXE, embora possa ser .COM dependendo da forma como for montado
+e ligado.
+
+                                   
+3.1.2.PROGRAMAÄ«O ASSEMBLY
+
+Para construirmos os programas com o TASM, devemos estruturar o fonte de
+forma diferenciada ao que faz°amos com o programa debug.
+
+ê importante incluir as seguintes diretivas assembly:
+
+.MODEL SMALL
+Define o melo de mem¢ria a usar em nosso programa
+
+.CODE
+Define as instruá‰es do programa, relacionado ao segmento de c¢digo
+
+.STACK
+Reserva espaáo de mem¢ria para as instruá‰es de programa na pilha
+
+END
+Finaliza um programa assembly
+
+Vamos programar
+
+Primeiro passo
+
+Use qualquer editor para criar o programa fonte. Entre com as seguintes
+linhas:
+
+Primeiro exemplo
+
+; use ; para fazer coment†rios em programas assembly
+.MODEL SMALL ;modelo de mem¢ria
+.STACK       ;espaáo de mem¢ria para instruá‰es do programa na pilha
+.CODE        ;as linhas seguintes s∆o instruá‰es do programa
+  mov ah,01h ;move o valor 01h para o registrador ah
+  mov cx,07h ;move o valor 07h para o registrador cx
+  int 10h    ;interrupá∆o 10h
+  mov ah,4ch ;move o valor 4ch para o registrador ah
+  int 21h    ;interrupá∆o 21h
+END          ;finaliza o c¢digo do programa
+
+Este programa assembly muda o tamanho do cursor.
+
+Segundo passo
+
+Salvar o arquivo com o seguinte nome: exam1.asm
+N∆o esquecer de salv†-lo no formato ASCII.
+
+Terceiro passo
+
+Usar o programa TASM para construir o programa objeto.
+
+Exemplo:
+
+C:\>tasm exam1.asm
+Turbo Assembler  Version 2.0  Copyright (c) 1988, 1990 Borland International
+
+Assembling file:   exam1.asm
+Error messages:    None
+Warning messages:  None
+Passes:            1
+Remaining memory:  471k
+
+O TASM s¢ pode criar programas no formato .OBJ, que ainda n∆o pode ser
+executado...
+
+Quarto passo
+
+Usar o programa TLINK para criar o programa execut†vel.
+
+Exemplo:
+
+C:\>tlink exam1.obj
+Turbo Link  Version 3.0 Copyright (c) 1987, 1990 Borland International
+
+C:\>
+
+Onde exam1.obj Ç o nome do programa intermedi†rio, .OBJ. O comando acima
+gera diretamente o arquivo com o nome do programa intermedi†rio e a extens∆o
+.EXE. ê opcional a colocaá∆o da extens∆o .obj no comando.
+
+Quinto passo
+
+Executar o programa execut†vel criado.
+
+C:\>exam1[enter]
+
+Lembre-se, este programa assembly muda o tamanho do cursor no DOS.
+
+
+			--------------- // ---------------
+                          
+3.2.Processo Assembly.
+
+3.2.1.Segmentos
+3.2.2.Tabela de equivalància
+
+                                 
+3.2.1.SEGMENTOS
+
+A arquitetura dos processadores x86 foráa-nos a usar segmentos de mem¢ria
+para gerenciar a informaá∆o, o tamanho destes segmentos Ç de 64Kb.
+
+A raz∆o de ser destes segmentos Ç que, considerando que o tamanho m†ximo de
+um n£mero que o processador pode gerenciar Ç dado por uma palavra de 16 bits
+ou registrador, assim n∆o seria poss°vel acessar mais do que 65536 locais da
+mem¢ria usando apenas um destes registradores. Mas agora, se a mem¢ria do PC
+Ç dividida em grupos de segmentos, cada um com 65536 locais, e podemos usar
+um endereáo ou registrador exclusivo para encontrar cada segmento, e ainda
+fazemos cada endereáo de um espec°fico slot com dois registradores, nos Ç
+poss°vel acessar a quantidade de 4294967296 bytes de mem¢ria, que Ç,
+atualmente, a maior mem¢ria que podemos instalar num PC.
+
+Desta forma, para que o montador seja capaz de gerenciar os dados, se faz
+necess†rio que cada informaá∆o ou instruá∆o se encontre na †rea
+correspondente ao seu segmento. O endereáo do segmento Ç fornecido ao
+montador pelos registradores DS, ES, SS e CS. Lembrando um programa no
+Debug, observe:
+
+1CB0:0102 MOV AX,BX
+
+O primeiro n£mero 1CB0, corresponde ao segmento de mem¢ria que est† sendo
+usado, o segundo Ç uma referància ao endereáo dentro do segmento, Ç um
+deslocamento dentro do segmento offset.
+
+O modo usado para indicar ao montador com quais segmentos vamos trabalhar Ç
+fazendo uso das diretivas .CODE, .DATA e .STACK.
+
+O montador ajusta o tamanho dos segmentos tomando como base o n£mero de
+bytes que cada instruá∆o assembly precisa, j† que seria um desperd°cio de
+mem¢ria usar segmentos inteiros. Por exemplo, se um programa precisa de
+apenas 10Kb para armazenar dados, o segmento de dados seria apenas de 10Kb e
+n∆o de 64Kb, como poderia acontecer se feito manualmente.
+
+                                   
+3.2.2.TABELAS DE EQUIVAL“NCIA
+
+Cada uma das partes numa linha de c¢digo assembly Ç conhecida como token,
+por exemplo:
+
+MOV AX,Var
+
+Aqui temos tràs tokens, a instruá∆o MOV, o operador AX e o operador VAR. O
+que o montador faz para gerar o c¢digo OBJ Ç ler cada um dos tokens e
+procurar a equivalància em c¢digo de m†quina em tabelas correspondentes,
+seja de palavras reservadas, tabela de c¢digos de operaá∆o, tabela de
+s°mbolos, tabela de literais, onde o significado dos mnemìnicos e os
+endereáos dos s°mbolos que usamos ser∆o encontrados.
+
+A maioria dos montadores s∆o de duas passagens. Em s°ntese na primeira
+passagem temos a definiá∆o dos s°mbolos, ou seja, s∆o associados endereáos a
+todas as instruá‰es do programa. Seguindo este processo, o assembler là MOV
+e procura-o na tabela de c¢digos de operaá∆o para encontrar seu equivalente
+na linguagem de m†quina. Da mesma forma ele là AX e encontra-o na tabela
+correspondente como sendo um registrador. O processo para Var Ç um pouco
+diferenciado, o montador verifica que ela n∆o Ç uma palavra reservada, ent∆o
+procura na tabela de s°mbolos, l† encontrando-a ele designa o endereáo
+correspondente, mas se n∆o encontrou ele a insere na tabela para que ela
+possa receber um endereáo na segunda passagem. Ainda na primeira passagem Ç
+executado parte do processamento das diretivas, Ç importante notar que as
+diretivas n∆o criam c¢digo objeto. Na passagem dois s∆o montadas as
+instruá‰es, traduzindo os c¢digos de operaá∆o e procurando os endereáos, e Ç
+gerado o c¢digo objeto.
+
+H† s°mbolos que o montador n∆o consegue encontrar, uma vez que podem ser
+declaraá‰es externas. Neste caso o linker entra em aá∆o para criar a
+estrutura necess†ria a fim de ligar as diversas poss°veis partes de c¢digo,
+dizendo ao loader que o segmento e o token em quest∆o s∆o definidos quando o
+programa Ç carregado e antes de ser executado.
+
+
+			--------------- // ---------------
+                                      
+3.3.Mais programas.
+
+Outro exemplo
+
+Primeiro passo
+
+Use qualquer editor e crie o seguinte:
+
+;exemplo2
+.model small
+.stack
+.code
+ mov ah,2h  ;move o valor 2h para o registrador ah
+ mov dl,2ah ;move o valor 2ah para o registrador dl
+            ;(Ç o valor ASCII do caractere *)
+ int 21h    ;interrupá∆o 21h
+ mov ah,4ch ;funá∆o 4ch, sai para o sistema operacional
+ int 21h    ;interrupá∆o 21h
+end         ;finaliza o programa
+
+Segundo passo
+
+Salvar o arquivo com o nome: exam2.asm
+N∆o esquecer de salvar em formato ASCII.
+
+Terceiro passo
+
+Usar o programa TASM para construir o programa objeto.
+
+C:\>tasm exam2.asm
+Turbo Assembler  Version 2.0  Copyright (c) 1988, 1990 Borland International
+
+Assembling file:   exam2.asm
+Error messages:    None
+Warning messages:  None
+Passes:            1
+Remaining memory:  471k
+
+Quarto passo
+
+Usar o programa TLINK para criar o programa execut†vel.
+
+C:\>tlink exam2.obj
+Turbo Link  Version 3.0 Copyright (c) 1987, 1990 Borland International
+
+C:\>
+
+Quinto passo
+
+Executar o programa:
+
+C:\>exam2[enter]
+*
+C:\>
+
+Este programa imprime o caracter * na tela.
+
+Clique aqui para obter mais programas
+
+
+			--------------- // ---------------
+                                      
+3.4.Tipos de instruá‰es.
+
+3.4.1.Movimento de dados
+3.4.2.Operaá‰es l¢gicas e aritmÇticas
+3.4.3.Saltos, laáos e procedimentos
+                                   
+
+3.4.1.MOVIMENTO DE DADOS
+
+Em qualquer programa h† necessidade de se mover dados na mem¢ria e em
+registradores da CPU; h† v†rios modos de se fazà-lo: pode-se copiar os dados
+da mem¢ria para algum registrador, de registrador para registrador, de um
+registrador para a pilha, da pilha para um registrador, transmitir dados
+para um dispositivo externo e vice-versa.
+
+Este movimento de dados Ç sujeito a regras e restriá‰es, entre elas:
+
+*N∆o Ç poss°vel mover dados de um local da mem¢ria para outro diretamente; Ç
+necess†rio primeiro mover o dado do local de origem para um registrador e
+ent∆o do registrador para o local de destino.
+
+*N∆o Ç poss°vel mover uma constante diretamente para um registrador de
+segmento; primeiro deve-se mover para um registrador.
+
+ê poss°vel mover blocos de dados atravÇs de instruá‰es movs, que copia uma
+cadeia de bytes ou palavras; movsb copia n bytes de um local para outro; e
+movsw copia n palavras. A £ltima das duas instruá‰es toma os valores dos
+endereáos definidos por DS:SI como o grupo de dados a mover e ES:DI como a
+nova localizaá∆o dos dados.
+
+Para mover dados h† tambÇm estruturas chamadas pilhas, onde o dado Ç
+introduzido com a instruá∆o push e Ç extra°do com a instruá∆o pop
+
+Numa pilha o primeiro dado a entrar Ç o £ltimo a sair, por exemplo:
+
+  PUSH AX
+  PUSH BX
+  PUSH CX
+
+Para retornar os valores da pilha referentes Ö cada registrador Ç necess†rio
+seguir-se a ordem:
+
+  POP CX
+  POP BX
+  POP AX
+
+Para a comunicaá∆o com dispositivos externos o comando de sa°da Ç usado para
+o envio de informaá‰es a uma porta e o comando de entrada Ç usado para
+receber informaá∆o de uma porta.
+
+A sintaxe do comando de sa°da:
+
+OUT DX,AX
+
+Onde DX contÇm o valor da porta que ser† usada para a comunicaá∆o e AX
+contÇm a informaá∆o que ser† enviada.
+
+A sintaxe do comando de entrada:
+
+IN AX,DX
+
+Onde AX Ç o registrador onde a informaá∆o ser† armazenada e DX contÇm o
+endereáo da porta de onde chegar† a informaá∆o.
+
+                                   
+3.4.2.OPERAÄÂES L‡GICAS E ARITMêTICAS
+
+As instruá‰es de operaá‰es l¢gicas s∆o: and, not, or e xor. Elas trabalham a
+n°vel de bits em seus operadores.
+
+Para verificar o resultado das operaá‰es usamos as instruá‰es cmp e test.
+
+As instruá‰es usadas para operaá‰es algÇbricas s∆o: para adiá∆o add, para
+subtraá∆o sub, para multiplicaá∆o mul e para divis∆o div.
+
+Quase todas as instruá‰es de comparaá∆o s∆o baseadas na informaá∆o contida
+no registrador de flag. Normalmente os flags do registrador que podem ser
+manuseados diretamente pelo programador s∆o os da direá∆o de dados DF, usado
+para definir as operaá‰es sobre cadeias. Uma outro que pode tambÇm ser
+manuseado Ç o flag IF atravÇs das instruá‰es sti e cli, para ativar e
+desativar as interrupá‰es.
+
+                                   
+3.4.3.SALTOS, LOOPS E PROCEDIMENTOS
+
+Saltos incondicionais na escrita de programas em linguagem assembly s∆o
+dados pela instruá∆o jmp; um salto Ç usado para modificar a seqÅància da
+execuá∆o das instruá‰es de um programa, enviando o controle ao endereáo
+indicado, ou seja, o registrador contador de programa recebe este novo
+endereáo.
+
+Um loop, tambÇm conhecido como interaá∆o, Ç a repetiá∆o de um processo um
+certo n£mero de vezes atÇ atingir a condiá∆o de parada.
+
+
+*****************************************************************************
+
+                           CAP÷TULO 4: INSTRUÄÂES ASSEMBLY
+
+Conte£do:
+
+4.1.Instruá‰es de operaá∆o de dados
+4.2.Instruá‰es l¢gicas e aritmÇticas
+4.3.Instruá‰es de controle de processos
+
+			--------------- // ---------------
+         
+4.1. Instruá‰es de operaá∆o de dados
+
+Conte£do:
+
+4.1.1.Instruá‰es de transferància
+4.1.2.Instruá‰es de carga
+4.1.3.Instruá‰es de pilha
+                                   
+
+4.1.1.Instruá‰es de transferància.
+
+S∆o usadas para mover o conte£do dos operadores. Cada instruá∆o pode ser
+usada com diferentes modos de endereáamento.
+
+ MOV
+ MOVS (MOVSB) (MOVSW)
+
+                                  
+INSTRUÄ«O MOV
+
+Prop¢sito: Transferància de dados entre cÇlulas de mem¢ria, registradores e
+o acumulador.
+
+Sintaxe:
+
+MOV Destino,Fonte
+
+Destino Ç o lugar para onde o dado ser† movido e Fonte Ç o lugar onde o dado
+est†.
+
+Os diferentes movimentos de dados permitidos para esta instruá∆o s∆o:
+
+*Destino: mem¢ria.                  Fonte: acumulador
+*Destino: acumulador.               Fonte: mem¢ria
+*Destino: registrador de segmento.  Fonte: mem¢ria/registrador
+*Destino: mem¢ria/regitrador.       Fonte: registrador de segmento
+*Destino: registrador.              Fonte: registrador
+*Destino: registrador.              Fonte: mem¢ria
+*Destino: mem¢ria.                  Fonte: registrador
+*Destino: registrador.              Fonte: dado imediato
+*Destino: mem¢ria.                  Fonte: dado imediato
+
+Exemplo:
+
+  MOV AX,0006h
+  MOV BX,AX
+  MOV AX,4C00h
+  INT 21h
+
+Este pequeno programa move o valor 0006h para o registrador AX, ent∆o ele
+move o conte£do de AX (0006h) para o registrador BX, e finalmente move o
+valor 4C00h para o registrador AX para terminar a execuá∆o com a opá∆o 4C da
+interrupá∆o 21h.
+
+                                   
+
+INSTRUÄÂES MOVS (MOVSB) (MOVSW)
+
+Prop¢sito: Mover byte ou cadeias de palavra da fonte, endereáada por SI,
+para o destino endereáado por DI.
+
+Sintaxe:
+
+MOVS
+
+Este comando n∆o necessita de parÉmetros uma vez que toma como endereáo
+fonte o conte£do do registrador SI e como destino o conte£do de DI. A
+seguinte seqÅància de instruá‰es ilustra isso:
+
+MOV SI, OFFSET VAR1
+MOV DI, OFFSET VAR2
+MOVS
+
+Primeiro inicializamos os valores de SI e DI com os endereáos das vari†veis
+VAR1 e VAR2 respectivamente, ent∆o ap¢s a execuá∆o de MOVS o conte£do de
+VAR1 Ç copiado para VAR2.
+
+As instruá‰es MOVSB e MOVSW s∆o usadas do mesmo modo que MOVS, a primeira
+move um byte e a segunda move uma palavra.
+
+                                   
+Instruá‰es de carga.
+
+S∆o instruá‰es espec°ficas para registradores, usadas para carregar bytes ou
+cadeias de bytes num registrador.
+
+ LODS (LODSB) (LODSW)
+ LAHF
+ LDS
+ LEA
+ LES
+
+                                 
+
+ INSTRUÄÂES LODS (LODSB) (LODSW)
+
+Prop¢sito: Carregar cadeias de um byte ou uma palavra para o acumulador.
+
+Sintaxe:
+
+LODS
+
+Esta instruá∆o toma a cadeia encontrada no endereáo especificado por SI, a
+carrega para o registrador AL (ou AX) e adiciona ou subtrai, dependendo do
+estado de DF, para SI se Ç uma transferància de bytes ou de palavras.
+
+MOV SI, OFFSET VAR1
+LODS
+
+Na primeira linha vemos a carga do endereáo de VAR1 em SI e na segunda Ç
+tomado o conte£do daquele local para o regiustrador AL.
+
+Os comandos LODSB e LODSW s∆o usados do mesmo modo, o primeiro carrega um
+byte e o segundo uma palavra (usa todo o registrador AX).
+
+                                   
+
+ INSTRUÄ«O LAHF
+
+Prop¢sito: Transferir o conte£do dos flags para o registrador AH.
+
+Sintaxe:
+
+LAHF
+
+Esta instruá∆o Ç £til para verificar o estado dos flags durante a execuá∆o
+do nosso programa.
+
+Os flags s∆o deixados na seguinte ordem dentro do registrador:
+
+SF ZF ?? AF ?? PF ?? CF
+
+O "??" significa que haver† um valor indefinido naqueles bits.
+
+                                   
+
+ INSTRUÄ«O LDS
+
+Prop¢sito: Carregar o registrador de segmento de dados.
+
+Sintaxe:
+
+LDS destino,fonte
+
+O operador fonte deve ser uma double word na mem¢ria. A palavra associada
+com o maior endereáo Ç transferida para DS, em outras palavras isto Ç tomado
+como o endereáo de segmento. A palavra associada com o menor endereáo Ç o
+endereáo de deslocamento e Ç depositada no registrador indicado como
+destino.
+
+                                   
+
+ INSTRUÄ«O LEA
+
+Prop¢sito: Carregar o endereáo do operador fonte.
+
+Sintaxe:
+
+LEA destino,fonte
+
+O operador fonte deve estar localizado na mem¢ria, e seu deslocamento Ç
+colocado no registrador de °ndice ou ponteiro especificado no destino.
+
+Para ilustrar uma das facilidades que temos com este comando, vejamos:
+
+MOV SI,OFFSET VAR1
+
+ê equivalente a:
+
+LEA SI,VAR1
+
+ê muito prov†vel que para o programador Ç muito mais f†cil criar programas
+grandes usando este £ltimo formato.
+
+                                   
+
+ INSTRUÄ«O LES
+
+Prop¢sito: Carregar o registrador de segmento extra
+
+Sintaxe:
+
+LES destino,fonte
+
+O operador fonte deve ser uma palavra dupla na mem¢ria. O conte£do da
+palavra com endereáo maior Ç interpretado como o endereáo do segmento e Ç
+colocado em ES. A palavra com endereáo menor Ç o endereáo do deslocamento e
+Ç colocada no registrador especificado no parÉmetro de destino.
+
+                                   
+
+ Instruá‰es de manipulaá∆o da pilha.
+
+Estas instruá‰es permitem usar a pilha para armazenar ou recuperar dados.
+
+ POP
+ POPF
+ PUSH
+ PUSHF
+
+                                   
+
+ INSTRUÄ«O POP
+
+Prop¢sito: Recuperar uma parte de informaá∆o da pilha.
+
+Sintaxe:
+
+POP destino
+
+Esta instruá∆o transfere o £ltimo valor armazenado na pilha para o operador
+de destino, e incrementa de 2 o registrador SP.
+
+Este incremento Ç duplo pelo fato de que a pilha do mais alto endereáo de
+mem¢ria para o mais baixo, e a pilha trabalha apenas com palavras, 2 bytes,
+logo deve ser 2 o incremento de SP, na realidade 2 est† sendo subtra°do do
+tamanho real da pilha.
+
+                                   
+
+ INSTRUÄ«O POPF
+
+Prop¢sito: Extrair os flags armazenados na pilha.
+
+Sintaxe:
+
+POPF
+
+Este comando transfere os bits da palavra armazenada na parte mais alta da
+pilha para registrador de flag.
+
+O modo da transferància Ç como se segue:
+
+BIT    FLAG
+
+  0     CF
+  2     PF
+  4     AF
+  6     ZF
+  7     SF
+  8     TF
+  9     IF
+ 10     DF
+ 11     OF
+
+Os locais dos bits s∆o os mesmos para o uso da instruá∆o PUSHF.
+
+Uma vez feita a transferància o registrador SP Ç incrementado de 2, conforme
+vimos anteriormente.
+
+                                   
+
+ INSTRUÄ«O PUSH
+
+Prop¢sito: Coloca uma palavra na pilha.
+
+Sintaxe:
+
+PUSH fonte
+
+A instruá∆o PUSH decrementa de dois o valor de SP e ent∆o transfere o
+conte£do do operador fonte para o novo endereáo desultante no registrador
+recÇm modificado.
+
+O decremento no endereáo Ç duplo pelo fato de que quando os valores s∆o
+adicionados Ö pilha, que cresce do maior para o menor endereáo, logo quando
+subra°mos de 2 o registrador SP o que fazemos Ç incrementar o tamanho da
+pilha em dois bytes, que Ç a £nica quantidade de informaá∆o que a pilha pode
+manusear em cada entrada e sa°da.
+
+                                   
+
+ INSTRUÄ«O PUSHF
+
+Prop¢sito: Colocar os valores dos flags na pilha.
+
+Sintaxe:
+
+PUSHF
+
+Este comando decrementa de 2 o valor do registrador SP e ent∆o o conte£do do
+registrador de flag Ç transferido para a pilha, no endereáo indicado por SP.
+
+Os flags s∆o armazenados na mem¢ria da mesma forma que o comando POPF.
+
+
+			--------------- // ---------------
+
+         
+4.2. Instruá‰es l¢gicas e aritmÇticas
+
+Conte£do:
+
+4.2.1.Instruá‰es l¢gicas
+4.2.2.Instruá‰es aritmÇticas
+                                  
+
+4.2.1.Instruá‰es l¢gicas
+
+S∆o usadas para realizar operaá‰es l¢gicas nos operadores.
+
+ AND
+ NEG
+ NOT
+ OR
+ TEST
+ XOR
+
+                                   
+INSTRUÄ«O AND
+
+Prop¢sito: Realiza a conjuná∆o de operadores bit a bit.
+
+Sintaxe:
+
+AND destino,fonte
+
+Com esta instruá∆o a operaá∆o l¢gica "y" para ambos os operadores Ç usada
+como na tabela:
+
+Fonte    Destino  |   Destino
+-----------------------------
+  1         1     |     1
+  1         0     |     0
+  0         1     |     0
+  0         0     |     0
+
+O resultado desta operaá∆o Ç armazenado no operador de destino.
+
+                                   
+INSTRUÄ«O NEG
+
+Prop¢sito: Gera o complemento de 2.
+
+Sintaxe:
+
+NEG destino
+
+Esta instruá∆o gera o complemento de 2 do operador destino e o armazena no
+mesmo operador. Por exemplo, if AX armazena o valor 1234H, ent∆o:
+
+NEG AX
+
+Isto far† com o que o valor EDCCH fque armazenado no registrador AX.
+
+                                   
+
+ INSTRUÄ«O NOT
+
+Prop¢sito: Faz a negaá∆o do operador de destino bit a bit.
+
+Sintaxe:
+
+NOT destino
+
+O resultado Ç armazenado no mesmo operador de destino.
+
+                                   
+
+ INSTRUÄ«O OR
+
+Prop¢sito: Realiza um OU l¢gico.
+
+Sintaxe:
+
+OR destino,fonte
+
+A instruá∆o OR, faz uma disjuná∆o l¢gica bit a bit dos dois operadores:
+
+Fonte      Destino    |    Destino
+-----------------------------------
+   1          1       |       1
+   1          0       |       1
+   0          1       |       1
+   0          0       |       0
+
+                                   
+
+ INSTRUÄ«O TEST
+
+Prop¢sito: Compara logicamente os operadores.
+
+Sintaxe:
+
+TEST destino,fonte
+
+Realiza uma conjuná∆o, bit a bit, dos operadores, mas difere da instruá∆o
+AND, uma vez que n∆o coloca o resultado no operador de destino. Tem efeito
+sobre o registrador de flag.
+
+                                   
+
+ INSTRUÄ«O XOR
+
+Prop¢sito: Realiza um OU exclusivo.
+
+Sintaxe:
+
+XOR destino,fonte
+
+Esta instruá∆o realizxa uma disjuná∆o exclusiva de dois operadores bit a
+bit.
+
+Fonte      Destino    |    Destino
+-----------------------------------
+   1          1       |       0
+   0          0       |       1
+   0          1       |       1
+   0          0       |       0
+
+                                   
+
+4.2.2.Instruá‰es aritmÇticas.
+
+S∆o usadas para realizar operaá‰es aritmÇticas nos operadores.
+
+ ADC
+ ADD
+ DIV
+ IDIV
+ MUL
+ IMUL
+ SBB
+ SUB
+
+
+                                 
+INSTRUÄ«O ADC
+
+Prop¢sito: Efetuar a soma entre dois operandos com carry.
+
+Sintaxe:
+
+ADC destino,fonte
+
+Esta instruá∆o efetua a soma entre dois operandos, mais o valor do flag CF,
+existente antes da operaá∆o. Apenas o operando destino e os flags s∆o
+afetados.
+
+O resultado Ç armazenado no operador de destino.
+
+                                   
+
+ INSTRUÄ«O ADD
+
+Prop¢sito: Adiá∆o de dois operadores.
+
+Sintaxe:
+
+ADD destino,fonte
+
+Esta instruá∆o adiciona dois operadores e armazena o resultado no operador
+destino.
+
+                                   
+
+ INSTRUÄ«O DIV
+
+Prop¢sito: Divis∆o sem sinal.
+
+Sintaxe:
+
+DIV fonte
+
+O divisor pode ser um byte ou uma palavra e Ç o operador que Ç dado na
+instruá∆o.
+
+Se o divisor Ç de 8 bits, o registrador AX de 16 bits Ç tomado como
+dividendo e se o divisor Ç de 16 bits, o par de registradores DX:AX ser†
+tomado como dividendo, tomando a palavra alta de DX e a baixa de AX.
+
+Se o divisor for um byte, ent∆o o quociente ser† armazenado no registrador
+AL e o resto em AH. Se for uma palavra, ent∆o o quociente Ç armazenado em AX
+e o resto em DX.
+
+                                   
+
+ INSTRUÄ«O IDIV
+
+Prop¢sito: Divis∆o com sinal.
+
+Sintaxe:
+
+IDIV fonte
+
+Consiste basicamente como a instruá∆o DIV, diferencia-se apenas por realizar
+a operaá∆o com sinal.
+
+Para os resultados s∆o usados os mesmos registradores da instruá∆o DIV.
+
+                                   
+
+ INSTRUÄ«O MUL
+
+Prop¢sito: Multiplicaá∆o com sinal.
+
+Sintaxe:
+
+MUL fonte
+
+Esta instruá∆o realiza uma multiplicaá∆o n∆o sinalizada entre o conte£do do
+acumulador AL ou AX pelo operando-fonte, devolvendo o resultado no
+acumulador AX caso a operaá∆o tenha envolvido AL com um operando de 8 bits,
+ou em DX e AX caso a operaá∆o tenha envolvido AX e um operando de 16 bits.
+
+                                   
+
+ INSTRUÄ«O IMUL
+
+Prop¢sito: Multiplicá∆o de dois n£meros inteiros com sinal.
+
+Sintaxe:
+
+IMUL fonte
+
+Esta instruá∆o faz o mesmo que a anterior, difere apenas pela inclus∆o do
+sinal.
+
+Os resultados s∆o mantidos nos mesmos registradores usados pela instruá∆o
+MUL.
+
+                                   
+
+ INSTRUÄ«O SBB
+
+Prop¢sito: Subtraá∆o com carry.
+
+Sintaxe:
+
+SBB destino,fonte
+
+Esta instruá∆o subtrai os operadores e subtrai um do resultado se CF est†
+ativado. O operador fonte Ç sempre subtra°do do destino.
+
+Este tipo de subtraá∆o Ç usado quando se trabalha com quantidades de 32
+bits.
+
+                                   
+
+ INSTRUÄ«O SUB
+
+Prop¢sito: Subtraá∆o.
+
+Sintaxe:
+
+SUB destino,fonte
+
+Esta instruá∆o subtrai o operador fonte do destino.
+
+        
+
+			--------------- // ---------------
+
+4.3.Instruá‰es de controle de processos
+                             
+Conte£do:
+
+4.3.1.Instruá‰es de salto
+4.3.2.Instruá‰es de laáos: loop
+4.3.3.Instruá‰es de contagem
+4.3.4.Instruá‰es de comparaá∆o
+4.3.5.Instruá‰es de flag
+                                   
+
+4.3.1.Instruá‰es de salto.
+
+Usadas para transferir o processo de execuá∆o do programa para o operador
+indicado.
+
+ JMP
+ JA (JNBE)
+ JAE (JNBE)
+ JB (JNAE)
+ JBE (JNA)
+ JE (JZ)
+ JNE (JNZ)
+ JG (JNLE)
+ JGE (JNL)
+ JL (JNGE)
+ JLE (JNG)
+ JC
+ JNC
+ JNO
+ JNP (JPO)
+ JNS
+ JO
+ JP (JPE)
+ JS
+
+
+                                   
+ INSTRUÄ«O JMP
+
+Prop¢sito: Salto incondicional.
+
+Sintaxe:
+
+JMP destino
+
+Esta instruá∆o Ç usada par adesviar o curso do programa sem tomar em conta
+as condiá‰es atuais dos flags ou dos dados.
+
+                                   
+
+ INSTRUÄ«O JA (JNBE)
+
+Prop¢sito: Salto condicional.
+
+Sintaxe:
+
+JA s°mbolo
+
+Ap¢s uma comparaá∆o este comando salta se n∆o Ç igual.
+
+Isto quer dizer que o salto s¢ Ç feito se o flag CF ou o flag ZF est∆o
+desativados, ou seja, se um dos dois for zero.
+
+                                   
+
+ INSTRUÄ«O JAE (JNB)
+
+Prop¢sito: Salto condicional.
+
+Sintaxe:
+
+JAE s°mbolo
+
+A instruá∆o salta se est† up, se est† equal ou se est† not down.
+
+O salto Ç feito se CF est† desativado.
+
+                                   
+
+ INSTRUÄ«O JB (JNAE)
+
+Prop¢sito: Salto condicional.
+
+Sintaxe:
+
+JB s°mbolo
+
+A instruá∆o salta se est† down, se est† not up ou se est† equal.
+
+O salto Ç feito se CF est† ativado.
+
+                                   
+
+ INSTRUÄ«O JBE (JNA)
+
+Prop¢sito: Salto condicional.
+
+Sintaxe:
+
+JBE s°mbolo
+
+A instruá∆o salta se est† down, se est† equal ou se est† not up.
+
+O salto Ç feito se CF ou ZF est∆o ativados, ou seja, se um deles for 1.
+
+                                   
+
+ INSTRUÄ«O JE (JZ)
+
+Prop¢sito: Salto condicional.
+
+Sintaxe:
+
+JE s°mbolo
+
+A instruá∆o salta se est† equal ou se est† zero.
+
+O salto Ç feito se ZF est† ativado.
+
+                                   
+
+ INSTRUÄ«O JNE (JNZ)
+
+Prop¢sito: Salto condicional.
+
+Sintaxe:
+
+JNE s°mbolo
+
+A instruá∆o salta se est† not equal ou se est† zero.
+
+O salto Ç feito se ZF est† desativado.
+
+                                   
+
+ INSTRUÄ«O JG (JNLE)
+
+Prop¢sito: Salto condicional, e o sinal Ç tomado.
+
+Sintaxe:
+
+JG s°mbolo
+
+A instruá∆o salta se est† larger, se est† not larger ou se est† equal.
+
+O salto ocorre se ZF = 0 ou se OF = SF.
+
+                                   
+
+ INSTRUÄ«O JGE (JNL)
+
+Prop¢sito: Salto condicional, e o sinal Ç tomado.
+
+Sintaxe:
+
+JGE s°mbolo
+
+A instruá∆o salta se est† larger, se est† less than ou se est† equal.
+
+O salto Ç feito se SF = OF.
+
+                                   
+
+ INSTRUÄ«O JL (JNGE)
+
+Prop¢sito: Salto condicional, e o sinal Ç tomado.
+
+Sintaxe:
+
+JL s°mbolo
+
+A instruá∆o salta se est† less than, se est† not larger than ou se est†
+equal.
+
+O salto Ç feito se SF Ç diferente de OF.
+
+                                   
+
+ INSTRUÄ«O JLE (JNG)
+
+Prop¢sito: Salto condicional, e o sinal Ç tomado.
+
+Sintaxe:
+
+JLE s°mbolo
+
+A instruá∆o salta se est† less than, se est† equal ou se est† not larger.
+
+O salto Ç feito se ZF = 1 ou se SF Ç diferente de OF.
+
+                                   
+
+ INSTRUÄ«O JC
+
+Prop¢sito: Salto condicional, e os flags s∆o tomados.
+
+Sintaxe:
+
+JC s°mbolo
+
+A instruá∆o salta se h† carry.
+
+O salto Ç feito se CF = 1.
+
+                                   
+
+ INSTRUÄ«O JNC
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JNC s°mbolo
+
+A instruá∆o salta se n∆o h† carry.
+
+O salto Ç feito se CF = 0.
+
+                                   
+
+ INSTRUÄ«O JNO
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JNO s°mbolo
+
+A instruá∆o salta se n∆o h† overflow
+
+O salto Ç feito se OF = 0.
+
+                                   
+
+ INSTRUÄ«O JNP (JPO)
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JNP s°mbolo
+
+A instruá∆o salta se n∆o h† paridade ou se a paridade Ç °mpar.
+
+O salto Ç feito se PF = 0.
+
+                                   
+
+ INSTRUÄ«O JNS
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JNP s°mbolo
+
+A instruá∆o salta se o sinal est† desativado.
+
+O salto Ç feito se SF = 0.
+
+                                   
+
+ INSTRUÄ«O JO
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JO s°mbolo
+
+A instruá∆o salta se h† overflow.
+
+O salto Ç feito se OF = 1.
+
+                                   
+
+ INSTRUÄ«O JP (JPE)
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JP s°mbolo
+
+A instruá∆o salta se h† paridade ou se a paridade Ç par.
+
+O salto Ç feito se PF = 1.
+
+                                   
+
+ INSTRUÄ«O JS
+
+Prop¢sito: Salto condicional, e o estado dos flags Ç tomado.
+
+Sintaxe:
+
+JS s°mbolo
+
+A instruá∆o salta se o sinal est† ativado.
+
+O salto Ç feito se SF =1.
+
+
+			--------------- // ---------------
+
+                               
+4.3.2.Instruá‰es para laáos: LOOP.
+
+Estas instruá‰es transferem a execuá∆o do processo, condicional ou
+incondicionalmente, para um destino, repetindo a aá∆o atÇ o contador ser
+zero.
+
+ LOOP
+ LOOPE
+ LOOPNE
+
+
+                                  
+ INSTRUÄ«O LOOP
+
+Prop¢sito: Gerar um laáo no programa.
+
+Sintaxe:
+
+LOOP s°mbolo
+
+A instruá∆o LOOP decrementa CX de 1 e transfere a execuá∆o do programa para
+o s°mbolo que Ç dado como operador, caso CX ainda n∆o seja 1.
+
+                                   
+
+ INSTRUÄ«O LOOPE
+
+Prop¢sito: Gerar um laáo no programa, considerando o estado de ZF.
+
+Sintaxe:
+
+LOOPE s°mbolo
+
+Esta instruá∆o decrementa CX de 1. Se CX Ç diferente de zero e ZF Ç igual a
+1, ent∆o a execuá∆o do programa Ç transferida para o s°mbolo indicado como
+operador.
+
+                                   
+
+ INSTRUÄ«O LOOPNE
+
+Prop¢sito: Gerar um laáo no programa, considerando o estado de ZF.
+
+Sintaxe:
+
+LOOPNE s°mbolo
+
+Esta instruá∆o decrementa CX de 1 e transfere a execuá∆o do programa apenas
+se ZF Ç diferente de 0.
+
+                                   
+
+			--------------- // ---------------
+
+4.3.3.Instruá‰es contadoras.
+
+Estas instruá‰es s∆o usadas para decrementar ou incrementar o conte£do de
+contadores.
+
+ DEC
+ INC
+
+
+                                  
+ DEC INSTRUCTION
+
+Prop¢sito: Decrementar o operador.
+
+Sintaxe:
+
+DEC destino
+
+Esta instruá∆o subtrai 1 do operador destino e armazena o novo valor no
+mesmo operador.
+
+                                   
+
+ INSTRUÄ«O INC
+
+Prop¢sito: Incrementar o operador.
+
+Sintaxe:
+
+INC destino
+
+Esta instruá∆o adiciona 1 ao operador destino e mantÇm o resultado no mesmo
+operador.
+
+
+			--------------- // ---------------
+                                 
+4.3.4.Instruá‰es de comparaá∆o.
+
+Estas instruá‰es s∆o usadas para comparar os operadores, e elas afetam o
+conte£do dos flags.
+
+ CMP
+ CMPS (CMPSB) (CMPSW)
+
+
+                                  
+ INSTRUÄ«O CMP
+
+Prop¢sito: Comparar os operadores.
+
+Sintaxe:
+
+CMP destino,fonte
+
+Esta instruá∆o subtrai o operador fonte do destino, mas n∆o armazena o
+resultado da operaá∆o, apenas afeta o estado dos flags.
+
+                                   
+
+ INSTRUÄ«O CMPS (CMPSB) (CMPSW)
+
+Prop¢sito: Comparar cadeias de um byte ou uma palavra.
+
+Sintaxe:
+
+CMP destino,fonte
+
+Esta instruá∆o compara efetuando uma subtraá∆o entre o byte ou palavra
+endereáado por DI, dentro do segmento extra de dados, e o byte ou palavra
+endereáado por SI dentro do segmento de dados, afetando o registrador de
+flags, mas sem devolver o resultado da subtraá∆o.
+
+A instruá∆o automaticamente incrementa ou decrementa os registradores de
+°ndice SI e DI, dependendo do valor do flag DF, de modo a indicar os
+pr¢ximos dois elementos a serem comparados. O valor de incremento ou
+decremento Ç uma de uma ou duas unidades, dependendo da natureza da
+operaá∆o.
+
+Diante desta instruá∆o, pode-se usar um prefixo para repetiá∆o, de modo a
+comparar dois blocos de mem¢ria entre si, repetindo a instruá∆o de
+comparaá∆o atÇ que ambos se tornem iguais ou desiguais.
+
+                                   
+
+			--------------- // ---------------
+
+4.3.5.Instruá‰es de flag.
+
+Estas instruá‰es afetam diretamente o conte£do dos flags.
+
+ CLC
+ CLD
+ CLI
+ CMC
+ STC
+ STD
+ STI
+
+                                   
+
+ INSTRUÄ«O CLC
+
+Prop¢sito: Limpar o flag de carry.
+
+Sintaxe:
+
+CLC
+
+Esta instruá∆o desliga o bit correspondente ao flag de carry. Em outras
+palavras, ela o ajusta para zero.
+
+                                   
+
+ INSTRUÄ«O CLD
+
+Prop¢sito: Limpar o flag de endereáo.
+
+Sintaxe:
+
+CLD
+
+Esta instruá∆o desliga o bit correspondente ao flag de endereáo.
+
+                                   
+
+ INSTRUÄ«O CLI
+
+Prop¢sito: Limpar o flag de interrupá∆o.
+
+Sintaxe:
+
+CLI
+
+Esta instruá∆o desliga o flag de interrupá‰es, desabilitando, deste modo,
+interrupá‰es mascar†veis.
+
+Uma interrupá∆o mascar†vel Ç aquela cujas funá‰es s∆o desativadas quando
+IF=0.
+
+                                   
+
+ INSTRUÄ«O CMC
+
+Prop¢sito: Complementar o flag de carry.
+
+Sintaxe:
+
+CMC
+
+Esta instruá∆o complementa o estado do flag CF. Se CF = 0 a instruá∆o o
+iguala a 1. Se CF = 1, a instruá∆o o iguala a 0.
+
+Poder°amos dizer que ela apenas inverte o valor do flag.
+
+                                   
+
+ INSTRUÄ«O STC
+
+Prop¢sito: Ativar o flag de carry.
+
+Sintaxe:
+
+STC
+
+Esta instruá∆o ajusta para 1 o flag CF.
+
+                                   
+
+ INSTRUÄ«O STD
+
+Prop¢sito: Ativar o flag de endereáo.
+
+Sintaxe:
+
+STD
+
+Esta instruá∆o ajusta para 1 o flag DF.
+
+                                   
+
+ INSTRUÄ«O STI
+
+Prop¢sito: Ativar o flag de insterrupá∆o.
+
+Sintaxe:
+
+STI
+
+Esta instruá∆o ativa o flag IF, e habilita interrupá‰es externas mascar†veis
+(que s¢ funcionam quando IF = 1).
+
+  
+
+*****************************************************************************
+
+                 CAP÷TULO 5: INTERRUPÄÂES E GER“NCIA DE ARQUIVOS
+                               
+                                
+Conte£do:
+
+5.1.Interrupá‰es
+5.2.Gerenciamento de arquivos
+
+			--------------- // ---------------
+                     
+Conte£do
+
+5.1.1.Interrupá‰es de hardware interno
+5.1.2.Interrupá‰es de hardware externo
+5.1.3.Interrupá‰es de software
+5.1.4.Interrupá‰es mais comuns
+                                   
+
+5.1.1.Interrupá‰es de hardware interno
+
+Interrupá‰es internas s∆o geradas por certos eventos que ocorrem durante a
+execuá∆o de um programa.
+
+Este tipo de interrupá‰es s∆o gerenciadas, na sua totalidade, pelo hardware
+e n∆o Ç poss°vel modific†-las.
+
+Um exemplo claro deste tipo de interrupá‰es Ç a que atualiza o contador do
+clock interno do computador, o hardware chama esta interrupá∆o muitas vezes
+durante um segundo.
+
+N∆o nos Ç permitido gerenciar diretamente esta interrupá∆o, uma vez que n∆o
+se pode controlar a hora atualizada por software. Mas podemos usar seus
+efeitos no computador para o nosso benef°cio, por exemplo para criar um
+virtual clock atualizado continuamente pelo contador interno de clock. Para
+tanto, precisamos apenas ler o valor atual do contador e o transformar num
+formato compreens°vel pelo usu†rio.
+
+
+
+			--------------- // ---------------
+                              
+5.1.2.Interrupá‰es de hardware externo
+
+Interrupá‰es externas s∆o geradas atravÇs de dispositivos perifÇricos, tais
+como teclados, impressoras, placas de comunicaá∆o, entre outros. S∆o tambÇm
+geradas por co-processadores.
+
+N∆o Ç poss°vel desativar interrupá‰es externas.
+
+Estas interrupá‰es n∆o s∆o enviadas diretamente para a CPU, mas, de uma
+forma melhor, s∆o enviadas para um circuito integrado cuja funá∆o exclusiva
+Ç manusear este tipo de interrupá∆o. O circuito, chamado PIC8259A, Ç
+controlado pela CPU atravÇs de uma sÇrie de comunicaá∆o chamada paths.
+
+
+			--------------- // ---------------
+                               
+5.1.3.Interrupá‰es de software
+
+Interrupá‰es de software podem ser ativadas diretamente por nossos programas
+assembly, invocando o n£mero da interrupá∆o desejada com a instruá∆o INT.
+
+O uso das interrupá‰es facilita muito a criaá∆o dos programas, torna-os
+menores. AlÇm disso, Ç f†cil compreendà-las e geram boa performance.
+
+Este tipo de interrupá‰es podem ser separadas em duas categorias:
+Interrupá‰es do Sistema Operacional DOS e interrupá‰es do BIOS.
+
+A diferenáa entre ambas Ç que as interrupá‰es do sistema operacional s∆o
+mais f†ceis de usar, mas tambÇm s∆o mais lentas, uma vez que acessam os
+serviáos do BIOS. Por outro lado, interrupá‰es do BIOS s∆o muito mais
+r†pidas, mas possuem a desvantagem de serem parte do hardware, o que
+significa serem espec°ficas Ö arquitetura do computador em quest∆o.
+
+A escolha sobre qual o tipo de interrupá∆o usar ir† depender somente das
+caracter°sticas que vocà deseja dar ao seu programa: velocidade (use BIOS),
+portabilidade (use DOS).
+
+
+			--------------- // ---------------
+                               
+
+5.1.4.Interrupá‰es mais comuns
+                            
+                                  
+Conte£do
+
+5.1.4.1.Int 21H (Interrupá∆o do DOS)
+		M£ltiplas chamadas Ö funá‰es DOS.
+
+5.1.4.2.Int 10H (Interrupá∆o do BIOS)
+		Entrada e Sa°da de V°deo.
+
+5.1.4.3.Int 16H (Interrupá∆o do BIOS)
+		Entrada e Sa°da do Teclado.
+
+5.1.4.4.Int 17H (Interrupá∆o do BIOS)
+		Entrada e Sa°da da Impressora.
+
+                                  
+			--------------- // ---------------
+
+5.1.4.1.Interrupá∆o 21H
+
+Prop¢sito: Chamar uma diversidade de funá‰es DOS.
+
+Sintaxe:
+
+Int 21H
+
+Nota: Quando trabalhamos com o programa TASM Ç necess†rio especificar que o
+valor que estamos usando est† em hexadecimal.
+
+Esta interrupá∆o tem muitas funá‰es, para acessar cada uma delas Ç
+necess†rio que o n£mero correspondente da funá∆o esteja no registrador AH no
+momento da chamada da interrupá∆o.
+
+Funá‰es para mostrar informaá‰es no v°deo.
+
+     02H Exibe um caracter
+     09H Exibe uma cadeia de caracteres
+     40H Escreve num dispositivo/arquivo
+
+Funá‰es para ler informaá‰es do teclado.
+
+     01H Entrada do teclado
+     0AH Entrada do teclado usando buffer
+     3FH Leitura de um dispositivo/arquivo
+
+Funá‰es para trabalhar com arquivos.
+
+Nesta seá∆o s∆o apenas especificadas as tarefas de cada funá∆o, para uma
+referància acerca dos conceitos usados, veja Introduá∆o ao gerenciamento de
+arquivos.
+
+MÇtodo FCB
+
+     0FH Abertura de arquivo
+     14H Leitura seqÅencial
+     15H Escrita seqÅencial
+     16H Criaá∆o de arquivo
+     21H Leitura randìmica
+     22H Escrita randìmica
+
+Handles
+
+     3CH Criaá∆o de arquivo
+     3DH Abertura de arquivo
+     3EH Fechamento de arquivo
+     3FH Leitura de arquivo/dispositivo
+     40H Escrita de arquivo/dispositivo
+     42H Move ponteiro de leitura/escrita num arquivo
+
+                                   
+
+ FUNÄ«O 02H
+
+Uso:
+
+Mostra um caracter na tela.
+
+Registradores de chamada:
+
+AH = 02H
+DL = Valor de caracter a ser mostrado.
+
+Registradores de retorno:
+
+Nenhum.
+
+Esta funá∆o mostra o caracter cujo c¢digo hexadecimal corresponde ao valor
+armazenado no registrador DL, e n∆o modifica nenhum registrador.
+
+O uso da funá∆o 40H Ç recomendado ao invÇs desta funá∆o.
+
+                                   
+
+ FUNÄ«O 09H
+
+Uso:
+
+Mostra uma cadeia de caracteres na tela.
+
+Registradores de chamada:
+
+AH = 09H
+DS:DX = Endereáo de in°cio da cadeia de caracteres.
+
+Registradores de retorno:
+
+Nenhum.
+
+Esta funá∆o mostra os caracteres, um por um, a partir do endereáo indicado
+nos registradores DS:DX atÇ encontrar um caracter $, que Ç interpretado como
+fim da cadeia.
+
+ê recomendado usar a funá∆o 40H ao invÇs desta.
+
+                                   
+
+ FUNÄ«O 40H
+
+Uso:
+
+Escrever num dispositivo ou num arquivo.
+
+Registradores de chamada:
+
+AH = 40H
+BX = N£mero do handle
+CX = Quantidade de bytes a gravar
+DS:DX = µrea onde est† o dado
+
+Registradores de retorno:
+
+CF = 0 se n∆o houve erro
+
+        AX = N£mero de bytes escrito
+
+CF = 1 se houve erro
+
+        AX = C¢digo de erro
+
+Para usar esta funá∆o para mostrar a informaá∆o na tela, faáa o registrador
+BX ser igual a 1, que Ç o valor default para o v°deo no DOS.
+
+                                   
+
+ FUNÄ«O 01H
+
+Uso:
+
+Ler um caracter do teclado e mostr†-lo.
+
+Registradores de chamada
+
+AH = 01H
+
+Registradores de retorno:
+
+AL = Caracter lido
+
+ê muito f†cil ler um caracter do teclado com esta funá∆o, o c¢digo
+hexadecimal do caracter lido Ç armazenado no registrador AL. Nos caso de
+teclas especiais, como as de funá∆o F1, F2, alÇm de outras, o registrador AL
+conter† o valor 1, sendo necess†rio chamar a funá∆o novamente para obter o
+c¢digo daquele caracter.
+
+                                   
+
+ FUNÄ«O 0AH
+
+Uso:
+
+Ler caracteres do teclado e armazen†-los num buffer.
+
+Registradores de chamada:
+
+AH = 0AH
+DS:DX = Endereáo inicial da †rea de armazenamento
+BYTE 0 = Quantidade de bytes na †rea
+BYTE 1 = Quantidade de bytes lidos
+do BYTE 2 atÇ BYTE 0 + 2 = caracteres lidos
+
+Registradores de retorno:
+
+Nenhum.
+
+Os caracteres s∆o lidos e armazenados num espaáo de mem¢ria que foi
+definido. A estrutura deste espaáo indica que o primeiro byte representar† a
+quantidade m†xima de caracteres que pode ser lida. O segundo, a quantidade
+de caracteres lidos e, no terceiro byte, o inicio onde eles s∆o armazenados.
+
+Quando se atinge a quantidade m†xima permitida, ouve-se o som do speaker e
+qualquer caracter adicional Ç ignorado. Para finalizar a entrada, basta
+digitar [ENTER].
+
+                                   
+
+ FUNÄ«O 3FH
+
+Uso:
+
+Ler informaá∆o de um dispositivo ou de um arquivo.
+
+Registradores de chamada:
+
+AH = 3FH
+BX = N£mero do handle
+CX = N£mero de bytes a ler
+DS:DX = µrea para receber o dado
+
+Registradores de retorno:
+
+CF = 0 se n∆o h† erro e AX = n£mero de bytes lidos.
+CF = 1 se h† erro e AX conter† o c¢digo de erro.
+
+                                   
+
+ FUNÄ«O 0FH
+
+Uso:
+
+Abrir um arquivo FCB.
+
+Registradores de chamada:
+
+AH = 0FH
+DS:DX = Ponteiro para um FCB
+
+Registradores de retorno:
+
+AL = 00H se n∆o h† problemas, de outra forma retorna 0FFH
+
+                                   
+
+ FUNÄ«O 14H
+
+Uso:
+
+Leitura sequencial num arquivo FCB.
+
+Registradores de chamada:
+
+AH = 14H
+DS:DX = Ponteiro para um FCB j† aberto.
+
+Registradores de retorno:
+
+AL = 0 se n∆o h† erros, de outra forma o c¢digo correspondente de erro retornar†:
+1 erro no fim do arquivo, 2 erro na estrutura FCB e 3 erro de leitura parcial.
+
+O que esta funá∆o faz Ç ler o pr¢ximo bloco de informaá‰es do endereáo dado
+por DS:DX, e atualizar este registro.
+
+                                   
+
+ FUNÄ«O 15H
+
+Uso:
+
+Escrita sequencial e arquivo FCB.
+
+Registradores de chamada:
+
+AH = 15H
+DS:DX = Ponteiro para um FCB ja aberto.
+
+Registradores de retorno:
+
+AL = 00H se n∆o h† erros, de outra forma conter† o c¢digo de erro:  1 disco cheio ou
+arquivo somente de leitura, 2 erro na formaá∆o ou na especificaá∆o do FCB.
+
+A funá∆o 15H atualiza o FCB ap¢s a escrita do registro para o presente
+bloco.
+
+                                   
+
+ FUNÄ«O 16H
+
+Uso:
+
+Criar um arquivo FCB. Registradores de chamada:
+
+AH = 16H
+DS:DX = Ponteiro para um FCB j† aberto.
+
+Registradores de retorno:
+
+AL = 00H se n∆o h† erros, de outra forma conter† o valor 0FFH.
+
+ê baseada na informaá∆o advinda de um FCB para criar um arquivo num disco.
+
+                                   
+
+ FUNÄ«O 21H
+
+Uso:
+
+Ler de modo randìmico um arquivo FCB.
+
+Registradores de chamada:
+
+AH = 21H
+DS:DX = Ponteiro para FCB aberto.
+
+Registradores de retorno:
+
+A = 00H se n∆o h† erro, de outra forma AH conter† o c¢digo de erro:
+1 se Ç o fim do arquivo, 2 se h† um erro de especificaá∆o no FCB e 3 se um registro foi
+lido parcialmente ou o ponteiro de arquivo est† no fim do mesmo.
+
+Esta funá∆o là o registro especificado pelos campos do bloco atual e
+registro de um FCB aberto e coloca a informaá∆o na DTA, µrea de
+Transferància do Disco.
+
+                                   
+
+ FUNÄ«O 22H
+
+Uso:
+
+Escrita randìmica num arquivo FCB.
+
+Registradores de chamada:
+
+AH = 22H
+DS:DX = Ponteiro para um FCB aberto.
+
+Registradores de retorno:
+
+AL = 00H se n∆o h† erro, de outra forma conter† o c¢digo de erro:
+1 se o disco est† cheio ou o arquivo Ç apenas de leitura e 2 se h† um erro na especificaá∆o FCB.
+
+Escreve o registro especificado pelos campos do bloco atual e registro de um
+FCB aberto. Esta informaá∆o Ç do conte£do da DTA.
+
+                                   
+
+ FUNÄ«O 3CH
+
+Uso:
+
+Criar um arquivo se n∆o existe ou deix†-lo com compirmento 0 se existe.
+
+Registradores de chamada:
+
+AH = 3CH
+CH = Atributo do arquivo
+DS:DX = Nome do arquivo, no formato ASCII.
+
+Registradores de retorno:
+
+CF = 0 e AX informa o n£mero do handle se n∆o h† erro. Se caso houver erro,
+CF ser† 1 e AX conter† o c¢digo de erro: 3 caminho n∆o encontrado, 4 n∆o h† handles dispon°veis
+e 5 acesso negado.
+
+Esta funá∆o substitui a funá∆o 16H. O nome do arquivo Ç especificado numa
+cadeia ASCII de bytes terminados pelo caracter 0.
+
+O arquivo criado conter† os atributos definidos no registrador CX, do
+seguinte modo:
+
+        Valor           Atributos
+         00H              Normal
+         02H              Hidden
+         04H              System
+         06H              Hidden e System
+
+O arquivo Ç criado com permiss∆o de leitura e escrita. N∆o Ç poss°vel a
+criaá∆o de diret¢rios atravÇs desta funá∆o.
+
+                                   
+
+ FUNÄ«O 3DH
+
+Uso:
+
+Abre um arquivo e retorna um handle.
+
+Registradores de chamada:
+
+AH = 3DH
+AL = modo de acesso
+DS:DX = Nome do arquivo, no formato ASCII.
+
+Registradores de retorno:
+
+CF = 0 e AX = n£mero do handle se n∆o h† erros, de outra forma CF = 1 e AX = c¢digo de erro:
+01H se a funá∆o n∆o Ç v†lida, 02H se o arquivo n∆o foi encontrado, 03H se o caminho n∆o foi
+encontrado, 04H se n∆o h† handles dispon°veis, 05H acesso negado, e 0CH se o c¢digo de
+acesso n∆o Ç v†lido.
+
+O handle retornado Ç de 16 bits.
+
+O c¢digo de acesso Ç especificado da seguinte maneira:
+
+        BITS
+       7  6  5  4  3  2  1
+
+       .  .  .  .  0  0  0      Apenas leitura
+       .  .  .  .  0  0  1      Apenas escrita
+       .  .  .  .  0  1  0      Leitura/Escrita
+       .  .  .  x  .  .  .      RESERVADO
+
+                                   
+
+ FUNÄ«O 3EH
+
+Uso:
+
+Fecha um arquivo (handle).
+
+Registradores de chamada:
+
+AH = 3EH
+BX = N£mero do handle associado
+
+Registradores de retorno:
+
+CF = 0 se n∆o h† erros, ou CF ser† 1 e AX conter† o c¢digo de erro: 06H se o handle Ç inv†lido.
+
+Esta funá∆o atualiza o arquivo e libera o handle que estava usando.
+
+ FUNÄ«O 3FH
+
+Uso:
+
+Ler uma quantidade espec°fica de bytes de um arquivo aberto e armazen†-los
+num buffer espec°fico.
+
+
+			--------------- // ---------------
+                                   
+5.1.4.2.Interrupá∆o 10h
+
+Prop¢sito: Chamar uma diversidade de funá‰es do BIOS
+
+Sintaxe:
+
+Int 10H
+
+Esta interrupá∆o tem v†rias funá‰es, todas para entrada e sa°da de v°deo.
+Para acessar cada uma delas Ç necess†rio colocar o n£mero da funá∆o
+correspondente no registrador AH.
+
+Veremos apenas as funá‰es mais comuns da interrupá∆o 10H.
+
+Funá∆o 02H, seleciona a posiá∆o do cursor
+Funá∆o 09H, exibe um caracter e o atributo na posiá∆o do cursor
+Funá∆o 0AH, exibe um caracter na posiá∆o do cursor
+Funá∆o 0EH, modo alfanumÇrico de exibiá∆o de caracteres
+
+                                   
+
+Funá∆o 02h
+
+Uso:
+
+Move o cursor na tela do computador usando o modo texto.
+
+Registradores de chamada:
+
+AH = 02H
+
+BH = P†gina de v°deo onde o cursor est† posicionado.
+
+DH = linha
+
+DL = coluna
+
+Registradores de retorno:
+
+Nenhum.
+
+A posiá∆o do cursor Ç definida pelas suas coordenadas, iniciando-se na
+posiá∆o 0,0 atÇ a posiá∆o 79,24. Logo os valores poss°veis para os
+registradores DH e DL s∆o: de 0 a 24 para linhas e de 0 a 79 para colunas.
+
+                                   
+
+Funá∆o 09h
+
+Uso:
+
+Mostra um determinado caracter v†rias vezes na tela do computador com um
+atributo definido, iniciando pela posiá∆o atual do cursor.
+
+Registradores de chamada:
+
+AH = 09H
+AL = Caracter a exibir
+BH = P†gina de v°deo, onde o caracter ser† mostrado
+BL = Atributo do caracter
+CX = N£mero de repetiá‰es.
+
+Registradores de retorno:
+
+Nenhum
+
+Esta funá∆o mostra um caracter na tela v†rias vezes, de acordo com o n£mero
+especificado no registrador CX, mas sem mudar a posiá∆o do cursor na tela.
+
+                                   
+
+Funá∆o 0Ah
+
+Uso:
+
+Exibe um caracter na posiá∆o atual do cursor.
+
+Registradores de chamada:
+
+AH = 0AH
+AL = Caracter a exibir
+BH = P†gina de v°deo onde o caracter ser† exibido
+BL = Cor do caracter (apenas em modo gr†fico)
+CX = N£mero de repetiá‰es
+
+Registradores de retorno:
+
+Nenhum.
+
+A principal diferenáa entre esta funá∆o e a anterior Ç permitir mudanáa nos
+atributos, bem como mudar a posiá∆o do cursor.
+
+                                   
+
+Funá∆o 0EH
+
+Uso:
+
+Exibir um caracter na tela do computador atualizando a posiá∆o do cursor.
+
+Registradores de chamada:
+
+AH = 0EH
+AL = Caracter a exibir
+BH = P†gina de v°deo onde o caracter ser† exibido
+BL = Cor a usar (apenas em modo gr†fico)
+
+Registradores de retorno:
+
+Nenhum
+
+
+			--------------- // ---------------
+                                  
+5.1.4.3.Interrupá∆o 16H
+
+Veremos duas funá‰es da interrupá∆o 16H. A exemplo das demais interrupá‰es,
+usa-se o registrador AH para cham†-las.
+
+                                   
+
+Funá‰es da interrupá∆o 16h
+
+Funá∆o 00H, là um caracter do teclado.
+Funá∆o 01H, là o estado atual do teclado.
+
+Funá∆o 00H Uso:
+
+Ler um caracter do teclado.
+
+Registradores de chamada:
+
+AH = 00H
+
+Registradores de retorno:
+
+AH = C¢digo da tecla pressionada
+
+AL = Valor ASCII do caracter
+
+Quando se usa esta interrupá∆o, os programas executam atÇ que uma tecla seja
+pressionada. Se Ç um valor ASCII, Ç armazenado no registrador AH. Caso
+contr†rio, o c¢digo Ç armazenado no registrador AL e AH=0.
+
+Este valor de AL pode ser utilizado quando queremos detectar teclas que n∆o
+est∆o diretamente representadas pelo seu valor ASCII, tais como
+[ALT][CONTROL].
+
+                                   
+
+Funá∆o 01h
+
+Uso:
+
+Ler o estado do teclado
+
+Registradores de chamada:
+
+AH = 01H
+
+Registradores de retorno:
+
+Se o registrador de flag Ç zero, significa que h† informaá∆o no buffer de
+teclado na mem¢ria. Caso contr†rio, o buffer est† vazio. Portanto o valor do
+registrador AH ser† o valor da tecla armazenada no buffer.
+
+
+			--------------- // ---------------
+                                  
+5.1.4.4.Interrupá∆o 17H
+
+Prop¢sito: Manusear a entrada e sa°da da impressora.
+
+Sintaxe:
+
+Int 17H
+
+Esta interrupá∆o Ç usada para enviar caracteres, setar ou ler o estado de
+uma impressora.
+
+     Funá‰es da interrupá∆o 17h
+
+          Funá∆o 00H, imprime um valor ASCII
+          Funá∆o 01H, seta a impressora
+          Funá∆o 02H, là estado da impressora
+
+Funá∆o 00H
+
+Uso:
+
+Imprimir um caracter numa impressora.
+
+Registradores de chamada:
+
+     AH = 00H
+     AL = Caracter a imprimir
+     DX = Porta de conex∆o
+
+Registradores de retorno:
+
+     AH = Estado da impressora
+
+Os valores da porta a colocar no registrador DX s∆o:
+
+LPT1 = 0, LPT2 = 1, LPT3 = 2 ...
+
+O estado da impressora Ç codificado bit a bit como segue:
+
+     BIT 1/0 SIGNIFICADO
+     ----------------------------------------
+     0 1 Estado de time-out
+     1 -
+     2 -
+     3 1 Erro de entrada e sa°da
+     4 1 Impressora selecionada
+     5 1 Fim de papel
+     6 1 Reconhecimento de comunicaá∆o
+     7 1 A impressora est† pronta para o uso
+
+Os bits 1 e 2 bits n∆o s∆o relevantes
+
+A maioria dos BIOS suportam 3 portas paralelas, havendo alguns que suportam
+4.
+
+Funá∆o 01h
+
+Uso:
+
+Setar uma porta paralela.
+
+Registradores de chamada:
+
+     AH = 01H
+     DX = Porta
+
+Registradores de retorno:
+
+     AH = Status da impressora
+
+A porta definida no registrador DX pode ser: LPT1=0, LPT2=1, assim por
+diante.
+
+O estado da impressora Ç codificado bit a bit como segue:
+
+     BIT 1/0 SIGNIFICADO
+     ----------------------------------------
+     0 1 Estado de time-out
+     1 -
+     2 -
+     3 1 Erro de entrada e sa°da
+     4 1 Impressora selecionada
+     5 1 Fim de papel
+     6 1 Reconhecimento de comunicaá∆o
+     7 1 A impressora est† pronta para o uso
+
+Os bits 1 e 2 bits n∆o s∆o relevantes
+
+Funá∆o 02h
+
+Uso:
+
+Obter o status da impressora.
+
+Registradores de chamada:
+
+     AH = 01H
+     DX = Porta
+
+Registradores de retorno
+
+     AH = Status da impressora
+
+A porta definida no registrador DX pode ser: LPT1=0, LPT2=1, assim por
+diante.
+
+O estado da impressora Ç codificado bit a bit como segue:
+
+     BIT 1/0 SIGNIFICADO
+     ----------------------------------------
+     0 1 Estado de time-out
+     1 -
+     2 -
+     3 1 Erro de entrada e sa°da
+     4 1 Impressora selecionada
+     5 1 Fim de papel
+     6 1 Reconhecimento de comunicaá∆o
+     7 1 A impressora est† pronta para o uso
+
+Os bits 1 e 2 bits n∆o s∆o relevantes
+
+
+
+			--------------- // ---------------
+                               
+5.2. Gerenciamento de Arquivos
+                                   
+Conte£do:
+
+5.2.1.Modos de trabalhar com arquivos
+5.2.2.MÇtodo FCB
+5.2.3.MÇtodos de canais de comunicaá∆o
+                                   
+
+5.2.1.Modos de trabalhar com arquivos.
+
+H† dois modos de trabalhar com arquivos. O primeiro Ç atravÇs de FCB (
+blocos de controle de arquivo), o segundo Ç atravÇs de canais de
+comunicaá∆o, tambÇm conhecidos como handles.
+
+O primeiro modo de manusear arquivos tem sido usado desde o sistema
+operacional CPM, predecessor do DOS, logo permite certas compatibilidades
+com muitos arquivos velhos do CPM bem como com a vers∆o 1.0 do DOS, alÇm
+deste mÇtodo permitir-nos ter um n£mero ilimitado de arquivos abertos ao
+mesmo tempo. Se vocà quiser criar um volume para o disco, a £nica forma Ç
+atravÇs deste mÇtodo.
+
+Depois de considerarmos as vantagens de FCB, o uso do mÇtodo de Canais de
+Comunicaá∆o Ç muito simples e permite-nos um melhor manuseio de erros.
+
+Para uma melhor facilidade, daqui por diante nos referiremos aos Blocos de
+Controle de Arquivo como FCBs e aos Canais de Comunicaá∆o como handles.
+
+
+			--------------- // ---------------
+                                 
+5.2.2.MÇtodo FCB.
+
+5.2.2.1.Introduá∆o
+5.2.2.2.Abertura de arquivo
+5.2.2.3.Criar um novo arquivo
+5.2.2.4.Escrita seqÅencial
+5.2.2.5.Leitura seqÅencial
+5.2.2.6.Leitura e escrita randìmica
+5.2.2.7.Fechar um arquivo
+
+
+			--------------- // ---------------
+
+5.2.2.1.INTRODUÄ«O
+
+H† dois tipos de FCB, o normal, cujo comprimento Ç 37 bytes, e o extendido,
+com 44 bytes. Neste tutorial iremos assumir o primeiro, ou seja, quando
+falarmos em FCB, estaremos fazendo referància ao tipo normal (37 bytes).
+
+O FCB Ç composto de informaá‰es dadas pelo programador e por informaá‰es que
+ele toma diretamente do sistema operacional. Quando estes tipos de arquivos
+s∆o usados, s¢ Ç poss°vel se trabalhar no diret¢rio corrente, pois FCBs n∆o
+fornecem suporte ao sistema de organizaá∆o de arquivos atravÇs de diret¢rios
+do DOS.
+
+FCB Ç composto pelos seguintes campos:
+
+  POSIÄ«O    COMPRIMENTO   SIGNIFICADO
+    00H         1 Byte       Drive
+    01H         8 Bytes      Nome do arquivo
+    09H         3 Bytes      Extens∆o
+    0CH         2 Bytes      N£mero do bloco
+    0EH         2 Bytes      Tamanho do registro
+    10H         4 Bytes      Tamanho do arquivo
+    14H         2 Bytes      Data de criaá∆o
+    16H         2 Bytes      Hora de criaá∆o
+    18H         8 Bytes      Reservado
+    20H         1 Bytes      Registro corrente
+    21H         4 Bytes      Registro randìmico
+
+Para selecionar o drive de trabalho, assuma: drive A = 1; drive B = 2; etc.
+Se for usado 0, o drive que est† sendo usado no momento ser† tomado como
+opá∆o.
+
+O nome do arquivo deve ser justificado Ö esquerda e Ç necess†rio preencher
+com espaáos os bytes remanescentes, a extens∆o Ç colocada do mesmo modo.
+
+O bloco corrente e o registro corrente dizem ao computador que registro ser†
+acessado nas operaá‰es de leitura e escrita. Um bloco Ç um grupo de 128
+registros. O primeiro bloco de arquivo Ç o bloco 0. O primeiro registro Ç o
+registro 0, logo o £ltimo registro do primeiro bloco deve ser o 127, uma vez
+que a numeraá∆o Ç iniciada com 0 e o bloco pode conter 128 registradores no
+total.
+
+			--------------- // ---------------
+                                
+5.2.2.2.ABERTURA DE ARQUIVO
+
+Para abrir um arquivo FCB Ç usada a funá∆o 0FH da interrupá∆o 21h.
+A unidade, o nome e a extens∆o do arquivo devem ser inicializadas antes da
+abertura.
+
+O registrador DX deve apontar para o bloco. Se o valor FFH Ç retornado no
+registrador AH quando da chamada da interrupá∆o, ent∆o o arquivo n∆o foi
+encontrado. Se tudo der certo, o valor 0 Ç retornado.
+
+Se o arquivo Ç aberto, ent∆o o DOS inicializa o bloco corrente em 0, o
+tamanho do registro para 128 bytes. O tamanho do arquivo e a sua data s∆o
+preenchidos com as informaá‰es encontradas no diret¢rio.
+
+			--------------- // ---------------
+                                  
+5.2.2.3.CRIAR UM NOVO ARQUIVO
+
+Para a criaá∆o de arquivos Ç usada a funá∆o 16H da interrupá∆o 21h.
+
+O registrador DX deve apontar para uma estrutura de controle cujo os
+requisitos s∆o de que pelo menos a unidade l¢gica, o nome e a extens∆o do
+arquivo sejam definidas.
+
+Caso ocorra problema, o valor FFH deve retornar em AL, de outra forma este
+registrador conter† o valor 0.
+
+			--------------- // ---------------
+                                  
+5.2.2.4.ESCRITA SEQöENCIAL
+
+Antes de conseguirmos realizar escrita para o disco, Ç necess†rio definir a
+†rea de transferància de dados usando, para tanto, a funá∆o 1AH da
+interrupá∆o 21h.
+
+A funá∆o 1AH n∆o retorna qualquer estado do disco nem da operaá∆o. Mas a
+funá∆o 15H, que usaremos para escrever para o disco, faz isso no registrador
+AL. Se este for igual a zero, ent∆o n∆o h† erro e os campos de registro
+corrente e de bloco s∆o atualizados.
+
+                                   
+			--------------- // ---------------
+
+5.2.2.5.LEITURA SEQöENCIAL
+
+Antes de tudo, devemos definir a †rea de transferància de arquivo ou DTA.
+Para a leitura seqÅencial usaremos a funá∆o 14H da interrupá∆o 21h.
+
+O registro a ser lido Ç definido pelos campos registro e bloco corrente. O
+registrador AL retorna o estado da operaá∆o. Se AL contÇm o valor 1 ou 3,
+significa que foi atingido o fim do arquivo. Um valor 2, por sua vez,
+significa que o FCB est† estruturado erroneamente.
+
+Caso n∆o ocorra erro, AL conter† o valor 0 e os campos de registro e bloco
+corrente s∆o atualizados.
+
+			--------------- // ---------------
+                                   
+5.2.2.6.LEITURA E ESCRITA RAND‚MICA
+
+A funá∆o 21H e a funá∆o 22H da insterrupá∆o 21h s∆o usadas Ö realizaá∆o,
+respectivamente, da escrita e leitura randìmica.
+
+O n£mero de registro randìmico e o bloco corrente s∆o usados para calcular a
+posiá∆o relativa do registro a ser lido ou escrito.
+
+O registrador AL retorna a mesma informaá∆o do que par a escrita e leitura
+seqÅencial. A informaá∆o a ser lida ser† retornada na †rea de transferància
+do disco, bem como a informaá∆o a ser escrita retorna na DTA.
+
+			--------------- // ---------------
+                                   
+5.2.2.7.FECHAR UM ARQUIVO
+
+Para fechar um arquivo usamos a funá∆o 10H da interrupá∆o 21h.
+
+Se ap¢s invocar esta funá∆o, o regisatrador AL conter o valor FFH, significa
+que o arquivo foi mudado de posiá∆o, o disco foi mudado ou h† erro de acesso
+a disco.
+
+			--------------- // ---------------
+                                 
+5.2.3.Canais de comunicaá∆o.
+
+5.2.3.1.Trabalhando com handles
+5.2.3.2.Funá‰es para usar handles
+
+                                   
+5.2.3.1.TRABALHANDO COM HANDLES
+
+O uso de handles para gerenciar arquivos traz grandes facilidades na criaá∆o
+de arquivos e o programador pode concentrar-se em outros aspectos da
+programaá∆o sem preocupar-se com detalhes que podem ser manuseados pelo
+sistema operacional.
+
+A facilidade dos handles consiste em que para operarmos sobre um arquivo Ç
+apenas necess†rio definirmos o nome do mesmo e o n£mero de handle a usar,
+todo o resto da informaá∆o Ç manuseada internamente pelo DOS.
+
+Quando usamos este mÇtodo para trabalhar com arquivos, n∆o h† distiná∆o
+entre acesso seqÅencial ou randìmico, o arquivo Ç simplesmente tomado como
+uma rede de bytes.
+
+			--------------- // ---------------
+                                  
+5.2.3.2.FUNÄÂES PARA USAR HANDLES
+
+As funá‰es usadas para o manuseio de arquivos atravÇs de handles s∆o
+descritas na p†gina sobre: Interrupá‰es, na seá∆o dedicada Ö interrupá∆o 21h.
+        
+
+*****************************************************************************
+
+                       CAP÷TULO 6: MACROS E PROCEDIMENTOS
+
+Conte£do
+
+6.1.Procedimentos
+6.2.Macros
+
+                                 
+6.1.Procedimentos
+
+6.1.1.Definiá∆o de procedimento
+6.1.2.Sintaxe de um procedimento
+
+			--------------- // ---------------
+                              
+6.1.1.Definiá∆o de um procedimento
+
+Um procedimento Ç uma coleá∆o de instruá‰es para as quais Ç poss°vel
+direcionar o curso de nosso programa, e uma vez que a execuá∆o destas
+instruá‰es do procedimento tenha acabado, o controle retorna para linha que
+segue Ö que chamou o procedimento.
+
+Procedimentos nos ajudam a criar programas leg°veis e f†ceis de modificar.
+
+Quando se invoca um procedimento, o endereáo da pr¢xima instruá∆o do
+programa Ç mantido na pilha, de onde Ç recuperado quando do retorno do
+procedimento.
+
+			--------------- // ---------------
+                          
+6.1.2.Sintaxe de um procedimento
+
+H† dois tipos de procedimentos, os intrasegments, que se localizam no mesmo
+segmento da instruá∆o que o chama, e os inter segments, que podem se
+localizar em diferentes segmentos de mem¢ria.
+
+Quando os procedimentos intrasegments s∆o usados, o valor de IP Ç armazenado
+na pilha e quando os procedimentos inter segments s∆o usados o valor de
+CS:IP Ç armazenado. Lembre-se que o registrador CS indica qual o segmento de
+c¢digo.
+
+A diretiva que chama um procedimento Ç como segue:
+
+CALL NomedoProcedimento
+
+As partes que comp‰em um procedimento s∆o as seguintes:
+
+Declaraá∆o do procedimento
+C¢digo do procedimento
+Diretiva de retorno
+TÇrmino do procedimento
+
+Por exemplo, se quisermos uma rotina que soma dois bytes armazenados em AH e
+AL, e o resultado da soma em BX:
+
+Soma Proc Near    ; Declaraá∆o do Procedimento
+Mov BX, 0         ; Conte£do do Procedimento...
+Mov BL, AH
+Mov AH, 00
+Add BX, AX
+Ret               ; Diretiva de retorno
+Soma EndP         ; Fim do Procedimento
+
+Na declaraá∆o, a primeira palavra, Soma, corresponde ao nome do
+procedimento. Proc declara-o e a palavra Near indica que o procedimento Ç do
+tipo intrasegment, ou seja, no mesmo segmento. A diretiva Ret carrega IP com
+o endereáo armazenado na pilha para retornar ao programa que chamou.
+Finalmente, Soma EndP indica o fim do procedimento.
+
+Para declarar um procedimento inter segment, basta substituir a palavra Near
+para FAR.
+
+A chamada deste procedimento Ç feito de modo idàntico:
+
+Call Soma
+
+Macros oferecem uma grande flexibilidade na programaá∆o, comparadas aos
+procedimentos.
+
+			--------------- // ---------------
+                                 
+6.2.Macros
+
+6.2.1.Definiá∆o de uma Macro
+6.2.2.Sintaxe de uma Macro
+6.2.3.Bibliotecas de Macros
+
+
+6.2.1.Definiá∆o de uma Macro
+
+Uma macro Ç um grupo de instruá‰es repetitivas em um programa que s∆o
+codificadas apenas uma vez e, assim, poupam espaáo, podendo ser utilizadas
+tantas vezes quantas forem necess†rio.
+
+A principal diferenáa entre uma macro e um procedimento Ç que numa macro Ç
+poss°vel a passagem de parÉmetros e num procedimento n∆o. No momento em que
+a macro Ç executada, cada parÉmetro Ç substitu°do pelo nome ou valor
+especificado na hora da chamada.
+
+Podemos dizer, desta forma, que um procedimento Ç uma extens∆o de um
+determinado programa, enquanto que uma macro Ç um m¢dulo que especifica
+funá‰es que podem ser utilizadas por diferentes programas.
+
+Uma outra diferenáa entre uma macro e um procedimento Ç o modo de chamada de
+cada um. Para chamar um procedimento, se faz necess†rio a diretiva CALL, por
+outro lado, para chamada de macros Ç feita com se fosse uma instruá∆o normal
+da linguagem assembly.
+
+			--------------- // ---------------
+
+6.2.2.Sintaxe de uma Macro
+
+As partes que comp‰em uma macro s∆o as seguintes:
+
+Declaraá∆o da macro
+C¢digo da macro
+Diretiva de tÇrmino da macro
+
+A declaraá∆o da macro Ç feita como se segue:
+
+NomeMacro MACRO [parÉmetro1, parÉmetro2...]
+
+Do mesmo modo que temos a funcionalidade dos parÉmetros, Ç poss°vel tambÇm a
+criaá∆o de uma macro que n∆o os possua.
+
+A diretiva de tÇrmino da macro Ç: ENDM
+
+Um exemplo de uma macro para colocar o cursor numa determinada posiá∆o da
+tela:
+
+Pos MACRO  Linha, Coluna
+  PUSH AX
+  PUSH BX
+  PUSH DX
+  MOV AH, 02H
+  MOV DH, Linha
+  MOV DL, Coluna
+  MOV BH, 0
+  INT 10H
+  POP DX
+  POP BX
+  POP AX
+ENDM
+
+Para usar uma macro basta cham†-la pelo seu nome, tal como se fosse qualquer
+instruá∆o na linguagem assembly:
+
+Pos 8, 6
+
+			--------------- // ---------------
+                                
+6.2.3.Biblioteca de Macros
+
+Uma das facilidades oferecidas pelo uso de macros Ç a criaá∆o de
+bibliotecas, que s∆o grupo de macros, podendo ser inclu°das num programa
+origin†rias de arquivos diferentes.
+
+A criaá∆o destas bibliotecas Ç muito simples. Criamos um arquivo com todas
+as macros que ser∆o necess†rias e o salvamos como um arquivo texto.
+
+Para incluir uma biblioteca num programa, basta colocar a seguinte instruá∆o
+Include NomedoArquivo na parte inicial do programa, antes da declaraá∆o do
+modelo de mem¢ria.
+
+Supondo que o arquivo de macros tenha sido salvo com o nome de MACROS.TXT, a
+instruá∆o Include seria utilizada do seguinte modo:
+
+  ;In°cio do programa
+        Include MACROS.TXT
+        .MODEL SMALL
+        .DATA
+          ;Os dados v∆o aqui
+        .CODE
+        Inicio:
+          ;O c¢digo do programa comeáa aqui
+        .STACK
+          ;A pilha Ç declarada
+        End Inicio
+          ;Fim do programa
+
+
+*****************************************************************************
+
+                           CAP÷TULO 7: EXEMPLOS DE PROGRAMAS
+                           
+                               
+Conte£do:
+
+7.1.Exemplos de Programas com Debug
+7.2.Exemplos de Programas com TASM                         
+
+			--------------- // ---------------
+
+7.1.Exemplos de Programas com Debug
+
+Nesta seá∆o forneceremos alguns programas feitos no debug do DOS.
+Vocà pode executar cada programa assembly usando o comando "g" (go), para
+ver o que cada programa faz.
+
+Procedimento
+
+Primeiro passo
+
+Carregar o programa exemplo
+
+Por exemplo:
+
+C:\>debug
+-n one.com
+-l
+-u 100 109
+0D80:0100 B80600        MOV     AX,0006
+0D80:0103 BB0400        MOV     BX,0004
+0D80:0106 01D8          ADD     AX,BX
+0D80:0108 CD20          INT     20
+-
+
+Nota:
+
+-n one.com
+
+Dar nome ao programa a ser carregado
+
+-l
+
+Carreg†-lo
+
+-u 100 109
+
+Desmontar o c¢digo do endereáo inicial ao final especificado
+
+Segundo passo
+
+Digite o comando g
+Por exemplo:
+
+-g
+
+Program terminated normally
+-
+
+                                   
+
+Exemplos de programas no Debug
+
+Primeiro exemplo
+
+-a0100
+297D:0100     MOV     AX,0006    ;P‰e o valor 0006 no registrador AX
+297D:0103     MOV     BX,0004    ;P‰e o valor 0004 no registrador BX
+297D:0106     ADD     AX,BX      ;Adiciona BX ao conte£do de AX
+297D:0108     INT     20         ;Finaliza o Programa
+
+A £nica coisa que este programa faz Ç salvar dois valores em dois
+registradores e adicionar o valor de um ao outro.
+
+Segundo exemplo
+
+- a100
+0C1B:0100 jmp 125 ;Salta para o endereáo 125h
+0C1B:0102 [Enter]
+- e 102  'Hello, How are you ?' 0d 0a '$'
+- a125
+0C1B:0125 MOV DX,0102 ;Copia a string para registrador DX
+0C1B:0128 MOV CX,000F ;Quantas vezes a string ser† mostrada
+0C1B:012B MOV AH,09   ;Copia o valor 09 para registrador AH
+0C1B:012D INT 21      ;Mostra a string
+0C1B:012F DEC CX      ;Subtrai 1 de CX
+0C1B:0130 JCXZ 0134   ;Se CX Ç igual a 0 salta para o endereáo 0134
+0C1B:0132 JMP 012D    ;Salta ao endereáo 012D
+0C1B:0134 INT 20      ;Finaliza o programa
+
+Este programa mostra 15 vezes na tela a string de caracteres.
+
+Terceiro exemplo
+
+-a100
+297D:0100       MOV     AH,01    ;Funá∆o para mudar o cursor
+297D:0102       MOV     CX,0007  ;Formata o cursor
+297D:0105       INT     10       ;Chama interrupá∆o do BIOS
+297D:0107       INT     20       ;Finaliza o programa
+
+Este programa muda o formato do cursor.
+
+Quarto exemplo
+
+-a100
+297D:0100       MOV     AH,01    ;Funá∆o 1 (là caractere do teclado)
+297D:0102       INT     21       ;Chama interrupá∆o do DOS
+297D:0104       CMP     AL,0D    ;Compara se o caractere lido Ç um ENTER
+297D:0106       JNZ     0100     ;Se n∆o Ç, là um outro caractere
+297D:0108       MOV     AH,02    ;Funá∆o 2 (escreve um caractere na tela)
+297D:010A       MOV     DL,AL    ;Character to write on AL
+297D:010C       INT     21       ;Chama interrupá∆o do DOS
+297D:010E       INT     20       ;Finaliza o programa
+
+Este programa usa a interrupá∆o 21h do DOS. Usa duas funá‰es da mesma: a
+primeira là um caractere do teclado (funá∆o 1) e a segundo escreve um
+caractere na tela. O programa là caracteres do teclado atÇ encontrar um
+ENTER.
+
+Quinto exemplo
+
+-a100
+297D:0100       MOV     AH,02     ;Funá∆o 2 (escreve um caractere na tela)
+297D:0102       MOV     CX,0008   ;P‰e o valor 0008 no registrador CX
+297D:0105       MOV     DL,00     ;P‰e o valor 00 no registrador DL
+297D:0107       RCL     BL,1      ;Rotaciona o byte em BL um bit para a esquerda
+297D:0109       ADC     DL,30     ;Converte o registrador de flag para 1
+297D:010C       INT     21        ;Chama interrupá∆o do DOS
+297D:010E       LOOP    0105      ;Salta se CX > 0 para o endereáo 0105
+297D:0110       INT     20        ;Finaliza o programa
+
+Este programa mostra na tela um n£mero bin†rio atravÇs de um ciclo
+condicional (LOOP) usando a rotaá∆o do byte.
+
+Sexto exemplo
+
+-a100
+297D:0100       MOV     AH,02     ;Funá∆o 2 (escreve um caractere na tela)
+297D:0102       MOV     DL,BL     ;P‰e o valor de BL em DL
+297D:0104       ADD     DL,30     ;Adiciona o valor 30 a DL
+297D:0107       CMP     DL,3A     ;Compara o valor 3A com o conte£do de DL sem afet†-lo
+                                  ;seu valor apenas modifica o estado do flag de carry
+297D:010A       JL      010F      ;salta ao endereáo 010f, se for menor
+297D:010C       ADD     DL,07     ;Adiciona o valor 07 a DL
+297D:010F       INT     21        ;Chama interrupá∆o do DOS
+297D:0111       INT     20        ;Finaliza o programa
+
+Este programa imprime um valor zero em d°gitos hexadecimais.
+
+SÇtimo exemplo
+
+-a100
+297D:0100       MOV     AH,02    ;Funá∆o 2 (escreve um caractere na tela)
+297D:0102       MOV     DL,BL    ;P‰e o valor de BL em DL
+297D:0104       AND     DL,0F    ;Transporta fazendo AND dos n£meros bit a bit
+297D:0107       ADD     DL,30    ;Adiciona 30 a Dl
+297D:010A       CMP     DL,3A    ;Compara Dl com 3A
+297D:010D       JL      0112     ;Salta ao endereáo 0112, se menor
+297D:010F       ADD     DL,07    ;Adiciona 07 a DL
+297D:0112       INT     21       ;Chama interrupá∆o do DOS
+297D:0114       INT     20       ;Finaliza o programa
+
+Este programa Ç usado para imprimir dois d°gitos hexadecimais.
+
+Oitavo exemplo
+
+-a100
+297D:0100     MOV     AH,02    ;Funá∆o 2 (escreve um caractere na tela)
+297D:0102     MOV     DL,BL    ;P‰e o valor de BL em DL
+297D:0104     MOV     CL,04    ;P‰e o valor 04 em CL
+297D:0106     SHR     DL,CL    ;Desloca os 4 bits mais altos do n£mero ao nibble mais Ö direita
+297D:0108     ADD     DL,30    ;Adiciona 30 a DL
+297D:010B     CMP     DL,3A    ;Compara Dl com 3A
+297D:010E     JL      0113     ;Salta ao endereáo 0113, se menor
+297D:0110     ADD     DL,07    ;Adiciona 07 a DL
+297D:0113     INT     21       ;Chama interrupá∆o do DOS
+297D:0115     INT     20       ;Finaliza o programa
+
+Este programa imprime o primeiro de dois d°gitos hexadecimais.
+
+Nono exemplo
+
+-a100
+297D:0100     MOV     AH,02   ;Funá∆o 2 (escreve um caractere na tela)
+297D:0102     MOV     DL,BL   ;P‰e o valor de BL em DL
+297D:0104     MOV     CL,04   ;P‰e o valor 04 em CL
+297D:0106     SHR     DL,CL   ;Desloca os 4 bits mais altos do n£mero ao nibble mais Ö direita
+297D:0108     ADD     DL,30   ;Adiciona 30 a DL
+297D:010B     CMP     DL,3A   ;Compara Dl com 3A
+297D:010E     JL      0113    ;Salta ao endereáo 0113, se menor
+297D:0110     ADD     DL,07   ;Adiciona 07 a DL
+297D:0113     INT     21      ;Chama interrupá∆o do DOS
+297D:0115     MOV     DL,BL   ;P‰e o valor de BL em DL
+297D:0117     AND     DL,0F   ;Transporta fazendo AND dos n£meros bit a bit
+297D:011A     ADD     DL,30   ;Adiciona 30 a DL
+
+297D:011D     CMP     DL,3A   ;Compara Dl com 3A
+297D:0120     JL      0125    ;Salta ao endereáo 0125, se menor
+297D:0122     ADD     DL,07   ;Adiciona 07 a DL
+297D:0125     INT     21      ;Chama interrupá∆o do DOS
+297D:0127     INT     20      ;Finaliza o programa
+
+Este programa imprime o segundo de dois d°gitos hexadecimais.
+
+DÇcimo exemplo
+
+-a100
+297D:0100      MOV     AH,01   ;Funá∆o 1 (là caractere do teclado)
+297D:0102      INT     21      ;Chama interrupá∆o do DOS
+297D:0104      MOV     DL,AL   ;P‰e o valor de AL em DL
+297D:0106      SUB     DL,30   ;Subtrai 30 de DL
+297D:0109      CMP     DL,09   ;Compara DL com 09
+297D:010C      JLE     0111    ;Salta ao endereáo 0111, se menor ou igual
+297D:010E      SUB     DL,07   ;Subtrai 07 de DL
+297D:0111      MOV     CL,04   ;P‰e o valor 04 em CL
+297D:0113      SHL     DL,CL   ;Insere zeros Ö direita
+297D:0115      INT     21      ;Chama interrupá∆o do DOS
+297D:0117      SUB     AL,30   ;Subtrai 30 de AL
+297D:0119      CMP     AL,09   ;Compara AL com 09
+297D:011B      JLE     011F    ;Salta ao endereáo 011f, se menor ou igual
+297D:011D      SUB     AL,07   ;Subtrai 07 de AL
+297D:011F      ADD     DL,AL   ;Adiciona AL a DL
+297D:0121      INT     20      ;Finaliza o programa
+
+Este programa pode ler dois d°gitos hexadecimais.
+
+DÇcimo primeiro exemplo
+
+-a100
+297D:0100     CALL    0200   ;Chama um procedimento
+297D:0103     INT     20     ;Finaliza o programa
+
+-a200
+297D:0200     PUSH    DX     ;P‰e o valor de DX na pilha
+297D:0201     MOV     AH,08  ;Funá∆o 8
+297D:0203     INT     21     ;Chama interrupá∆o do DOS
+297D:0205     CMP     AL,30  ;Compara AL com 30
+297D:0207     JB      0203   ;Salta se CF Ç ativado ao endereáo 0203
+297D:0209     CMP     AL,46  ;Compara AL com 46
+297D:020B     JA      0203   ;Salta ao endereáo 0203, se diferente
+297D:020D     CMP     AL,39  ;Compara AL com 39
+297D:020F     JA      021B   ;Salta ao endereáo 021B, se diferente
+297D:0211     MOV     AH,02  ;Funá∆o 2 (escreve um caractere na tela)
+297D:0213     MOV     DL,AL  ;P‰e o valor de AL em DL
+297D:0215     INT     21     ;Chama interrupá∆o do DOS
+297D:0217     SUB     AL,30  ;Subtrai 30 de AL
+297D:0219     POP     DX     ;Extrai o valor de DX da pilha
+297D:021A     RET            ;Retorna o controle ao programa principal
+297D:021B     CMP     AL,41  ;Compara AL com 41
+297D:021D     JB      0203   ;Salta se CF Ç ativado ao endereáo 0203
+297D:021F     MOV     AH,02  ;Funá∆o 2 (escreve um caractere na tela)
+297D:022      MOV     DL,AL  ;P‰e o valor AL em DL
+297D:0223     INT     21     ;Chama interrupá∆o do DOS
+297D:0225     SUB     AL,37  ;Subtrai 37 de AL
+297D:0227     POP     DX     ;Extrai o valor de DX da pilha
+297D:0228     RET            ;Retorna o controle ao programa principal
+
+Este programa se mantÇm lendo caracteres atÇ receber um que possa ser
+convertido para um n£mero hexadecimal.
+
+
+			--------------- // ---------------
+
+7.2.Exemplos de Programas com TASM                         
+
+Nesta seá∆o forneceremos a vocà v†rios exemplos de programas a serem
+montados fazendo uso do TASM da Borland.
+
+Procedimento:
+
+Para mont†-los, siga os seguintes passos:
+
+Primeiro passo
+
+Montar o programa
+Por exemplo:
+
+C:\>tasm one.asm
+Turbo Assembler  Version 2.0  Copyright (c) 1988, 1990 Borland International
+
+Assembling file:   one.asm
+Error messages:    None
+Warning messages:  None
+Passes:            1
+Remaining memory:  471k
+
+C:\>
+
+Isto criar† um programa objeto com o mesmo nome do fonte, neste caso:
+one.obj
+
+Segundo passo
+
+Criar o programa execut†vel
+Por exemplo:
+
+C:\>tlink one.obj
+Turbo Link  Version 3.0 Copyright (c) 1987, 1990 Borland International
+
+C:\>
+
+Isto cria o programa execut†vel com o mesmo nome do objeto e com extens∆o
+diferente, one.exe
+
+Terceiro passo
+
+Rodar o programa execut†vel. Basta digitar o nome do programa criado.
+
+                                   
+
+Exemplos de Programas Assembly
+
+Primeiro exemplo
+
+;nome do programa: one.asm
+;
+.model small
+.stack
+.code
+   mov AH,1h       ;Funá∆o 1 do DOS
+   Int 21h         ;là o caracter e returna o c¢digo ASCII ao registrador AL
+   mov DL,AL       ;move o c¢digo ASCII para o registrador DL
+   sub DL,30h      ;subtrai de 30h para converter a um d°gito de 0 a 9
+   cmp DL,9h       ;compara se o d°gito est† entre 0 e 9
+   jle digit1      ;se verdadeiro obtÇm o primeiro n£mero (4 bits)
+   sub DL,7h       ;se falso, subtrai de 7h para converter a uma letra A-F
+digit1:
+   mov CL,4h       ;prepara para multiplicar por 16
+   shl DL,CL       ;multiplica para converter dentro dos 4 bits mais altos
+   int 21h         ;obtÇm o pr¢ximo caracter
+   sub AL,30h      ;repete a operaá∆o de convers∆o
+   cmp AL,9h       ;compara o valor 9h com o conte£do do registrador AL
+   jle digit2      ;se verdadeiro, obtÇm o segundo d°gito
+   sub AL,7h       ;se falso, subtrai de 7h
+digit2:
+   add DL,AL       ;adiciona o segundo d°gito
+   mov AH,4Ch      ;funá∆o 4Ch do DOS (exit)
+   Int 21h         ;interrupá∆o 21h
+   End             ;finaliza o programa
+
+Este programa là dois caracteres e os imprime na tela
+
+Segundo exemplo
+
+;nome do programa: two.asm
+.model small
+.stack
+.code
+PRINT_A_J       PROC
+     MOV DL,'A'      ;move o character A para o registrador DL
+     MOV CX,10       ;move o valor decimal 10 para o registrador CX
+                     ;este valor Ç usado para fazer laáo com 10 interaá‰es
+PRINT_LOOP:
+     CALL WRITE_CHAR ;Imprime o caracter em DL
+     INC DL          ;Incrementa o valor do registrador DL
+     LOOP PRINT_LOOP ;Laáo para imprimir 10 caracteres
+     MOV AH,4Ch      ;Funá∆o 4Ch, para sair ao DOS
+     INT 21h         ;Interrupá∆o 21h
+PRINT_A_J       ENDP ;Finaliza o procedimento
+
+WRITE_CHAR      PROC
+     MOV AH,2h       ;Funá∆o 2h, imprime caracter
+     INT 21h         ;Imprime o caracter que est† em DL
+     RET             ;Retorna o controle ao procedimento que chamou
+WRITE_CHAR      ENDP ;Finaliza o procedimento
+     END  PRINT_A_J  ;Finaliza o programa
+
+Este programa mostra os caracteres ABCDEFGHIJ na tela.
+
+Terceiro exemplo
+
+;nome do programa: three.asm
+.model small
+.STACK
+.code
+
+TEST_WRITE_HEX    PROC
+      MOV DL,3Fh      ;Move o valor 3Fh para o registrador DL
+      CALL WRITE_HEX  ;Chama a sub-rotina
+      MOV AH,4CH      ;Funá∆o 4Ch
+      INT 21h         ;Retorna o controle ao DOS
+TEST_WRITE_HEX ENDP   ;Finaliza o procedimento
+
+      PUBLIC WRITE_HEX
+;........................................................;
+;Este procedimento converte para hexadecimal o byte      ;
+;armazenado no registrador DL e mostra o d°gito          ;
+;Use:WRITE_HEX_DIGIT                                     ;
+;........................................................;
+
+WRITE_HEX    PROC
+      PUSH CX        ;coloca na pilha o valor do registrador CX
+      PUSH DX        ;coloca na pilha o valor do registrador DX
+      MOV DH,DL      ;move o valor do registrador DL para o registrador DH
+      MOV CX,4       ;move o valor 4 para o registrador CX
+      SHR DL,CL
+CALL WRITE_HEX_DIGIT ;mostra na tela o primeiro n£mero hexadecimal
+      MOV DL,DH      ;move o valor do registrador DH para o registrador DL
+      AND DL,0Fh
+CALL WRITE_HEX_DIGIT ;mostra na tela o segundo n£mero hexadecimal
+      POP DX         ;retira da pilha o valor do registrador DX
+      POP CX         ;retira da pilha o valor do registrador CX
+      RET            ;Retorna o controle ao procedimento que chamou
+WRITE_HEX  ENDP
+
+      PUBLIC WRITE_HEX_DIGIT
+;......................................................................;
+;Este procediento converte os 4 bits mais baixos do registrador DL     ;
+;para um n£mero hexadecimal e o mostrana tela do computador            ;
+;Use: WRITE_CHAR                                                       ;
+;......................................................................;
+
+WRITE_HEX_DIGIT    PROC
+      PUSH DX               ;coloca na pilha o valor de DX
+      CMP DL,10             ;compara se o n£mero de bits Ç menor do que 10
+      JAE HEX_LETTER        ;se n∆o, salta para HEX_LETER
+      ADD DL,"0"            ;se sim, converte para n£mero
+      JMP Short WRITE_DIGIT ;escreve o caracter
+HEX_LETTER:
+      ADD DL,"A"-10         ;converte um caracter para hexadecimal
+WRITE_DIGIT:
+      CALL WRITE_CHAR       ;imprime o caracter na tela
+      POP DX                ;Retorna o valor inicial do registrador DX
+                            ;para o registrador DL
+      RET                   ;Retorna o controle ao procedimento que chamou
+WRITE_HEX_DIGIT   ENDP
+
+      PUBLIC WRITE_CHAR
+;......................................................................;
+;Este procedimento imprime um caracter na tela usando o D.O.S.         ;
+;......................................................................;
+
+WRITE_CHAR   PROC
+      PUSH AX       ;Coloca na pilha o valor do registarador AX
+      MOV AH,2      ;Funá∆o 2h
+      INT 21h       ;Interrupá∆o 21h
+      POP AX        ;Extrai da pilha o valor de AX
+      RET           ;Retorna o controle ao procedimento que chamou
+WRITE_CHAR   ENDP
+
+      END TEST_WRITE_HEX ;Finaliza o programa
+
+Quarto exemplo
+
+;nome do programa: four.asm
+.model small
+.stack
+.code
+
+TEST_WRITE_DECIMAL    PROC
+      MOV DX,12345       ;Move o valor decimal 12345 para o registrador DX
+      CALL WRITE_DECIMAL ;Chama o procedimento
+      MOV AH,4CH         ;Funá∆o 4Ch
+      INT 21h            ;Interrupá∆o 21h
+TEST_WRITE_DECIMAL ENDP  ;Finaliza o procedimento
+
+      PUBLIC WRITE_DECIMAL
+;.................................................................;
+;Este procedimento escreve um n£mero de 16 bit como um n£mero     ;
+;sem sinal em notaá∆o decimal                                     ;
+;Use: WRITE_HEX_DIGIT                                              ;
+;.................................................................;
+
+WRITE_DECIMAL    PROC
+      PUSH AX   ;P‰e na pilha o valor do registrador AX
+      PUSH CX   ;P‰e na pilha o valor do registrador CX
+      PUSH DX   ;P‰e na pilha o valor do registrador DX
+      PUSH SI   ;P‰e na pilha o valor do registrador SI
+      MOV AX,DX ;move o valor do registrador DX para AX
+      MOV SI,10 ;move o valor 10 para o registrador SI
+      XOR CX,CX ;zera o registrador CX
+NON_ZERO:
+      XOR DX,DX ;zera o registrador CX
+      DIV SI    ;diviz∆o entre SI
+      PUSH DX   ;P‰e na pilha o valor do registrador DX
+      INC CX    ;incrementa CX
+      OR AX,AX  ;n∆o zero
+      JNE NON_ZERO  ;salta para NON_ZERO
+WRITE_DIGIT_LOOP:
+      POP DX    ;Retorna o valor em modo reverso
+      CALL WRITE_HEX_DIGIT  ;Chama o procedimento
+      LOOP WRITE_DIGIT_LOOP ;loop
+END_DECIMAL:
+      POP SI    ;retira da pilha o valor do registrador SI
+      POP DX    ;retira da pilha o valor do registrador DX
+      POP CX    ;retira da pilha o valor do registrador CX
+      POP AX    ;retira da pilha o valor do registrador AX
+      RET       ;Retorna o controle ao procedimento que chamou
+WRITE_DECIMAL   ENDP ;Finaliza o procedimento
+
+      PUBLIC WRITE_HEX_DIGIT
+;......................................................................;
+;                                                                      ;
+;Este procedimento converte os 4 bits mais baixos do registrador DL    ;
+;num n£mero hexadecimal e os imprime                                   ;
+;Use: WRITE_CHAR                                                       ;
+;......................................................................;
+
+WRITE_HEX_DIGIT    PROC
+      PUSH DX         ;P‰e na pilha o valor do registrador DX
+      CMP DL,10       ;Compara o valor 10 com o valor do registrador DL
+      JAE HEX_LETTER  ;se n∆o, salta para HEX_LETER
+      ADD DL,"0"      ;se Ç, converte em d°gito numÇrico
+      JMP Short WRITE_DIGIT ;escreve o caracter
+HEX_LETTER:
+      ADD DL,"A"-10   ;converte um caracter para um n£mero hexadecimal
+WRITE_DIGIT:
+      CALL WRITE_CHAR ;mostra o caracter na tela
+      POP DX          ;Retorna o valor inicial para o registrador DL
+      RET             ;Retorna o controle ao procedimento que chamou
+WRITE_HEX_DIGIT   ENDP
+
+      PUBLIC WRITE_CHAR
+;......................................................................;
+;Este procedimento imprime um caracter na tela usando uma funá∆o D.O.S.;
+;......................................................................;
+
+WRITE_CHAR   PROC
+      PUSH AX   ;P‰e na pilha o valor do registrador AX
+      MOV AH,2h ;Funá∆o 2h
+      INT 21h   ;Interrupá∆o 21h
+      POP AX    ;Retira da pilha o valor inicial do registrador AX
+      RET       ;Retorna o controle ao procedimento que chamou
+WRITE_CHAR   ENDP
+
+      END TEST_WRITE_DECIMAL ;finaliza o programa
+
+Este programa mostra na tela os n£meros 12345
+
+Quinto exemplo
+
+;nome do programa: five.asm
+.model small
+.stack
+.code
+
+PRINT_ASCII       PROC
+      MOV DL,00h       ;move o valor 00h para o registrador DL
+      MOV CX,255       ;move o valor decimal 255 para o registrador CX
+                       ;usado para fazer um laáo com 255 interaá‰es
+PRINT_LOOP:
+      CALL WRITE_CHAR  ;Chama o procedimento que imprime
+      INC DL           ;Incrementa o valor do registrador DL
+      LOOP PRINT_LOOP  ;Loop para imprimir 10 caracteres
+      MOV AH,4Ch       ;Funá∆o 4Ch
+      INT 21h          ;Interrupá∆o 21h
+PRINT_ASCII       ENDP ;Finaliza o procedimento
+
+WRITE_CHAR      PROC
+      MOV AH,2h        ;Funá∆o 2h para imprimir um caracter
+      INT 21h          ;Imprime o caracter que est† em DL
+      RET              ;Retorna o controle ao procediemento que chamou
+WRITE_CHAR      ENDP   ;Finaliza o procedimento
+
+      END  PRINT_ASCII  ;Finaliza o programa
+
+Este programa mostra na tela o valor dos 256 caracteres do c¢digo ASCII.
+
+
+
+*****************************************************************************
+
+                           CAP÷TULO 8: BIBLIOGRAFIA
+
+CrÇditos:
+
+Monico Brise§o C., Engenheiro
+     IdÇia Original
+     Desenvolvimento e Implementaá∆o da ediá∆o 1996
+
+Hugo Eduardo PÇrez P.
+     Desenvolvimento e Implementaá∆o da ediá∆o 1995
+
+V°ctor Hugo Avila B.
+     Vers∆o Inglesa
+
+Jeferson Botelho do Amaral
+     Vers∆o Portuguesa
+
+Ana Mar°a Peraza
+     Programadora de Linguagem Assembly
+
+Graciela Salcedo Mancilla
+     Programadora Tcl/Tk
+
+Juan Olmos Monroy
+     Designer Gr†fico
+
+                                   
+
+Referàncias Bibliogr†ficas:
+
+Assembly Language For IBM Microcomputers
+     J. Terry Godfrey
+     Prentice Hall Hispanoamericana, S.A.
+     Mexico
+
+Basic Assembler
+     A. Rojas
+     Ed Computec Editores S.A. de C.V.
+     Mexico
+
+IBM Personal Computer Assembly Language Tutorial
+     Joshua Auerbach
+     Yale University
+
+Organizaá∆o Estruturada de Computadores
+     Andrew S. Tanenbaum
+     Prentice Hall do Brasil
+
+Guia do Programador para as Placas EGA e VGA
+     Richard F. Ferraro
+     Ed. Ciància Moderna
+
+Programando em Assembler 8086/8088
+     Jeremias R. D. Pereira dos Santos
+     Edison Raymundi Junior
+     McGraw-Hill
+
+Assembly IBM PC - TÇcnicas de Programaá∆o
+     Alan R. Miller
+     EBRAS, Editora Brasileira
+
+Linguagem Assembly para IBM PC
+     Peter Norton
+     John Socha
+     Editora Campus
+
+C - Caixa de Ferramentas
+     Carlos Augusto P. Gomes
+     Antonio Carlos Barbosa
+     Editora êrica
+
+Interrupá‰es MS-DOS, ROM-BIOS
+     Eurico Soalheiro Br†s
+     McGraw-Hill
+
+Desenvolvimento de Software B†sico
+     Leland L. Beck
+     Editora Campus
+
+Programaá∆o Assembly 80386 - Guia Pr†tico para Programadores
+     Ross P. Nelson
+     McGraw-Hill

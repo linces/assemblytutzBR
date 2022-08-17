@@ -1,0 +1,270 @@
+
+                               úAúSúSúEúMúBúLúYú
+                            Registradores (Parte 1)
+                                Aula nr. 3 de 26
+
+    Comecemos   a   dar    uma    olhadela    na   arquitetura   dos
+microprocessadores   da   fam¡lia    INTEL   80x86...    Vamos   aos
+registradores!
+
+    Entenda  os  registradores  como  se  fossem  vari veis  que   o
+microprocessador  disponibiliza  ao sistema.  TODOS os registradores
+tˆm 16 bits de tamanho e aqui vai a descri‡„o deles:
+
+     ÚÄÄÄÄÄÄ¿
+     ³  AX  ³<ÄÄ¿
+     ÃÄÄÄÄÄÄ´   ³
+     ³  BX  ³<ÄÄ´
+     ÃÄÄÄÄÄÄ´   ÃÄ Registradores de uso geral
+     ³  CX  ³<ÄÄ´
+     ÃÄÄÄÄÄÄ´   ³
+     ³  DX  ³<ÄÄÙ
+     ÀÄÄÄÄÄÄÙ
+     ÚÄÄÄÄÄÄ¿
+     ³  SI  ³<ÄÄÄÄ ¡ndice FONTE (Source Index)
+     ÃÄÄÄÄÄÄ´
+     ³  DI  ³<ÄÄÄÄ ¡ndice DESTINO (Destination Index)
+     ÀÄÄÄÄÄÄÙ
+     ÚÄÄÄÄÄÄ¿
+     ³  SP  ³<ÄÄÄÄ Apontador de pilha (Stack Pointer)
+     ÃÄÄÄÄÄÄ´
+     ³  BP  ³<ÄÄÄÄ Apontador de base (Base Pointer)
+     ÀÄÄÄÄÄÄÙ
+     ÚÄÄÄÄÄÄ¿
+     ³  CS  ³<ÄÄÄÄ Segmento de C¢gido (Code Segment)
+     ÃÄÄÄÄÄÄ´
+     ³  DS  ³<ÄÄÄÄ Segmento de Dados (Data Segment)
+     ÃÄÄÄÄÄÄ´
+     ³  ES  ³<ÄÄÄÄ Segmento de dados Extra (Extra data Segment)
+     ÃÄÄÄÄÄÄ´
+     ³  SS  ³<ÄÄÄÄ Segmento de Pilha (Stack Segment)
+     ÀÄÄÄÄÄÄÙ
+     ÚÄÄÄÄÄÄ¿
+     ³  IP  ³<ÄÄÄÄ Apontador de instru‡„o (Instruction Pointer)
+     ÀÄÄÄÄÄÄÙ
+     ÚÄÄÄÄÄÄ¿
+     ³Flags ³<ÄÄÄÄ Sinalizadores
+     ÀÄÄÄÄÄÄÙ
+
+    Por  enquanto vamos nos deter na descri‡„o dos registradores uso
+geral...  Eles podem ser  subdivididos  em dois registradore de oito
+bits cada:
+
+        AX (16 bits)            BX (16 bits)
+    ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿     ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+    ÚÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿     ÚÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿
+    ³   AH   ³   AL   ³     ³   BH   ³   BL   ³
+    ÀÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ     ÀÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ
+    15      8 7      0      15      8 7      0
+
+        CX (16 bits)            DX (16 bits)
+    ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿     ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+    ÚÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿     ÚÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ¿
+    ³   CH   ³   CL   ³     ³   DH   ³   DL   ³
+    ÀÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ     ÀÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ
+    15      8 7      0      15      8 7      0
+
+    AH ‚ o byte mais significativo do registrador AX,  enquanto  que
+AL  ‚  o  menos  significativo.   Se  alterarmos  o  conte£do de AL,
+estaremos alterando  o  byte  menos  significativo  de  AX  ao mesmo
+tempo...  N„o existem registradores  de  oito  bits  em  separado...
+tudo  ‚  uma  coisa  s¢.   Portanto,  ao  manipularmos AH, estaremos
+manipulando AX ao mesmo tempo!
+
+    O nome de cada registrador tem  o  seu sentido de ser...  "A" de
+AX quer dizer  que  este  registrador  ‚  um "acumulador" (usado por
+default em algumas opera‡”es matematicas!), por exemplo...
+
+    AX  -> Acumulador
+    BX  -> Base
+    CX  -> Contador
+    DX  -> Dados
+
+    O  "X"  de  AX  significa "eXtended".  "H" de AH significa "High
+byte".
+
+    Embora estes registradores possam ser usados sem  restri‡”es,  ‚
+interessante  atribuir  uma  fun‡„o  para  cada  um deles nos nossos
+programas sempre que poss¡vel...  Isto  facilita a leitura do c¢digo
+e nos educa a seguirmos uma  linha  de  racioc¡nio  mais  concisa...
+Mas,  se  for  de  sua preferˆncia n„o seguir qualquer padr„o no uso
+desses  registradores,  n„o  se  preocupe...   n„o  haver   qualquer
+desvantagem nisso  (Well...   depende  do  c¢digo,  as  vezes  somos
+obrigados a usar determinado registrador!).
+
+    Alguns pontos importantes quanto  a esses nomes ser„o observados
+no decorrer do curso...  Por exemplo, certas instru‡”es usam AX  (ou
+AL, ou AH) e  somente  ele,  n„o  permitindo  o  uso de nenhum outro
+registrador...   Outras,  usam  CX  para   contar,   etc...    essas
+instru‡”es espec¡ficas ser„o vistas em outra oportunidade.
+
+    Os registradores SI e DI  s„o  usados como ¡ndices para tabelas.
+Em particular, SI ‚ usado para leitura  de  uma  tabela  e  DI  para
+escrita  (fonte  e  destino...   lembra algum procedimento de c¢pia,
+nao?).  No entanto, esses registradores  podem ser usados com outras
+finalidades...  Podemos inclu¡-los no grupo de "registradores de uso
+geral",  mas  assim como alguns registradores de uso geral, eles tˆm
+aplica‡„o exclusiva  em  algumas  instru‡”es,  SI  e  DI  s„o usados
+especificamente  como  ¡ndices  em  instru‡”es  que manipulam blocos
+(tamb‚m veremos isso mais tarde!).
+
+    Os registradores CS, DS,  ES  e  SS  armazenam os segmentos onde
+est„o o c¢digo  (programa  sendo  executado),  os  dados,  os  dados
+extras,  e  a  pilha,  respectivamente.   Lembre-se  que a mem¢ria ‚
+segmentada em blocos de 64kbytes (dˆ uma olhada na primeira mensagem
+dessa s‚rie).
+
+    Quando nos referimos, atrav‚s de alguma instru‡„o, a um endere‡o
+de mem¢ria, estaremos nos referindo ao OFFSET dentro de um segmento.
+O registrador de  segmento  usado  para  localizar  o dado no offset
+especificado vai depender da pr¢pria  instru‡„o...   Um  exemplo  em
+assembly:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      MOV     AL,[1D4Ah]                                        ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O  n£mero  hexadecimal  entre  os  colchetes ‚ a indica‡„o de um
+offset em um segmento...  Por  default, a maioria das instru‡”es usa
+o segmento de dados (valor em  DS).  A instru‡„o acima ‚ equivalente
+a:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      AL = DS:[1D4Ah]                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Isto ‚, em AL ser  colocado o byte que est  armazenado no offset
+1D4Ah  do  segmento  de  dados (valor em DS).  Veremos mais sobre os
+segmentos e as instru‡”es mais tarde :)
+
+    Se quisessemos localizar o byte  desejado em outro segmento (mas
+no mesmo offset) devemos especificar o registrador  de  segmento  na
+instru‡„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      MOV     AL,ES:[1D4Ah]                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Aqui o valor de ES ser  usado.
+
+    O registrador IP (Instruction Pointer) ‚ o offset do segmento de
+c¢digo  que  cont‚m  a  pr¢xima  instru‡„o  a  ser  execuatda.  Este
+registrador n„o ‚ acess¡vel por qualquer instru‡„o (pelo  menos  n„o
+pelas   documentadas   pela   Intel)...    ‚   de   uso  interno  do
+microprocessador.    No   entanto   existem   alguns   macetes  para
+conseguirmos obter o seu conte£do (o que na maioria  das  aplica‡”es
+n„o  ‚  necessario...   Para  que  conhecer  o  endere‡o  da pr¢xima
+instru‡„o se ela var ser executada de qualquer jeito?).
+
+    O registrador SP ‚ o offset do segmento SS (segmento  de  pilha)
+onde o pr¢ximo dado vai ser empilhado.  A pilha serve para armazenar
+dados  que posteriormente podem ser recuperados sem que tenhamos que
+usar um  dos  registradores  para  esse  fim.   Tamb‚m  ‚ usada para
+armazenar o endere‡o de retorno das sub-rotinas.  A  pilha  "cresce"
+de  cima  para baixo, isto ‚, SP ‚ decrementado cada vez que um novo
+dado ‚ colocado na pilha.  Note  tamb‚m que existe um registrador de
+segmento exclusivo para a pilha... SP sempre est  relacionado a  esse
+segmento (SS), como foi dito antes.
+
+    Para  ilustrar  o  funcionamento  da  pilha,  no  gr fico abaixo
+simularemos o empilhamento do conte£do do registrador AX atrav‚s  da
+instru‡„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      PUSH    AX                                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  AX = A527h (Valor em AX)                                       ³
+ ³                                                                 ³
+ ³   ÚÄÄÄÄÄÄÄ¿                       ÚÄÄÄÄÄÄÄ¿                     ³
+ ³   ³ ????h ³<ÄÄÄÄÄ SP = n          ³ A527h ³                     ³
+ ³   ÃÄÄÄÄÄÄÄ´                       ÃÄÄÄÄÄÄÄ´                     ³
+ ³   ³       ³                       ³       ³<ÄÄÄÄÄ SP = n - 1    ³
+ ³   ÀÄÄÄÄÄÄÄÙ                       ÀÄÄÄÄÄÄÄÙ                     ³
+ ³                                                                 ³
+ ³ (antes de PUSH AX)              (depois de PUSH AX)             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Observe que SP sempre aponta para um espa‡o vago na pilha.
+
+    Na  realidade  SP  ‚  decrementado  de duas posi‡”es ao inv‚s de
+apenas uma... mas, esse detalhe deixo para mais tarde.
+
+    O registrador BP pode ser usado como apontador para  a  base  da
+pilha (j  que,  por  default,  est   relacionado  a  SS)  ou como um
+registrador de uso geral...  depende do seu programa.  Veremos  isso
+detalhadamente mais tarde.
+
+    Um   dos    registradores    mais    importantes   de   qualquer
+microprocessador ‚ o de "Flags".  Eis uma descri‡„o dos  bits  deste
+registrador  (a descri‡„o abaixo aplica-se ao 8086.  Normalmente n„o
+acessamos diretamente  o  registrador  de  flags  -  embora possamos
+fazˆ-lo - por isso n„o ‚ conveniente assumirmos que  os  bits  est„o
+sempre  no  mesmo  lugar  para  qualquer microprocessador da fam¡lia
+80x86!):
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³            ÚÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄ¿                   ³
+ ³            ³ ³ ³ ³ ³O³D³I³T³S³Z³ ³A³ ³P³ ³C³                   ³
+ ³            ÀÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÙ                   ³
+ ³            15                             0                    ³
+ ³                                                                ³
+ ³  C = Carry                                                     ³
+ ³  P = Parity                                                    ³
+ ³  A = Auxiliar Carry                                            ³
+ ³  Z = Zero                                                      ³
+ ³  S = Signal                                                    ³
+ ³  T = Trap                                                      ³
+ ³  I = Interrupt Enable Flag                                     ³
+ ³  D = Direction                                                 ³
+ ³  O = OverFlow                                                  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    ş Carry:
+
+        Esse  flag  ‚ setado sempre quando houver "vai um" depois de
+    uma  adi‡„o  ou  quando  h   BORROW depois de uma subtra‡„o.  Ou
+    quando, numa opera‡„o de  deslocamento  de  bits,  o bit mais ao
+    extremo for deslocado para fora do dado (suponha um byte...   se
+    todos  os bits forem deslocados em uma posi‡„o para a direita, o
+    que acontece com o bit 0?...  Resposta: Vai para o carry!)
+
+    ş Parity:
+
+        Depois  de  uma  instru‡„o  aritim‚tica  ou  l¢gica este bit
+    informa se o resultado tem um n£mero par de "1"s ou n„o.
+
+    ş Auxiliar Carry:
+
+        Igual ao carry, mas indica o "vai um" no meio de um dado (no
+    caso de um byte, se houve "vai um" do bit 3 para o bit 4!).
+
+    ş Zero:
+
+        Depois de  uma  opera‡„o  aritim‚tica  ou  l¢gica, esse flag
+    indica se o resultado ‚ zero ou n„o.
+
+    ş Signal:
+
+        Depois de uma instru‡„o aritim‚tica ou l¢gica, este  flag  ‚
+    uma  c¢pia  do  bit de mais alta ordem do resultado, isto ‚, seu
+    sinal (dˆ uma olhada  na  "representa‡„o de n£meros negativos em
+    bin rio" no texto anterior!).
+
+    ş Trap:
+
+        Quando setado (1)  executa  instru‡”es passo-a-passo...  N„o
+    nos interessa estudar esse  bit  por  causa  das  diferen‡as  de
+    implementa‡„o deste flag em toda a fam¡lia 80x86.
+
+    ş Interrupt Enable Flag
+
+        Habilita/Desabilita   o   reconhecimento   de   interrup‡”es
+    mascar veis pela CPU. Sobre interrup‡”es, veremos mais tarde!
+
+    ş Direction:
+
+        Quando   usamos   instru‡”es   de   manipula‡„o  de  blocos,
+    precisamos espec
+                                                

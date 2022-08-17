@@ -1,0 +1,184 @@
+
+                               úAúSúSúEúMúBúLúYú
+                             Manipula‡„o de Mem¢ria
+                                Aula nr. 17 de 26
+
+    Eis  o  arquivo  .ASM com as rotinas para manipula‡„o da mem¢ria
+expandida:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  IDEAL                                                         ³
+ ³  MODEL LARGE,PASCAL                                            ³
+ ³  LOCALS                                                        ³
+ ³  JUMPS                                                         ³
+ ³                                                                ³
+ ³  GLOBAL  emmGetVersion : PROC                                  ³
+ ³  GLOBAL  emmGetPageFrameSegment : PROC                         ³
+ ³  GLOBAL  emmGetAvailablePages : PROC                           ³
+ ³  GLOBAL  emmAllocPages : PROC                                  ³
+ ³  GLOBAL  emmFreePages : PROC                                   ³
+ ³  GLOBAL  emmMapPage : PROC                                     ³
+ ³  GLOBAL  emmGetError : PROC                                    ³
+ ³                                                                ³
+ ³  DATASEG                                                       ³
+ ³                                                                ³
+ ³  emmVersion  dw  0                                             ³
+ ³  emmError    db  0       ; Nenhum erro ainda... :)             ³
+ ³                                                                ³
+ ³  CODESEG                                                       ³
+ ³                                                                ³
+ ³  ; Obt‚m a vers„o do EMM.                                      ³
+ ³  ; Devolve no formato 0x0X0Y (onde X ‚ vers„o e Y revis„o).    ³
+ ³  ; Prot¢tipo em C:                                             ³
+ ³  ;   unsigned pascal emmGetVersion(void);                      ³
+ ³  PROC    emmGetVersion                                         ³
+ ³      mov     [emmError],0    ; Inicializa flag de erro...      ³
+ ³      mov     ah,46h                                            ³
+ ³      int     67h             ; Invoca o EMM                    ³
+ ³      or      ah,ah           ; Testa o sucesso da fun‡„o...    ³
+ ³      jz      @@no_error                                        ³
+ ³      mov     [emmError],ah   ; Poe erro no flag...             ³
+ ³      mov     ax,-1           ; ... e retorna != 0.             ³
+ ³      jmp     @@done                                            ³
+ ³      mov     ah,al           ; Prepara formato da vers„o.      ³
+ ³      and     ax,111100001111b ; A fun‡„o 46h do EMM devolve    ³
+ ³      mov     [emmVersion],ax  ; no formato BCD... por isso     ³
+ ³  @@done:                      ; precisamos formatar...         ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ; Fun‡„o: Obt‚m o segmento do Page Frame.                     ³
+ ³  ; Prot¢tipo em C:                                             ³
+ ³  ;   unsigned pascal emmGetPageFrameSegment(void);             ³
+ ³  PROC    emmGetPageFrameSegment                                ³
+ ³      mov     ah,41h      ; Usa a fun‡„o 41h do EMM             ³
+ ³      int     67h         ; Chama o EMM                         ³
+ ³      mov     ax,bx       ; Poe o segmento em AX                ³
+ ³                          ; Fun‡„o 41h coloca o segmento do     ³
+ ³                          ; "Page Frame" em BX.                 ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ; Fun‡„o: Obt‚m o n£mero de p ginas dispon¡veis na mem¢ria.   ³
+ ³  ; Prot¢tipo em C:                                             ³
+ ³  ;   unsigned pascal emmGetAvailablePages(void);               ³
+ ³  ; Obs:                                                        ³
+ ³  ;   N„o verifica a ocorrencia de erros... modifique se quiser ³
+ ³  PROC    emmGetAvailablePages                                  ³
+ ³      mov     ah,42h                                            ³
+ ³      int     67h     ; Invoca o EMM.                           ³
+ ³      mov     ax,bx   ; Poe p ginas disponiveis em AX.          ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ; Aloca p ginas e devolve handle.                             ³
+ ³  ; Prot¢tipo em C:                                             ³
+ ³  ;   int pascal emmGetAvailablePages(unsigned Pages);          ³
+ ³  ; Obs: Devolve -1 se houve erro na aloca‡ao e seta            ³
+ ³  ;      a vari vel emmError.                                   ³
+ ³  PROC    emmAllocPages                                         ³
+ ³  ARG     Pages:WORD                                            ³
+ ³      mov     [emmError],0    ; Inicializa flag de erros...     ³
+ ³      mov     bx,[Pages]      ; BX = n£mero de p ginas a alocar ³
+ ³      mov     ah,43h                                            ³
+ ³      int     67h             ; Invoca o EMM.                   ³
+ ³      or      ah,ah           ; Verifica erro do EMM.           ³
+ ³      jz      @@no_error                                        ³
+ ³      mov     [emmError],ah   ; Poe erro na vari vel emmError   ³
+ ³      mov     dx,-1                                             ³
+ ³  @@no_error:                                                   ³
+ ³      mov     ax,dx           ; retorna c¢digo de erro.         ³
+ ³                              ; ou o handle.                    ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ; Libera p ginas alocadas.                                    ³
+ ³  ; Prot¢tipo em C:                                             ³
+ ³  ;   void pascal emmFreePages(int handle);                     ³
+ ³  ; Obs: N„o verifica erros... modifique se quiser...           ³
+ ³  PROC    emmFreePages                                          ³
+ ³  ARG     handle:WORD                                           ³
+ ³      mov     dx,[handle]                                       ³
+ ³      mov     ah,45h                                            ³
+ ³      int     67h                                               ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ; Mapeia uma p gina no Page Frame.                            ³
+ ³  ; Prot¢tipo em C:                                             ³
+ ³  ;   int pascal emmMapPage(int handle,                         ³
+ ³  ;                         unsigned char pfPage,               ³
+ ³  ;                         unsignec PageNbr);                  ³
+ ³  ; Onde: handle ‚ o valor devolvido pela fun‡„o de aloca‡„o de ³
+ ³  ;       p ginas.                                              ³
+ ³  ;       pfPage ‚ o n£mero da p gina do Page Frame (0 at‚ 3).  ³
+ ³  ;       PageNbr  ‚ o n£mero da p gina a ser colocada no       ³
+ ³  ;       Page Frame (0 at‚ m ximo - 1).                        ³
+ ³  ; Devolve -1 se ocorreu erro e seta a vari vel emmError.      ³
+ ³  PROC    emmMapPage                                            ³
+ ³  ARG     handle:WORD, pfPage:BYTE, PageNbr:WORD                ³
+ ³      mov     [emmError],0                                      ³
+ ³      mov     ah,44h                                            ³
+ ³      mov     al,[pfPage]                                       ³
+ ³      mov     bx,[PageNbr]                                      ³
+ ³      mov     dx,[handle]                                       ³
+ ³      int     67h                                               ³
+ ³      or      ah,ah                                             ³
+ ³      jz      @@no_error                                        ³
+ ³      mov     [emmError],ah                                     ³
+ ³      mov     ah,-1                                             ³
+ ³  @@no_error:                                                   ³
+ ³      mov     al,ah                                             ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ; Retorna com o erro do EMM.                                  ³
+ ³  ; Prot¢tipo:                                                  ³
+ ³  ;   int pascal emmGetError(void);                             ³
+ ³  PROC    emmGetError                                           ³
+ ³      mov     ax,[emmError]                                     ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  END                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esta  ‚  uma   implementa‡„o   simplificada,   mas  para  nossos
+prop¢sitos serve muito bem.  Algumas considera‡”es:  A  aloca‡„o  de
+mem¢ria  via  EMM n„o ‚ feita da mesma maneira que a fun‡„o malloc()
+de C ou GetMem() do  TURBO  PASCAL.  N„o ‚ devolvido nenhum pointer.
+Isto se torna ¢bvio a partir do momento que entendemos como funciona
+o EMM: Toda a manipula‡„o de bancos de  mem¢ria  ‚  feita  de  forma
+indireta pelo Page Frame.  A fun‡„o de aloca‡„o deve apenas devolver
+um handle para que possamos  manipular as p ginas alocadas.  Entenda
+esse handle da mesma forma com que os  arquivos  s„o  manipulados...
+Se  quisermos  usar um banco alocado precisamos informar ao EMM qual
+dos bancos queremos usar, fazendo  isso  via o handle devolvido pelo
+pr¢prio EMM.
+
+    Suponha que queiramos alocar  128kb  da mem¢ria expandida para o
+nosso programa.  Precisamos alocar 8 p ginas  l¢gicas  (8  *  16k  =
+128k).  Chamariamos a fun‡„o emmAllocPages() em C da seguinte forma:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  #include <conio.h>                                            ³
+ ³  #include <stdlib.h>                                           ³
+ ³                                                                ³
+ ³  int emm_handle;                                               ³
+ ³                                                                ³
+ ³  void f(void)                                                  ³
+ ³  {                                                             ³
+ ³      /* ... */                                                 ³
+ ³      if ((emm_handle = emmAllocPages(8)) == -1) {              ³
+ ³          cprintf("EMM ERROR #%d\r\n", emmGetError());          ³
+ ³          exit(1);                                              ³
+ ³      }                                                         ³
+ ³      /* ... */                                                 ³
+ ³  }                                                             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Na  fun‡„o  emmAllocPages() optei por devolver -1 para indicar o
+insucesso da fun‡„o...  Vocˆ pode  arrumar um esquema diferente para
+chegar isso (por  exemplo,  checando  a  vari vel  emmError  ap¢s  a
+chamada a fun‡„o!).
+                                                                                                                             

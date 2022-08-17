@@ -1,0 +1,127 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         TASM: Turbo Assembler (Parte 2/2)
+                                Aula nr. 15 de 26
+
+    Continuando o  papo  sobre  o  TASM,  precisaremos aprender como
+manipular tipos de dados mais complexos do que WORD, BYTE ou  DWORD.
+Eis a descri‡„o das estruturas!
+
+    Uma  estrutura  ‚ o agrupamento de tipos de dados simples em uma
+£nica classe de armazenamento, por exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  STRUC   MyType                                                 ³
+ ³      A   DB  ?                                                  ³
+ ³      B   DW  ?                                                  ³
+ ³  ENDS                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A estrutura MyType acima,  delimitada pelas palavras-chava STRUC
+e ENDS, foi construida com dois tipos de dados simples (BYTE e WORD)
+com os nomes de A e B. Note que as linhas acima  apenas  declaram  a
+estrutura,  sem  alocar  espa‡o  na  mem¢ria  para  ela.   Criar uma
+'instancia' dessa estrutura ‚ t„o  simples quanto criar uma vari vel
+de tipo simples:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MyVar   MyType  <0,0>                                          ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A sintaxe  ‚  basicamente  a  mesma  de  qualquer  declara‡„o de
+vari vel em assembly, com a diferen‡a de que o 'tipo' do  dado  ‚  o
+nome  (ou  TAG)  da  estrutura  -  MyType  - e os dados iniciais dos
+elementos da estrutura est„o localizados entre os simbolos < e >. Na
+linha acima criamos a  vari vel  MyVar,  cujos  elementos s„o 0 e 0.
+Vamos a um exemplo de uso desse novo tipo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ;... Aqui entra o modelamento,...                             ³
+ ³                                                                ³
+ ³  DATASEG                                                       ³
+ ³                                                                ³
+ ³  MyVar   MyType  <0,0>                                         ³
+ ³                                                                ³
+ ³  CODESEG                                                       ³
+ ³                                                                ³
+ ³  PROC    SetA        ; Poe valor em A na estrutura.            ³
+ ³  ARG     V : Byte                                              ³
+ ³          mov     al,[V]                                        ³
+ ³          mov     [MyVar.A],al                                  ³
+ ³          ret                                                   ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  PROC    SetB        ; Poe valor em B na estrutura.            ³
+ ³  ARG     V : Word                                              ³
+ ³          mov     ax,[V]                                        ³
+ ³          mov     [MyVar.B],ax                                  ³
+ ³          ret                                                   ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ;... Aqui entra o fim do c¢digo...                            ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Simples, n„o?
+
+    Mas, e se quisermos trabalhar  com  um  vetor  do  tipo  MyType?
+Vetores de tipos mais simples ‚ facil:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  DATASEG                                                       ³
+ ³                                                                ³
+ ³  MyVar1  dw  10 DUP (0)                                        ³
+ ³                                                                ³
+ ³  CODESEG                                                       ³
+ ³                                                                ³
+ ³  PROC    Fill1                                                 ³
+ ³      mov     cx,10                                             ³
+ ³      sub     bx,bx                                             ³
+ ³  @@FillType1:                                                  ³
+ ³      mov     [bx+MyVar1],0FFh                                  ³
+ ³      add     bx,2                                              ³
+ ³      dec     cx                                                ³
+ ³      jnz     @@FillType1                                       ³
+ ³      ret                                                       ³
+ ³  ENDP                                                          ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Aqui fiz da  maneira  mais  dificil  apenas para exemplificar um
+m‚todo de preenchimento  de  vetores.   No  caso,  BX  cont‚m o item
+desejado do vetor.  MyVar1 ‚ o  deslocamento  do  primeiro  item  do
+vetor  na  mem¢ria  e  CX  a quantidade de itens do vetor.  Note que
+temos um vetor de WORDS  e  precisaremos  adicionar 2 (tamnho de uma
+WORD) para cara item do vetor.  No caso da estrutura, isso  fica  um
+pouco mais complicado porque ela pode ter um tamanho n„o m£ltiplo de
+2  (o que complica o c lculo.  Por exemplo, MyType (a estrutura) tem
+3 bytes de  tamanho.   Eis  a  implementa‡„o  (n„o otimizada) para a
+rotina FillType para preenchimento de um  vetor  de  MyType  com  10
+itens:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  DATASEG                                                        ³
+ ³  MyVar   MyType  10 dup (<0,0>)                                 ³
+ ³                                                                 ³
+ ³  CODESEG                                                        ³
+ ³  PROC    FillType                                               ³
+ ³          mov     cx,10                                          ³
+ ³          sub     bx,bx   ; indice para localizar itens.         ³
+ ³  @@FillLoop:                                                    ³
+ ³          mov     [bx+MyVar.A],0FFh   ; * Instru‡„o destacada... ³
+ ³          mov     [bx+MyVar.B],0FFFFh                            ³
+ ³          add     bx,3                                           ³
+ ³          dec     cx                                             ³
+ ³          jnz     @@FillLoop                                     ³
+ ³          ret                                                    ³
+ ³  ENDP                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Essa rotina merece ser observada mais de perto:
+
+    Vejamos a  instru‡„o  destacada  na  listagem  acima...  MyVar.A
+fornece o deslocamento de A, do primeiro item do vetor, na  mem¢ria,
+enquanto isso BX fornece o indice do item desejado no vetor.  Assim,
+BX+MyVar.A  fornecer   o  offset  do elemento A do item da estrutura
+desejado.
+
+    Well...  isso...
+                                                             

@@ -1,0 +1,70 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 4)
+                                Aula nr. 7 de 26
+
+    Algumas instru‡”es afetam  somente  aos  flags.  Dentre elas, as
+mais utilizadas s„o as instru‡”es de compara‡„o entre dois dados.
+
+ ş Compara‡”es aritim‚ticas:
+
+    A  instru‡„o  CMP  ‚  usada  quando se quer comparar dois dados,
+afetando somente aos flags.  Eis a sintaxe:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  CMP AL,1Fh                                                     ³
+ ³  CMP ES:[DI],1                                                  ³
+ ³  CMP AX,[SI]                                                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esta  instru‡„o faz a subtra‡„o entre o operando mais a esquerda
+e o mais a direita, afetando  somente  os flags.  Por exemplo, se os
+dois operandos  tiverem  valores  iguais  a  subtra‡„o  dar  valores
+iguais e o flag de ZERO ser  1. Eis a mecƒnica de CMP:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  CMP AL,1Fh   ; AL - 1Fh, afetando somente os Flags             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+ ş Compara‡”es l¢gicas:
+
+    A instru‡„o TEST ‚ usada quando se quer  comparar  o  estado  de
+determinados bits de um operando. Eis a sintaxe:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  TEST AL,10000000b                                              ³
+ ³  TEST [BX],00001000b                                            ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esta  instru‡„o faz um AND com os dois operados, afetando apenas
+os flags.  Os flags Z, S  e  P  s„o  afetados,  os flags O e C ser„o
+zerados.
+
+ ş Instru‡”es que mudam o estado dos flags diretamente:
+
+    CLC - Abrevia‡„o de CLear Carry (Zera o flag Carry).
+    CLD - Abrevia‡„o de CLear Direction (Ajusta flag de  dire‡„o  em
+          zero,  especificando  o sentido correto para instru‡”es de
+          bloco).
+    CLI - Abrevia‡„o   de  CLear   Interrupt   (Mascara   flag    de
+          interrup‡„o,   n„o  permitindo  que  a  CPU  reconhe‡a  as
+          interrup‡”es mascar veis).
+    CMC - Abrevia‡„o de CoMplement Carry (Inverte o flag de carry).
+    STC - Abrevia‡„o de SeT Carry (Faz carry = 1).
+    STD - Abrevia‡„o  de  SeT  Direction  (flag  de dire‡„o setado -
+          indica que as instru‡”es de bloco  incrementar„o  os  seus
+          pointers no sentido contr rio - de cima para baixo).
+    STI - Abrevia‡„o  de  SeT Interrupt (Faz com que a CPU volte a
+          reconhecer as interrup‡”es mascar veis).
+
+    Uma  interrup‡„o  ‚  um  "desvio"  feito  pela  CPU  quando   um
+dispositivo  requer  a  aten‡„o  da mesma.  Por exemplo, quando vocˆ
+digita uma tecla, o circuito do  teclado requisita a aten‡„o da CPU,
+que  por  sua  vez,  para  o  que  est  fazendo e executa uma rotina
+correspondente  …  requisi‡„o  feita  pelo  dispositivo  (rotina  de
+interrup‡„o).  Ao final da rotina, a CPU retorna … tarefa que estava
+desempenhando antes da interrup‡„o.   Nos PCs, TODAS as interrup‡”es
+s„o mascar veis (podem ser ativadas e desativadas quando quisermos),
+com a £nica excess„o da rotina de  checagem  do  sistema  (o  famoso
+MEMORY PARITY ERROR ‚ um exeplo!).
+                                                                                              

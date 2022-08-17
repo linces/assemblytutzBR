@@ -1,0 +1,167 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 2)
+                                Aula nr. 5 de 26
+
+    Depois  de  algumas  instru‡”es  de  movimenta‡„o  de  dados vou
+mostrar a mecƒnica da l¢gica booleana, bem como algumas instru‡”es.
+
+    A l¢gica booleana  baseia-se  nas  seguintes opera‡”es: AND, OR,
+NOT.   Para  simplificar  a  minha  digita‡„o  vou  usar  a  nota‡„o
+simplificada: & (AND), | (OR) e ~ (NOT).  Essa nota‡„o  ‚  usada  na
+linguagem C e em muitos manuais relacionados a hardware da IBM.
+
+
+ ş Opera‡„o AND:
+
+    A opera‡„o AND funciona de acordo com a seguinte tabela-verdade:
+
+                           ÚÄÄÄÄÄÄÄÄÄÄÄ¿
+                           ³ S = A & B ³
+                           ÆÍÍÍÑÍÍÍÑÍÍÍµ
+                           ³ A ³ B ³ S ³
+                           ÃÄÄÄÅÄÄÄÅÄÄÄ´
+                           ³ 0 ³ 0 ³ 0 ³
+                           ³ 0 ³ 1 ³ 0 ³
+                           ³ 1 ³ 0 ³ 0 ³
+                           ³ 1 ³ 1 ³ 1 ³
+                           ÀÄÄÄÁÄÄÄÁÄÄÄÙ
+
+    Note que o resultado (S) ser  1 apenas se A "E" B forem 1.
+    Aplicando esta l¢gica bit a bit  em  opera‡”es  envolvendo  dois
+bytes obteremos um terceiro byte que ser  o primeiro AND o segundo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³              A = 01010111b       B = 00001111b                 ³
+ ³                                                                ³
+ ³              S = A & B ->    01010111b                         ³
+ ³                            & 00001111b                         ³
+ ³                           ÄÄÄÄÄÄÄÄÄÄÄÄÄ                        ³
+ ³                              00000111b                         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Uma das utilidades  de  AND  ‚  resetar  um  determinado bit sem
+afetar os demais.   Suponha  que  queira  resetar  o  bit  3  de  um
+determinado  byte.   Para  tanto  basta efetuar um AND do byte a ser
+trabalhado com o valor 11110111b (Apenas o bit 3 resetado).
+
+    Eis a sintaxe da instru‡„o AND:
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³     AND AL,11110111b                                          ³
+  ³     AND BX,8000h                                              ³
+  ³     AND DL,CL                                                 ³
+  ³     AND [DI],AH                                               ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Lembrando que o operando destino (o mais a esquerda) deve sempre
+ser um  registrador  ou  uma  referencia  a  mem¢ria.   o operando a
+direita (fonte) pode ser um registrador, uma referˆncia a mem¢ria ou
+um  valor  imediato,  com  a  restri‡„o  de  que  n„o  podemos  usar
+referˆncias a mem¢ria nos dois operandos.
+
+    A  instru‡„o  AND  afeta  os  FLAGS  Z, S e P e zera os flags Cy
+(Carry) e O (veja os flags em alguma mensagem anterior a esta).
+
+
+ ş Opera‡„o OR:
+
+                           ÚÄÄÄÄÄÄÄÄÄÄÄ¿
+                           ³ S = A | B ³
+                           ÆÍÍÍÑÍÍÍÑÍÍÍµ
+                           ³ A ³ B ³ S ³
+                           ÃÄÄÄÅÄÄÄÅÄÄÄ´
+                           ³ 0 ³ 0 ³ 0 ³
+                           ³ 0 ³ 1 ³ 1 ³
+                           ³ 1 ³ 0 ³ 1 ³
+                           ³ 1 ³ 1 ³ 1 ³
+                           ÀÄÄÄÁÄÄÄÁÄÄÄÙ
+
+    Note que S ser  1 se A "OU" B forem 1.
+    Da  mesma  forma  que  AND,  aplicamos  essa  l¢gica  bit  a bit
+envolvendo  um  byte  ou  word atrav‚s de uma instru‡„o em assembly.
+Vejamos um exemplo da utilidade de OR:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³              A = 01010111b       B = 10000000b                 ³
+ ³                                                                ³
+ ³              S = A | B ->    01010111b                         ³
+ ³                            | 10000000b                         ³
+ ³                           ÄÄÄÄÄÄÄÄÄÄÄÄÄ                        ³
+ ³                              11010111b                         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A  opera‡„o  OR  ‚  ideal  para  setarmos um determinado bit sem
+afetar os demais.  No exemplo acima  B  tem apenas o bit 7 setado...
+depois da opera‡„o OR com A o resultado final foi  A  com  o  bit  7
+setado! :)
+
+    A  sintaxe  de OR ‚ a mesma que a de AND (obviamente trocando-se
+AND por OR). Os flags afetados s„o os mesmos da instru‡„o AND!
+
+
+ ş Opera‡„o NOT:
+
+    NOT simplesmente inverte todos os bits de um byte ou word:
+
+                           ÚÄÄÄÄÄÄÄÄÄÄÄ¿
+                           ³   S = ~A  ³
+                           ÆÍÍÍÍÍÑÍÍÍÍÍµ
+                           ³  A  ³  S  ³
+                           ÃÄÄÄÄÄÅÄÄÄÄÄ´
+                           ³  0  ³  1  ³
+                           ³  1  ³  0  ³
+                           ÀÄÄÄÄÄÁÄÄÄÄÄÙ
+
+    A sintaxe da instru‡„o em assembly ‚ a seguinte:
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³     NOT AL                                                    ³
+  ³     NOT DX                                                    ³
+  ³     NOT [SI]                                                  ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+
+ ş Opera‡„o XOR:
+
+    A opera‡„o XOR ‚ derivada das trˆs acima.   A  equa‡„o  booleana
+que descreve XOR ‚:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  S = (A AND ~B) OR (~A AND B) = A ^ B                          ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Que na tabela-verdade fica:
+
+                           ÚÄÄÄÄÄÄÄÄÄÄÄ¿
+                           ³ S = A ^ B ³
+                           ÆÍÍÍÑÍÍÍÑÍÍÍµ
+                           ³ A ³ B ³ S ³
+                           ÃÄÄÄÅÄÄÄÅÄÄÄ´
+                           ³ 0 ³ 0 ³ 0 ³
+                           ³ 0 ³ 1 ³ 1 ³
+                           ³ 1 ³ 0 ³ 1 ³
+                           ³ 1 ³ 1 ³ 0 ³
+                           ÀÄÄÄÁÄÄÄÁÄÄÄÙ
+
+    Uso  o  simbolo  ^ para o XOR aqui.  XOR funciona da mesma forma
+que OR, s¢ que o resultado ser  1 se APENAS A ou  APENAS  B  for  1,
+melhor dizendo: Se ambos forem diferentes.
+
+    XOR ‚ muito £til quando se quer inverter um determinado  bit  de
+um byte ou word sem afetar os outros:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³              A = 01010111b       B = 00001111b                 ³
+ ³                                                                ³
+ ³              S = A ^ B ->    01010111b                         ³
+ ³                            ^ 00001111b                         ³
+ ³                           ÄÄÄÄÄÄÄÄÄÄÄÄÄ                        ³
+ ³                              01011000b                         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    No   exemplo  acima  invertemos  apenas  os  quatro  bits  menos
+significativos de A.
+
+    A sintaxe e os flags afetados s„o os mesmos que AND e OR.
+                                                                                         

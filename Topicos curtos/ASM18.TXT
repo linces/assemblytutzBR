@@ -1,0 +1,348 @@
+
+                               úAúSúSúEúMúBúLúYú
+                             Manipula‡„o de Mem¢ria
+                                Aula nr. 18 de 26
+
+    Hummmm...  Estamos na era dos  32 bits...  ent„o por que esperar
+mais para discutirmos as novidades da linha 386  e  486?   Eles  n„o
+diferem  muito do irm„o menor: o 8086.  A n„o ser pelo fato de serem
+"maiores". :)
+
+    O 8086 e 80286 tˆm barramento de dados de  16  bits  de  tamanho
+enquanto o 386 e o 486 tem  de 32 bits.  Nada mais justo que existam
+modifica‡”es nos registradores tamb‚m:
+
+           31              16 15                  0
+           ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿
+           ³                 ³   AH   AX   AL     ³ EAX
+           ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄ´
+           ³                 ³   BH   BX   BL     ³ EBX
+           ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄ´
+           ³                 ³   CH   CX   CL     ³ ECX
+           ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄ´
+           ³                 ³   DH   DX   DL     ³ EDX
+           ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÙ
+
+    Os registradores de uso geral continuam os velhos conhecidos  de
+sempre...  S¢ que existem os registradores  de uso geral de 32 bits:
+EAX, EBX, ECX e EDX, onde os 16 bits menos significativos destes s„o
+AX, BX, CX e DX, respectivamente.
+
+           31              16 15                  0
+           ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+           ³                 ³        SI          ³ ESI
+           ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+           ³                 ³        DI          ³ EDI
+           ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+           ³                 ³        BP          ³ EBP
+           ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+           ³                 ³        SP          ³ ESP
+           ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Da mesma forma, os registradores SI, DI, BP  e  SP  ainda  est„o
+aqui...  bem como os seus equivalentes de 32 bits: ESI, EDI,  EBP  e
+ESP.
+
+    Os registradores  de  segmento  (chamados  de  SELETORES desde o
+surgimento do 80286)  s„o  os  mesmos  e  n„o  mudaram  de  tamanho,
+continuam com 16 bits: CS, DS, ES e SS.  Mas acrecentaram outros: FS
+e  GS.  Isto ‚...  Agora existe um registrador de segmento de c¢digo
+(CS), um segmento de pilha (SS) e quatro segmentos de dados (DS, ES,
+FS e GS).  Lembrando que DS  ‚  o segmento de dados default.  Repare
+na ordem alfab‚tica dos registradores de segmento de dados...
+
+    O registrador Instruction Pointer  tamb‚m  continua  o  mesmo...
+E tamb‚m existe o seu irm„o maior... EIP:
+
+           31              16 15                  0
+           ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+           ³                 ³        IP          ³ EIP
+           ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Da mesma forma os FLAGS tamb‚m s„o os mesmos de sempre...  mas o
+registrador FLAGS tamb‚m foi expandido para 32  bits  e  chamado  de
+EFLAGS.   Os sinalizadores extras s„o usados em aplica‡”es especiais
+(como por exemplo,  chaveamento  para  modo protegido, modo virtual,
+chaveamento de tarefas, etc...).
+
+    Alguns outros registradores foram  adicionados ao conjunto: CR0,
+CR1, CR3, TR4 a TR7.  DR0 a DR3, DR6 e DR7  (todos  de  32  bits  de
+tamanho).  Esses novos registradores  s„o  usados no controle da CPU
+(CR?), em testes (TR?) e DEBUG (DR?).  N„o tenho maiores informa‡”es
+sobre alguns deles e por isso n„o vou descrevˆ-los aqui.
+
+     Novas instru‡”es foram criadas para o 386 e ainda  outras  mais
+novas  para  o  486  (imagino  que  devam  existir outras instru‡”es
+espec¡ficas para o Pentium!). Eis algumas delas:
+
+ş BSF (Bit Scan Forward)
+
+    Processador: 386 ou superior
+
+    Sintaxe: BSF dest,src
+
+    Descri‡„o:
+
+        Procura pelo  primeiro  bit  setado  no  operando "src".  Se
+encontrar, coloca o numero do bit no operando "dest" e seta  o  flag
+Zero.   Se  n„o  encontrar,  n„o altera o operando "dest" e reseta o
+flag Zero.   BSF  procura  o  bit  setado  come‡ando  pelo  bit 0 do
+operando "src".
+
+    Exemplo:
+
+        BSF     AX,BX
+
+ş BSR (Bit Scan Reverse)
+
+    Processador: 386 ou superior
+
+    Sintaxe: BSR dest,src
+
+    Descri‡„o:
+
+        Faz a mesma coisa que BSF, por‚m a ordem de procura come‡a a
+partir do bit mais significativo do operando "src".
+
+    Exemplo:
+
+        BSR     AX,BX
+
+ş BSWAP
+
+    Processador: 486 ou superior
+
+    Sintaxe: BSWAP reg32
+
+    Descri‡„o:
+
+        Inverte a ordem das words de um registrador de 32 bits.
+
+    Exemplo:
+
+        BSWAP EAX
+
+ş BT (Bit Test)
+
+    Processador: 386 ou superior
+
+    Sintaxe: BT dest,src
+
+    Descri‡„o:
+
+        Copia  o  conte£do  do  bit do operando "dest" indicado pelo
+operando "src" para o flag Carry.
+
+    Exemplo:
+
+        BT  AX,3
+
+    Observa‡”es:
+
+      1- Aparentemente esta  instru‡„o  n„o  aceita  operandos de 32
+         bits.
+      2- No exemplo acima o bit 3 de AX ser   copiado  para  o  flag
+         Carry.
+
+ş BTC (Bit Test And Complement)
+
+    Processador: 386 ou superior
+
+    Sintaxe:  BTC dest,src
+
+    Descri‡„o:
+
+        Instru‡„o  identica  … BT, por‚m complementa (inverte) o bit
+do operando "dest".
+
+ş BTR e BTS
+
+    Processador: 386 ou superior
+
+    Sintaxe: BTR dest,src
+             BTS dest,src
+
+    Descri‡„o:
+
+        Instru‡”es identicas a BT, por‚m  BTR zera o bit do operando
+destino e BTS seta o bit do operando destino.
+
+ş CDQ (Convert DoubleWord to QuadWord)
+
+    Processador: 386 ou superior
+
+    Sintaxe: CDQ
+
+    Descri‡„o:
+
+        Expande o conte£do do registrador EAX para o par EDX e  EAX,
+preenchendo com o bit 31 de EAX os bits de EDX (extens„o de sinal).
+
+ş CWDE (Convert Word to DoubleWord Extended)
+
+    Processador: 386 ou superior
+
+    Sintaxe: CWDE
+
+    Descri‡„o:
+
+        Esta  instru‡„o  expande  o   registrador   AX   para   EAX,
+considerando  o sinal.  Ela ‚ equivalente a instru‡„o CWD, por‚m n„o
+usa o par DX:AX para isso.
+
+ş CMPXCHG
+
+    Processador: 486 ou superior
+
+    Sintaxe: CMPXCHG dest,src
+
+    Descri‡„o:
+
+        Compara  o  acumulador  (AL,  AX  ou  EAX  -  dependendo dos
+operandos) com o operando  "dest".   Se  forem iguais o acumulador ‚
+carregado com o conte£do de "dest", caso contr rio com o conte£do de
+"src".
+
+    Exemplo:
+
+        CMPXCHG BX,CX
+
+ş INVD (Invalidate Cache)
+
+    Processador: 486 ou superior
+
+    Sintaxe: INVD
+
+    Descri‡„o:
+
+        Limpa o cache interno do processador.
+
+ş JECXZ
+
+    Processador: 386 ou superior
+
+    Observa‡„o:  identica a instru‡„o  JCXZ,  por‚m o teste ‚ feito
+no registrador extendido ECX (32 bits).
+
+ş LGS e LFS
+
+    Processador: 386 ou superior
+
+    Observa‡„o: Essas instru‡”es s„o identicas as instru‡”es  LDS  e
+LES, por‚m trabalham com os novos registradores de segmento.
+
+ş MOVSX e MOVZX
+
+    Processador: 386 ou superior
+
+    Sintaxe: MOVSX dest,src
+             MOVZX dest,src
+
+    Descri‡„o:
+
+        Instru‡”es  £teis  quando  queremos  lidar  com operandos de
+tamanhos diferentes.  MOVZX move  o  conte£do do operando "src" para
+"dest" (sendo que "src" deve ser menor que "dest") zerando  os  bits
+extras.   MOVSX  faz  a  mesma coisa, por‚m copiando o £ltimo bit de
+"src" nos bits extras de "dest" (convers„o com sinal).
+
+    Exemplo:
+
+        * Usando  instru‡”es  do  8086,  para  copiar  AL  para  BX
+          precisariamos fazer isto:
+
+                MOV     BL,AL
+                MOV     BH,0
+
+        * Usando MOVZX podemos simplesmente fazer:
+
+                MOVZX   BX,AL
+
+ş Instru‡„o condicional SET
+
+    Processador: 386 ou superior
+
+    Sintaxe: SET? dest
+             (Onde ? ‚ a condi‡„o...)
+
+    Descri‡„o:
+
+        Poe 1 no operando destino  se  a  condi‡„o  for  satisfeita.
+        Caso contr rio poe 0.
+
+    Exemplo:
+
+        SETNZ AX
+        SETS  EBX
+        SETZ  CL
+
+ş SHRD e SHLD (Double Precision Shift)
+
+    Processador: 386 ou superior
+
+    Sintaxe: SHRD dest,src,count
+             SHLD dest,src,count
+
+    Descri‡„o:
+
+        Faz  o  shift  para  esquerda  (SHLD)  ou  direita (SHRD) do
+operando "dest" "count" vezes, por‚m  os bits que seriam preenchidos
+com zeros s„o preenchidos com o cont‚udo dos bits do operando "src".
+Eis um gr fico exemplificando:
+
+    SHRD
+          src                 dest
+    ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿    ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+    ³              ÃÄÄ>Ä´             ÃÄÄÄ> Carry
+    ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ    ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+     n            0      n            0
+
+    O operando "src" n„o ‚ alterado no processo.  O  flag  de  Carry
+cont‚m o £ltimo bit que "saiu" do operando "dest".
+
+    Exemplo:
+
+        SHLD    EAX,ECX,3
+        SHRD    AX,BX,CL
+
+ş Instru‡”es que manipulam blocos...
+
+    CMPSD,  LODSD,  MOVSD, STOSD, INSD e OUTSD se comportam da mesma
+forma que suas similares  de  8  ou  16  bits (CMPSB, CMPSW, etc..),
+por‚m usam os registradores extendidos (ESI, EDI, ECX, EAX) e operam
+com dados de 32 bits de tamanho (DoubleWords).
+
+    Existem mais instru‡”es...  Consulte algum manual da Intel ou  o
+hipertexto  HELPPC21...  Pedirei aos Sysops do VixNET BBS (agora com
+6 linhas hehehe) para  deixarem disponivel o arquivo 386INTEL.ZIP...
+que ‚ o guia t‚cnico para o processador 386.
+--------------------------------------------------------------------
+
+D£vidas a respeito dos novos recursos:
+
+şQş Os  segmentos  tem  mais  que  64k  no  modo  real,  j   que  os
+registradores  extendidos  podem  ser  usados  neste   modo?    Como
+funcionaria uma instru‡„o do tipo:
+
+    MOV     [ESI+3],EAX
+
+şRş  N„o...   no  modo  real  os  segmentos  continuam  a ter 64k de
+tamanho.  Os registradores extendidos podem  ser usados a vontade e,
+quando  usados como offset em um segmento, os 16 bits superiores s„o
+ignorados. A instru‡„o apresentada funcionaria da mesma forma que:
+
+    MOV     [SI+3],EAX
+
+şQş Onde e quando deve-se usar os novos registradores de segmentos?
+şRş Onde e quando  vocˆ  quiser.   Pense  neles  como se fosse novos
+segmentos de dados extras.   Na  realidade  vocˆ  apenas  conseguir 
+us -los  se  explicit -los  numa  instru‡„o  que  faz  referˆncia  …
+mem¢ria, por exemplo:
+
+    MOV FS:[BX],AL
+
+şQş Posso usar os registradores extendidos nas instru‡”es normais ou
+apenas nas novas instru‡”es?
+şRş  Pode  us -los  nas  instru‡”es  "normais".   A  n„o  ser  que a
+instru‡„o n„o permita operandos de 32 bits...
+             

@@ -1,0 +1,146 @@
+
+                               úAúSúSúEúMúBúLúYú
+                            Gerenciamento de Mem¢ria
+                                Aula nr. 16 de 26
+
+    Usando a mem¢ria Expandida (EMS).
+
+    Muitos modplayers hoje  em  dia  usam  a  mem¢ria expandida para
+armazenar os samples.  Neste texto veremos como funciona  a  mem¢ria
+expandida e como us -la...
+
+    A  maioria  dos  PC-ATs  com  mais de 1Mb de mem¢ria possui dois
+tipos de mem¢ria:
+
+    ş Convencional - Na faixa de 0 at‚ 1Mb
+    ş Extendida: de 1Mb em diante.
+
+    A  mem¢ria extendida ‚ facilmente manipul vel quando um programa
+est  em modo protegido e com  toda  a  mem¢ria mapeada em um ou mais
+seletores.  Os 386s permitem que um seletor acesse  um  segmento  de
+at‚  4Gb  de  tamanho...   Mas,  n„o  ‚ esse o nosso caso.  Temos um
+pequeno programa rodando sob o MS-DOS, no modo real (modo nativo dos
+processadores Intel), que tem acesso somente … mem¢ria convencional.
+Podemos acessar a mem¢ria  extendida  atrav‚s do driver HIMEM.SYS ou
+usando  uma  fun‡„o  de  movimento  de  blocos  da  BIOS,  mas  isso
+aumentaria em muito a complexidade do software (e, por conseguˆncia,
+seu tamanho).
+
+    A Lotus, Intel e Microsoft criaram a especifica‡„o EMS para esse
+caso.  O  programa  EMM386.EXE,  ou  qualquer  outro  gerenciador de
+mem¢ria como o QEMM, emula a mem¢ria expandida da  mesma  forma  que
+uma  m quina  com  apenas  este  tipo  de  mem¢ria  faria (A mem¢ria
+expandida por hardware n„o fez muito  sucesso nos EUA como a mem¢ria
+extendida!).  A especifica‡„o EMS  simplesmente  usa  um  espa‡o  da
+mem¢ria  convencional  (chamado  de  "Page  Frame")  para  armazenar
+"p ginas" de 16kb da mem¢ria extendida.  Isto  ‚...   divida  a  sua
+mem¢ria  extendida  em  diversos  blocos  de  16k e ter  o n£mero de
+p ginas (pages) que poder„o estar dispon¡veis para  uso.
+
+    O EMM (Expanded  Memory  Manager)  simplesmente  faz a c¢pia das
+p ginas  desejadas  para  o  "Page  Frame" para que o nosso software
+posssa lˆ-las e escrevˆ-las,  copiando-as  de  volta para as p ginas
+corretas quando fizermos a troca de p ginas  do  "Page  Frame".   No
+"Page  Frame"  cabem,  normalmente, 4 p ginas... fazendo um total de
+64kb (ou seja, exatamente o  tamanho  de um segmento!).  Considere a
+figura abaixo:
+
+
+         Mem¢ria extendida          Mem¢ria extendida
+                                         paginada
+
+               ÚÄÄ¿                       ÚÄÄ¿
+               ³  ³                       ³  ³Page 0
+               ³  ³                       ÃÄÄ´
+               ³  ³                       ³  ³Page 1
+               ³  ³                       ÃÄÄ´
+               ³  ³                       ³  ³Page 2
+               ³  ³                       ÃÄÄ´
+               ³  ³                       ³  ³Page 3
+               ³  ³                       ÃÄÄ´
+               ³  ³                       ³  ³Page 4
+               ³  ³                       ÃÄÄ´
+               ÀÄÄÙ...                    ÀÄÄÙ...
+
+
+    Ok...  a mem¢ria extendida foi dividida em 'n' p ginas  de  16k.
+O  "Page  Frame" fica na mem¢ria convencional.  Por exemplo, suponha
+que o "Page Frame" esteja localizado no segmento 0C000h:
+
+
+                         "Page Frame"
+
+                     ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿0
+     P gina fisica 0 ³                   ³
+                     ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´16k
+     P gina fisica 1 ³                   ³
+                     ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´32k
+     P gina fisica 2 ³                   ³
+                     ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´48k
+     P gina fisica 3 ³                   ³
+                     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ64k
+
+
+    Do offset 0 at‚ 16k-1 fica a primeira p gina do "Page Frame", do
+offset 16k at‚ 32k-1 a segunda, e assim por diante.  A especifica‡„o
+EMS nos permite colocar apenas 4  p ginas no "Page Frame".  Assim, o
+nosso programa escolhe cada uma das  quatro  "p ginas  l¢gicas"  que
+ser„o  copiadas  da  mem¢ria  extendida  para  cada  uma  das quatro
+"p ginas fisicas" do Page Frame.
+
+    Vale a pena lembrar que o  Page Frame est  sempre em algum lugar
+da mem¢ria convencional, portanto  acess¡vel  aos  programas  feitos
+para MS-DOS, que normalmente trabalham em modo real.
+
+    A  interrup‡„o  67h  ‚ a porta de entrada para as fun‡”es do EMM
+(EMM386,  QEMM,  386MAX,  entre  outros).  Mas antes de come‡armos a
+futucar o EMM precisamos saber se ele est  presente...  Eis a rotina
+de detec‡„o do EMM p/ os compiladores C da BORLAND:
+
+---%<----------------------------------%<---------------------------
+#include <io.h>
+#include <fcntl.h>
+#include <dos.h>
+
+#define CARRY_BIT   (_FLAGS & 0x01)
+
+/* Obt‚m a maior vers„o do EMM - definida em outro m¢dulo! */
+extern int emm_majorVer(void);
+
+/* Testa a presen‡a do EMM
+   Retorna 0 se EMM n„o presente ou vers„o < 3.xx
+   Retorna 1 se tudo ok! */
+int isEMMpresent(void)
+{
+    int handle;
+
+    /* Tenta abrir o device driver EMMXXXX0 para leitura! */
+    if ((handle = open("EMMXXXX0", O_BINARY | O_RDONLY)) == -1)
+        return 0;   /* N„o tem EMM! */
+
+    /* Verifica se ‚ um arquivo ou dispositivo
+       Usa IOCTL para isso! */
+    _BX = handle;
+    _AX = 0x4400;
+    geninterrupt(0x21);
+    if (!(_DX & 0x80))
+        return 0;   /*  um arquivo!!! N„o ‚ o EMM! */
+
+    /* Verifica o dispositivo est  ok */
+    _BX = handle;
+    _AX = 0x4407;
+    geninterrupt(0x21);
+    if (CARRY_BIT || !_AL) return 0; /* N„o est  ok */
+
+    /* Verifica a vers„o do EMM.
+       Para nossos prop¢sitos tem que ser >= que
+       3.xx */
+    if (emm_majorVer() < 3) return 0; /* N„o ‚ ver >= 3.xx */
+
+    /* Tudo ok... EMM presente */
+    return 1;
+}
+---%<----------------------------------%<---------------------------
+
+    No pr¢ximo texto mostrarei como usar o EMM.
+                                                 

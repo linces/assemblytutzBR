@@ -1,0 +1,233 @@
+
+                               úAúSúSúEúMúBúLúYú
+                             Codigos e Codifica‡”es
+                                Aula nr. 13 de 26
+
+    Algumas pessoas,  depois  de  verem  o  c¢digo-exemplo  do texto
+anterior, desenvolvido  para  ser  compilado  em  TURBO  PASCAL,  me
+perguntaram:  "E quanto ao C?!".  Well...  aqui v„o algumas t‚cnicas
+para codifica‡„o mixta em C...
+
+    Antes de come‡armos a dar uma olhada nas t‚cnicas, quero  avisar
+que  meu  compilador preferido ‚ o BORLAND C++ 3.1.  Ele tem algumas
+caracter¡sticas que n„o est„o presentes  do  MicroSoft C++ 7.0 ou no
+MS Visual C++!  Por  exemplo,  O  MSC++  ou  o MS-Visual C++ n„o tem
+"pseudo"-registradores (que ajudam um  bocado  na mixagem de c¢digo,
+evitando os "avisos" do compilador).
+
+    Mesmo com algumas diferen‡as, vocˆ poder  usar as t‚cnicas  aqui
+descritas...  As regras podem ser usadas  para  qualquer  compilador
+que n„o gere aplica‡”es em modo protegido para o MS-DOS.
+
+ ş Regras para a boa codigifica‡„o assembly em C
+
+    Assim como no TURBO PASCAL, devemos:
+
+        * Nunca alterar CS, DS, SS, SP, BP e IP.
+        * Podemos alterar com muito cuidado ES, SI e DI
+        * Podemos alterar sempre que quisermos AX, BX, CX, DX
+
+    O registrador DS  sempre  aponta  para  o  segmento  de dados do
+programa...  Se a sua fun‡„o assembly acessa alguma vari vel global,
+e vocˆ tiver alterado DS, a  vari vel  que  vocˆ  pretendia  acessar
+n„o estar  dispon¡vel!  Os registradores SS, SP e BP s„o usados pela
+linguagem  para  empilhar  e  desempilhar  os parametros e vari veis
+locais da fun‡„o na  pilha...   altera-los pode causar problemas!  O
+par de registradores CS:IP nao deve ser  alterado  porque  indica  a
+pr¢xima  posi‡„o  da  mem¢ria  que cont‚m uma instru‡„o assembly que
+ser  executada...  Em qualquer  programa "normal" esses £ltimos dois
+registradores s„o deixados em paz.
+
+    No caso dos registradores ES, SI e DI, o compilador  os  usa  na
+manipula‡„o  de  pointers  e  quando precisa manter uma vari vel num
+registrador  (quando  se  usa   a  palavra-reservada  "register"  na
+declara‡„o de uma vari vel, por exemplo!).   Dentro  de  uma  fun‡„o
+escrita puramente em assembly, SI e DI podem ser alterados a vontade
+porque  o compilador trata de salva-las na pilha (via PUSH SI e PUSH
+DI) e, ao t‚rmino da fun‡„o, as  restaura  (via POP DI e POP SI).  A
+melhor  forma  de  se  saber  se  podemos  ou  n„o  usar  um  desses
+registradores em um c¢digo mixto ‚ compilando o programa  e  gerando
+uma listagem assembly (no BORLAND C++ isso ‚ feito usando-se a chave
+-S  na  linha  de comando!)...  fa‡a a an lize da fun‡„o e veja se o
+uso  desses  registradores  vai  prejudicar  alguma  outra  parte do
+c¢digo!
+
+    Se vocˆ n„o quer ter essa dor de cabe‡a,  simplesmente  salve-os
+antes de usar e restaure-os depois que os usou!
+
+
+ ş Modelamento de mem¢ria:
+
+    O  mais  chato  dos  compiladores   C/C++  para  o  MS-DOS  ‚  o
+modelamento de mem¢ria, coisa que n„o existe no TURBO PASCAL!   Digo
+"chato"  porque esse recurso, QUE  MUITO UTIL, nos d  algumas dores
+de cabe‡a de vez em quando...
+
+    Os modelos COMPACT, LARGE e  HUGE usam, por default, pointers do
+tipo  FAR  (segmento:offset).  Os modelos TINY, SMALL e MEDIUM usam,
+por default, pointers do  tipo  NEAR  (apenas  offset, o segmento de
+dados ‚ assumido!).
+
+    A "chatisse" est   em  criarmos  c¢digos  que  compilem  bem  em
+qualquer  modelo  de  mem¢ria.  Felizmente isso ‚ poss¡vel gra‡as ao
+pre-processador:
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³#if defined(__TYNY__) || defined(__SMALL__) || defined(__MEDIUM__)³
+³/* Processamento de pointers NEAR */                              ³
+³#else                                                             ³
+³/* Processamento dos mesmos pointers... mas, FAR! */              ³
+³#endif                                                            ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Concorda comigo que ‚  meio  chato  ficar enchendo a listagem de
+diretivas do pr‚-processador?... C'est la vie!
+
+ ş C + ASM
+
+    Os compiladores da BORLAND possuem a  palavra  reservada  "asm".
+Ela  diz  ao compilador que o que a segue deve ser interpretado como
+uma instru‡„o  assembly.   Os  compiladores  da  MicroSoft possuem o
+"_asm" ou o "__asm".  A  BORLAND  ainda  tem  uma  diretiva  para  o
+pr‚-processador  que ‚ usada para indicar ao compilador que o c¢digo
+deve ser montado pelo TURBO ASSEMBLER ao inv‚s do compilador C/C++:
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ #pragma inline                                                   ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Vocˆ pode usar isto ou ent„o  a  chave -B da linha de comando do
+BCC...  funciona da mesma forma!  Vocˆ  deve  estar  se  perguntando
+porque  usar  o  TURBO  ASSEMBLER se o pr¢prio compilador C/C++ pode
+compilar o c¢digo...   Ahhhhh,  por  motivos de COMPATIBILIDADE!  Se
+vocˆ pretende que o seu c¢digo seja compil vel no TURBO C  2.0,  por
+exemplo,  deve  incluir a diretiva acima!!  Al‚m do mais, o TASM faz
+uma checagem mais detalhada do c¢digo assembly do que o BCC...
+
+    Eis um exemplo de uma fun‡„ozinha escrita em assembly:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  int f(int X)                                                  ³
+ ³  {                                                             ³
+ ³      asm mov     ax,X    /* AX = parametro X */                ³
+ ³      asm add     ax,ax   /* AX = 2 * AX */                     ³
+ ³      return _AX;         /* retorna AX */                      ³
+ ³  }                                                             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Aqui segue mais uma regra:
+
+    ş Se a sua fun‡„o pretende  devolver  um valor do tipo "char" ou
+      "unsigned char", coloque o valor  no  registrador  AL  e  (nos
+      compiladores da BORLAND) use "return _AL;"
+
+    ş  Se  a  sua fun‡„o pretende devolver um valor do tipo "int" ou
+      "unsigned int", coloque o  valor  no  registrador AX e (tamb‚m
+      nos compiladores da BORLAND) use "return _AX;"
+
+    A £ltima linha da fun‡„o acima ("return _AX;") n„o ‚ necess ria,
+mas  se  n„o  a colocarmos teremos um aviso do compilador, indicando
+que "a fun‡„o precisa retornar  um  'int'".  Se vocˆ omitir a £ltima
+linha   (‚  o  caso  dos  compiladores  da  MicroSoft  que  n„o  tem
+pseudo-registradores) e n„o ligar  pros  avisos, a coisa funciona do
+mesmo jeito.
+
+    Agora vocˆ deve estar querendo  saber  como  devolver  os  tipos
+"long", "double", "float", etc...  O tipo "long" (bem como "unsigned
+long") ‚ simples:
+
+    ş Se a sua fun‡„o pretende  devolver  um valor do tipo "long" ou
+      "unsigned  long", coloque os 16 bits mais significativos em DX
+      e os 16 menos significativos em AX.
+
+    N„o existe uma forma de devolvermos  DX  e  AX  ao  mesmo  tempo
+usando  os pseudo-registradores da Borland, ent„o prepare-se para um
+"aviso" do compilador...
+
+    Os demais tipos n„o s„o  inteiros...   s„o  de  ponto-flutuante,
+portanto, deixe que o compilador tome conta deles.
+
+
+ ş Trabalhando com pointers e vetores:
+
+    Dˆ uma olhada na listagem abaixo:
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³   unsigned ArraySize(char *str)                                   ³
+³   {                                                               ³
+³#if defined(__TYNY__) || defined(__SMALL__) || defined(__MEDIUM__) ³
+³       asm mov     si,str  /* STR = OFFSET apenas */               ³
+³#else                                                              ³
+³       asm push    ds                                              ³
+³       asm lds     si,str  /* STR = SEGMENTO:OFFSET */             ³
+³#endif                                                             ³
+³                                                                   ³
+³       asm mov     cx,-1                                           ³
+³ContinuaProcurando:                                                ³
+³       asm inc     cx                                              ³
+³       asm lodsb                                                   ³
+³       asm or      al,al                                           ³
+³       asm jnz     ContinuaProcurando                              ³
+³       asm mov     ax,cx                                           ³
+³                                                                   ³
+³#if defined(__COMPACT__) || defined(__LARGE__) || defined(__HUGE__)³
+³       asm pop     ds          /* Restaura DS */                   ³
+³#endif                                                             ³
+³                                                                   ³
+³       return _AX;                                                 ³
+³   }                                                               ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A rotina acima ‚ equivalente a fun‡„o strlen() de <string.h>.
+
+    Como disse antes, nos modelos COMPACT, LARGE e HUGE  um  pointer
+tem o formato SEGMENTO:OFFSET  que  ‚  armazenado  na mem¢ria em uma
+grande vari vel de 32 bits (os 16 mais significativos s„o o SEGMENTO
+e os 16 menos significativos s„o o OFFSET).  Nos modelos TINY, SMALL
+e MEDIUM apenas o OFFSET ‚ fornecido no pointer  (ele  tem  16  bits
+neste  caso),  o SEGMENTO ‚ o assumido em DS (n„o devemos alter -lo,
+neste caso!).
+
+    Se vocˆ compilar  essa  listagem  nos  modelos COMPACT, LARGE ou
+HUGE o c¢digo coloca em DS:SI o pointer (lembre-se: pointer ‚ s¢  um
+outro  nome  para "endere‡o de mem¢ria!").  Sen„o, precisamos apenas
+colocar em SI o OFFSET (DS j  est  certo!).
+
+    Ao sair da fun‡„o, DS deve  ser  o  mesmo de antes da fun‡„o ser
+chamada...  Portanto, nos modelos "LARGOS" (hehe) precisamos  salvar
+DS ANTES de us -lo e restaura-lo  DEPOIS de usado!  O compilador n„o
+faz isso automaticamente!
+
+    N„o se preocupe com SI  (neste caso!)...  este sim, o compilador
+salva sozinho...
+
+    Um macete com o  uso  de  vetores  pode ser mostrado no seguinte
+c¢digo exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  char a[3];                                                     ³
+ ³  int b[3], c[3];                                                ³
+ ³  long d[3];                                                     ³
+ ³                                                                 ³
+ ³  void init(void)                                                ³
+ ³  {                                                              ³
+ ³      int i;                                                     ³
+ ³                                                                 ³
+ ³      for (i = 0; i < 3; i++)                                    ³
+ ³          a[i] = b[i] = c[i] = d[i] = 0;                         ³
+ ³  }                                                              ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O compilador gera a seguinte fun‡„o equivalente em assembly:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  void init(void)                                                ³
+ ³  {                                                              ³
+ ³      asm xor     si,si           /* SI = i */                   ³
+ ³      asm jmp     short @1@98                                    ³
+ ³  @1@50:                                                         ³
+ ³      asm mov     bx,si           /* BX = i */                   ³
+ ³      asm shl     bx,1                                           ³
+ ³      asm shl     bx,1            /* BX = BX * 4 */              ³
+ ³      asm xor     ax,ax                                          ³
+                                                           

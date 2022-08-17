@@ -1,0 +1,185 @@
+
+
+                               ˙A˙S˙S˙E˙M˙B˙L˙Y˙
+                             Modo de escrita na tela
+                                Aula nr. 25 de 26
+
+    O modo de  escrita  1  nÑo  Ç  tÑo  £til,  como  vimos no £ltimo
+texto...  A plca VGA possui algumas redundancias que  podem  parecer
+desnesses†rias  Ö primeira vista, como por exemplo o modo de escrita
+3.  Nesse modo podemos despresar  o registrador "Enable Set/Reset" e
+usar "Set/Reset" para ajustar os bits dos quatro planos de v°deo.
+
+
+    ˛ Modo de escrita 3
+
+    Well...  No modo 0 vimos como  atualizar  os  quatro  planos  de
+bits de uma s¢ vez...  Isso Ç feito setando  o  registrador  "Enable
+Set/Reset"  e  "Set/Reset"...  usando  tambÇm MapMask e BitMask para
+habilitarmos  os  planos  e   os  bits  desejados,  respectivamente.
+Acontece que no modo 0 podemos ter uma mistura de  dados  vindos  da
+CPU,  dos  latches e do registro Set/Reset... a mistura pode ser tÑo
+confusa que podemos  ter  a  CPU  atualizando  um  plano e Set/Reset
+outro.  ê, sem sombra de d£vida, um recurso interessante e  bastante
+£til...  mas  se  nÑo  tomarmos  cuidado pode ser uma catastrofe, em
+termos visuais!
+
+    O modo de escrita 3 trabalha da  mesma forma que o modo 0 s¢ que
+"seta" automaticamente os quatro bits de "Enable  Set/Reset".   Isto
+Ç,  a  CPU  nÑo  escreve  nada  nos  planos de bits... isso fica sob
+responsabilidade do registrador "Set/Reset".  O que a CPU escreve na
+mem¢ria so sistema sofre uma operaáÑo  l¢gica  AND  com  o  conte£do
+atual  de  BitMask...   O resultado Ç usado como se fosse o BitMask!
+(Para facilitar  as  coisas...  se  BitMask  for  11111111b  e a CPU
+escrever 01100011b, entÑo o "novo" BitMask ser† 01100011b, sem que o
+registrador BitMask seja afetado!!)
+
+    Com  esse  modo  de escrita descartamos a necessidade de ajustar
+"Enable Set/Reset", eliminando a  confusÑo  que  pode ser causada no
+modo  0...  descartamos  a  atualizaáÑo  de  BitMask,  que  pode  feita
+indiretamente pela  CPU...   Mas,  infelizmente  nÑo  descartamos  a
+necessidade  de leitura da mem¢ria do sistema para carga dos latches
+e nem mesmo  a  necessidade  de  habilitarmos  os  planos de bits em
+MapMask!  Se  MapMask  estiver  zerado  nenhum  plano  de  bit  ser†
+atualizado,  lembre-se  sempre disso!!!  Isso Ç v†lido para TODOS os
+modos de escrita!
+
+    Eis um exemplo  pr†tico  do  uso  do  modo  de escrita 3...  Uma
+rotina que traáa uma linha horizontal:
+
+ ⁄ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒø
+ ≥  ideal                                                           ≥
+ ≥  model small,c                                                   ≥
+ ≥  locals                                                          ≥
+ ≥  jumps                                                           ≥
+ ≥  p386                                                            ≥
+ ≥                                                                  ≥
+ ≥  ; inclui os macros definidos no £ltimo texto!                   ≥
+ ≥  include "VGA.INC"                                               ≥
+ ≥                                                                  ≥
+ ≥  SCREEN_SEGMENT  equ 0A000h                                      ≥
+ ≥                                                                  ≥
+ ≥  ; Tamanho de uma linha... (modo 640x480)                        ≥
+ ≥  LINE_SIZE       equ 80                                          ≥
+ ≥                                                                  ≥
+ ≥  ; Coordenadas m†ximas...                                        ≥
+ ≥  MAX_X_POS       equ 639                                         ≥
+ ≥  MAX_Y_POS       equ 479                                         ≥
+ ≥                                                                  ≥
+ ≥  global  grHorizLine:proc                                        ≥
+ ≥  global  grVertLine:proc                                         ≥
+ ≥  global  setGraphMode:proc                                       ≥
+ ≥  global  setTextMode:proc                                        ≥
+ ≥                                                                  ≥
+ ≥  codeseg                                                         ≥
+ ≥                                                                  ≥
+ ≥  ;*** DESENHA LINHA HORIZONTAL ***                               ≥
+ ≥  proc    grHorizLine                                             ≥
+ ≥  arg     left:word, right:word, y:word, color:word               ≥
+ ≥  local   bitmask1:byte, bitmask2:byte                            ≥
+ ≥  uses    si, di                                                  ≥
+ ≥                                                                  ≥
+ ≥          ; Verifica se a coordenada Y Ç v†lida...                ≥
+ ≥          mov     ax,[y]                                          ≥
+ ≥          or      ax,ax                                           ≥
+ ≥          js      @@grHorizLineExit                               ≥
+ ≥                                                                  ≥
+ ≥          cmp     ax,MAX_Y_POS                                    ≥
+ ≥          ja      @@grHorizLineExit                               ≥
+ ≥                                                                  ≥
+ ≥          ; Verifica validade das coordenadas "left" e "right"... ≥
+ ≥          mov     ax,[left]                                       ≥
+ ≥          cmp     ax,[right]                                      ≥
+ ≥          jb      @@noSwap                                        ≥
+ ≥                                                                  ≥
+ ≥          ; Troca "left" por "right"                              ≥
+ ≥          ;  se "right" for menor que "left".                     ≥
+ ≥          xchg    ax,[left]                                       ≥
+ ≥          mov     [right],ax                                      ≥
+ ≥                                                                  ≥
+ ≥  @@noSwap:                                                       ≥
+ ≥          ; Verifica a validade das coordenadas "left" e "right"  ≥
+ ≥          cmp     ax,MAX_X_POS    ; "left" Ç valido?              ≥
+ ≥          ja      @@grHorizLineExit                               ≥
+ ≥                                                                  ≥
+ ≥          or      [right],0       ; "right" Ç valido?             ≥
+ ≥          js      @@grHorizLineExit                               ≥
+ ≥                                                                  ≥
+ ≥          WriteMode   3     ; Ajusta no modo de escrita 3.        ≥
+ ≥          BitMask     0FFh  ; BitMask totalmente setado!          ≥
+ ≥          MapMask     1111b ; Habilita todos os quatro planos     ≥
+ ≥                            ;  de bits.                           ≥
+ ≥          SetReset    <[byte color]> ; Ajusta a cor desejada...   ≥
+ ≥                                                                  ≥
+ ≥          mov     ax,SCREEN_SEGMENT                               ≥
+ ≥          mov     es,ax   ; ES = segmento de v°deo.               ≥
+ ≥                                                                  ≥
+ ≥          ; Calcula os offsets das colunas...                     ≥
+ ≥          mov     si,[left]                                       ≥
+ ≥          mov     di,[right]                                      ≥
+ ≥          shr     si,3        ; si = offset da coluna 'left'      ≥
+ ≥          shr     di,3        ; di = offset da coluna 'right'     ≥
+ ≥                                                                  ≥
+ ≥          ; Calcula o offset da linha 'y'                         ≥
+ ≥          mov     bx,[y]                                          ≥
+ ≥          mov     ax,LINE_SIZE                                    ≥
+ ≥          mul     bx                                              ≥
+ ≥          mov     bx,ax   ; BX contÇm o offset da linha.          ≥
+ ≥                                                                  ≥
+ ≥          ; PrÇ-calcula a mascara da coluna 'left'                ≥
+ ≥          mov     cx,[left]                                       ≥
+ ≥          mov     ch,cl                                           ≥
+ ≥          and     ch,111b                                         ≥
+ ≥          mov     cl,8                                            ≥
+ ≥          sub     cl,ch                                           ≥
+ ≥          mov     ah,0FFh                                         ≥
+ ≥          shl     ah,cl                                           ≥
+ ≥          not     ah                                              ≥
+ ≥          mov     [bitmask1],ah                                   ≥
+ ≥                                                                  ≥
+ ≥          ; prÇ-calcula a mascara da coluna 'right'               ≥
+ ≥          mov     cx,[right]                                      ≥
+ ≥          and     cl,111b                                         ≥
+ ≥          inc     cl                                              ≥
+ ≥          mov     ah,0FFh                                         ≥
+ ≥          shr     ah,cl                                           ≥
+ ≥          not     ah                                              ≥
+ ≥          mov     [bitmask2],ah                                   ≥
+ ≥                                                                  ≥
+ ≥          ; Verifica se apenas um byte ser† atualizado.           ≥
+ ≥          cmp     si,di                                           ≥
+ ≥          jz      @@OneByte                                       ≥
+ ≥                                                                  ≥
+ ≥          mov     ah,[bitmask1]                                   ≥
+ ≥          xchg    [es:bx+si],ah  ; Escreve na mem¢ria da video... ≥
+ ≥                                 ; ... XCHG primeiro là o que     ≥
+ ≥                                 ;  est† no operando destino,     ≥
+ ≥                                 ;  depois efetua a troca.        ≥
+ ≥                                 ;  Com isso economizamos um MOV! ≥
+ ≥          inc     si                                              ≥
+ ≥          cmp     si,di                                           ≥
+ ≥          je      @@doMask2                                       ≥
+ ≥                                                                  ≥
+ ≥  @@MiddleDraw:                                                   ≥
+ ≥          mov     [byte es:bx+si],0ffh    ; Linha cheia...        ≥
+ ≥                                          ; NÑo precisamos        ≥
+ ≥                                          ;  carregar os latches  ≥
+ ≥                                          ;  pq todos os bits     ≥
+ ≥                                          ;  serÑo atualizados!   ≥
+ ≥          inc     si                                              ≥
+ ≥          cmp     si,di                                           ≥
+ ≥          jne     @@MiddleDraw                                    ≥
+ ≥                                                                  ≥
+ ≥  @@doMask2:                                                      ≥
+ ≥          mov     ah,[bitmask2]                                   ≥
+ ≥          xchg    [es:bx+si],ah   ; Escreve na mem¢ria de v°deo   ≥
+ ≥          jmp     @@HorizLineEnd                                  ≥
+ ≥                                                                  ≥
+ ≥  @@OneByte:                                                      ≥
+ ≥          and     ah,[bitmask1]                                   ≥
+ ≥          xchg    [es:bx+si],ah                                   ≥
+ ≥                                                                  ≥
+ ≥  @@HorizLineEnd:                                                 ≥
+ ≥          WriteMode 0         ; Poe no modo 0 de novo...          ≥
+ ≥                              ;  Necess†rio
+                                             

@@ -1,0 +1,229 @@
+
+                               úAúSúSúEúMúBúLúYú
+                              Fun‡”es e Procedures
+                                Aula nr. 12 de 26
+
+    A partir de agora veremos como desenvolver fun‡”es/procedures em
+assembly no mesmo c¢digo PASCAL.
+
+    O  TURBO  PASCAL  (a  partir  da  versao  6.0)  fornece  algumas
+palavras-chave dedicadas …  constru‡„o  de  rotinas assembly in-line
+(esse recurso ‚ chamado de BASM nos manuais do TURBO PASCAL - BASM ‚
+a abrevia‡„o de Borland ASseMbler).
+
+    Antes de come‡armos a  ver  o  nosso primeiro c¢digo em assembly
+vale a pena ressaltar  alguns  cuidados  em rela‡„o a codifica‡„o de
+rotinas assembly em TURBO PASCAL...  As nossas rotinas devem:
+
+    ş Preservar sempre o conte£do dos registradores DS, BP e SP.
+    ş Nunca modificar, diretamente, o conte£do dos registradores CS,
+      IP e SS.
+
+    O  motivo  dessas  restri‡”es ‚ que os registradores BP, SP e SS
+s„o usados  na  obten‡„o  dos  valores  passados  como  parametros …
+fun‡„o/procedure.  O registrador DS ‚ usado por todo o c¢digo PASCAL
+a  fim  de  localizar  o  segmento  de dados correntes (os quais n„o
+sabemos onde se encontram...  deixe  que  o c¢digo PASCAL tome conta
+disso!).
+
+    Com rela‡„o ao conte£do de CS  e  IP, n„o ‚ uma boa pr tica (nem
+mesmo em c¢digos assembly puros) alterar o seus valores.  Deixe  que
+as  instru‡”es  de  salto  e  chamada  de  subrotinas fa‡am isso por
+vocˆ!).
+
+    Os  demais  registradores  podem  ser  alterados a vontade.
+
+    A fun‡„o HexByte()  abaixo  ‚  um  exemplo  de fun‡„o totalmente
+escrita em assembly:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  FUNCTION    HexByte(Data : Byte) : String; ASSEMBLER;         ³
+ ³  ASM                                                           ³
+ ³      LES     DI,@Result   { Aponta para o inicio da string. }  ³
+ ³                                                                ³
+ ³      MOV     AL,2         { Ajusta tamanho da string em 2.  }  ³
+ ³      STOSB                                                     ³
+ ³                                                                ³
+ ³      MOV     AL,Data      { Pega o dado a ser convertido.   }  ³
+ ³                                                                ³
+ ³      MOV     BL,AL        { Salva-o em BL.                  }  ³
+ ³      SHR     AL,1         { Para manter compatibilidade com }  ³
+ ³      SHR     AL,1         { os microprocessadores 8088/8086 }  ³
+ ³      SHR     AL,1         { nao ‚ prudente usar SHR AL,4.   }  ³
+ ³      SHR     AL,1                                              ³
+ ³      ADD     AL,'0'       { Soma com ASCII '0'.             }  ³
+ ³      CMP     AL,'9'       { Maior que ASCII '9'?            }  ³
+ ³      JBE     @NoAdd_1     { ... Nao ‚, ent„o nao soma 7.    }  ³
+ ³      ADD     AL,7         { ... , ent„o soma 7.            }  ³
+ ³  @NoAdd_1:                                                     ³
+ ³      MOV     AH,AL        { Salva AL em AH.                 }  ³
+ ³                                                                ³
+ ³      MOV     AL,BL        { Pega o valor antigo de AL em BL.}  ³
+ ³      AND     AL,1111B     { Zera os 4 bits superiores de AL.}  ³
+ ³      ADD     AL,'0'       { Soma com ASCII '0'.             }  ³
+ ³      CMP     AL,'9'       { Maior que ASCII '9'?            }  ³
+ ³      JBE     @NoAdd_2     { ... Nao ‚, ent„o nao soma 7.    }  ³
+ ³      ADD     AL,7         { ... , ent„o soma 7.            }  ³
+ ³  @NoAdd_2:                                                     ³
+ ³                                                                ³
+ ³      XCHG    AH,AL        { Trocar AH com AL para gravar na }  ³
+ ³      STOSW                { ordem correta.                  }  ³
+ ³  END;                                                          ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A primeira linha ‚ a declara‡„o da fun‡„o  seguida  da  diretiva
+ASSEMBLER  (informando  que a fun‡„o TODA foi escrita em assembly!).
+A seguir a palavra-chave ASM  indica  o inicio do bloco assembly at‚
+que END; marque o fim da fun‡„o...
+
+    A primeira linha do c¢digo assembly ‚:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      LES     DI,@Result                                        ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Quando retornamos uma string  numa  fun‡„o precisamos conhecer o
+endere‡o do  inicio  dessa  string.   A  vari vel  @Result cont‚m um
+pointer que aponta para o inicio da string que ser   devolvida  numa
+fun‡„o.  Esse endere‡o ‚ sempre um endere‡o FAR (ou seja, no formato
+SEGMENTO:OFFSET).
+
+    A seguir inicializamos o tamanho da string em 2 caracteres:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      MOV     AL,2                                              ³
+ ³      STOSB                                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Note  que STOSB vai gravar o conte£do de AL no endere‡o apontado
+por ES:DI, ou seja, o endere‡o  apontado por @Result, e logo ap¢s DI
+‚ incrementado, apontando para a primeira posi‡„o valida da string.
+
+    O m‚todo  que  usei  para  gerar  uma  string  hexadecimal  ‚  o
+seguinte:
+
+    - Pegamos o parametro 'Data' e colocamos em AL.
+    - Salva-se o conte£do de AL em BL para que possamos obter  os  4
+      bits menos significativos sem termos que ler 'Data' novamente!
+    - Com AL fazemos:
+        - Desloca-se AL 4  posi‡oes  para  a direita, colocando os 4
+          bits mais significativos  nos  4  menos  significativos  e
+          preenchendo os 4 mais significativos com 0B.
+     (a)- Soma-se o valor do ASCII '0' a AL.
+     (b)- Verifica-se se o  resultado ‚ maior que o ASCII '9'.
+            - Se for, somamos 7.
+        - Salvamos o conte£do  de  AL  em  AH.
+    - Recuperamos o valor antigo de AL que estava em BL.
+    - Com AL fazemos:
+        - Zeramos os 4 bits mais significativos para obtermos apenas
+          os 4 menos significativos em AL.
+        - Repetimos (a) e (b)
+    - Trocamos AL com AH e gravamos AX  com STOSB
+
+    A primeira pergunta ‚: Porque somar 7 quando o resultado da soma
+com o ASCII '0' for  maior  que  o  ASCII  '9'?  A resposta pode ser
+vista no peda‡o da tabela ASCII abaixo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³         0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B C D E F          ³
+ ³                             ÀÄÄÄÄÄÂÄÄÄÄÄÙ                      ³
+ ³                           E esses 7 bytes ?                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Observe  que  depois  do ASCII '9' segue o ASCII ':' ao inv‚s do
+ASCII 'A', como ‚ desejado...  Entao,  se  o resultado da soma dos 4
+bits menos signficativos (que varia de 0000B at‚ 1111B - ou de  0  a
+15) com o ASCII '0' for maior que o ASCII '9' precisamos compensar a
+existencia dos 7 caracteres indesej veis!
+
+    Imagine que AL seja 0. Somando o  ASCII  '0'  (que  equivale  ao
+n£mero 30h) a AL obteriamos:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  AL = 0010B = 2h                                                ³
+ ³  AL = 2h + '0'                                                  ³
+ ³  AL = 2h + 30h                                                  ³
+ ³  AL = 32h = '2'                                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Imagine  agora  que  AL  seja  1011B.   Fazendo as mesmas contas
+obteriamos AL = 3Bh  (que  ‚  a  mesma  coisa  que  o ASCII ';'.  No
+entando, 3Bh ‚ maior que o ASCII '9' (ou seja, 39h)... Ent„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  AL = ';' = 3Bh                                                 ³
+ ³  AL = 3Bh + 7h                                                  ³
+ ³  AL = 42h = 'B'                                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A outra coisa que vocˆ poderia me perguntar ‚ o porque eu usei a
+instru‡„o  XCHG  AH,AL  no final do c¢digo.  A resposta ‚ simples...
+Os microprocessadores da INTEL  gravam  words na mem¢ria da seguinte
+maneira:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  Word = FAFBh                                                   ³
+ ³  Na mem¢ria: FBh FAh                                            ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    N„o  importa  se o seu computador seja um Pentium ou um XT...  A
+mem¢ria  ‚  sempre dividida em BYTES.  A CPU apenas "le" um conjunto
+maior de bytes de acordo com  a  quantidade de bits da sua CPU.  Por
+exemplo, os microprocessadores 8086 e 80286 s„o CPUs de  16  bits  e
+por isso conseguem ler 2 bytes (8 bits + 8 bits = 16 bits) de uma s¢
+vez...  As CPUs 386 e 486 s„o de 32 bits e podem ler de uma s¢ vez 4
+bytes!
+
+    Esse  conjunto  de  bytes  que  a  CPU  pode  enxergar  ‚ sempre
+armazenado da forma contr ria  do  que  os  olhos humanos leem...  O
+byte menos significativo SEMPRE vem ANTES do mais significativo.  No
+caso de um DOUBLEWORD (ou numero de 32 bits de tamanho) o formato  ‚
+o mesmo... Exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  N£mero = FAFBFDFEh                                             ³
+ ³  Na mem¢ria: FE FD FB FA                                        ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Analizando  a rotina HexByte() a gente ve que AH tem o byte mais
+significativo  e   AL   o   menos   significativo.    Como  o  menos
+significativo vem sempre antes do mais significativo fiz a troca  de
+AH com AL para que o n£mero HEXA seja armazenado de forma correta na
+mem¢ria  (string).  Um exemplo: Suponha que o vocˆ passe o valor 236
+… fun‡„o HexByte():
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  Valor = 236 ou ECh                                             ³
+ ³  At‚ antes de XCHG AH,AL:    AH = ASCII 'E'                     ³
+ ³                              AL = ASCII 'C'                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Se  n„o  tivessemos  a   instru‡„o  XCHG  AH,AL  e  simplesmente
+usassemos o STOSW (como est  no c¢digo!) AH seria precedido de AL na
+mem¢ria (ou na string!),  ficariamos  com  uma  string 'CE'!  N„o me
+lembro  se  j   falei  que  o  L  de  AL  significa  LOW  (ou  menos
+significativo!) e H de AH significa HIGH  (ou  mais  significativo),
+portanto  AL  e  AH  s„o,  respectivamente,  os  bytes  menos e mais
+significativos de AX!
+
+    N„o se importe em coloca um RET ao fim da fun‡„o, o TURBO PASCAL
+coloca isso sozinho...
+
+    Vocˆ deve estar se perguntando porque n„o fiz a rotina de  forma
+tal  que  a troca de AH por AL n„o fosse necess ria...  Well...  Fiz
+isso pra ilustrar a  forma  como  os  dados s„o gravados na mem¢ria!
+Retire XCHG AH,AL do c¢digo e veja o que  acontece!   Um  outro  bom
+exerc¡cio  ‚  tentar  otimizar  a  rotina  para que a troca n„o seja
+necess ria...
+
+    E...  para fechar  a  rotina,  podemos aproveitar HexByte() para
+construir HexWord():
+
+   Function HexWord(Data : Word) : String;
+   Var H, L : String;
+   Begin
+       H := HexByte(HIGH(Data));
+       L := HexByte(LOW(Data));
+       HexWord := H + L;
+   End;
+                                                                                                   

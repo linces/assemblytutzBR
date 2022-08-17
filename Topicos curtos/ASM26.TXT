@@ -1,0 +1,133 @@
+
+                               úAúSúSúEúMúBúLúYú
+                             Modo de escrita na tela
+                                Aula nr. 26 de 26
+
+    Vistos os trˆs  primeiros  modos  de  escrita  da placa VGA, nos
+resta apenas o modo 2.  Esse modo  ‚  muito  £til  para  escrita  de
+bitmaps  nos modos de v¡deo de 16 cores...  Ele trabalha basicamente
+como o  registro  Set/Reset,  sem  que  tenhamos  que  manusear esse
+registro explicitamente.
+
+
+    ş O modo de escrita 2
+
+    Uma vez setado, o modo de escrita 2  habilita  todos  os  quatro
+bits  de "Enable Set/Reset", da mesma forma que o modo de escrita 3.
+No entanto, diferente do modo de escrita 3, o registro Set/Reset n„o
+precisa ser ajustado com  a  "cor"  desejada.  Neste modo o registro
+Set/Reset ‚ setado com os quatro bits menos significativos  enviados
+pela  CPU  …  mem¢ria do sistema.  Precisaremos mascarar os bits n„o
+desejados em BitMask, bem como  ajustar  os planos de bits desejados
+em MapMask.
+
+    Repare na for‡a  deste  modo  de  v¡deo...  poderemos  atualizar
+pixels  com a "cor" que quisermos sem usarmos Set/Reset diretamente,
+e sem termos que setar os  bits de "Enable Set/Reset".  Mas, teremos
+que ajustar BitMask para n„o setarmos todos os oito pixels  no  byte
+que estamos escrevendo dos planos de bits...  Eis um exemplo do modo
+de escrita 2:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ideal                                                          ³
+ ³  model tiny                                                     ³
+ ³  locals                                                         ³
+ ³  jumps                                                          ³
+ ³                                                                 ³
+ ³  include "vga.inc"                                              ³
+ ³                                                                 ³
+ ³  LINE_LENGTH     equ     80                                     ³
+ ³                                                                 ³
+ ³  codeseg                                                        ³
+ ³  org     100h                                                   ³
+ ³  start:                                                         ³
+ ³      mov     ax,12h  ; Ajusta modo de v¡deo 640x480x16          ³
+ ³      int     10h                                                ³
+ ³                                                                 ³
+ ³      WriteMode   2      ; modo de escrita 2                     ³
+ ³      MapMask     1111b  ; todos os planos de bits               ³
+ ³                                                                 ³
+ ³      mov     ax,0A000h                                          ³
+ ³      mov     es,ax      ; ES = segmento de v¡deo                ³
+ ³                                                                 ³
+ ³      sub     di,di      ; DI = offset                           ³
+ ³      sub     bl,bl      ; usaremos BL p/ contar as linhas.      ³
+ ³                                                                 ³
+ ³      mov     ah,10000000b ; ah = bitmask inicial                ³
+ ³      mov     cl,1000b     ; CL = cor inicial                    ³
+ ³                                                                 ³
+ ³  @@1:                                                           ³
+ ³      BitMask ah                                                 ³
+ ³      mov     al,[es:di]  ; carrega latches                      ³
+ ³      mov     [es:di],cl  ; escreve nos planos                   ³
+ ³      ror     ah,1        ; rotaciona bitmask                    ³
+ ³      inc     cl          ; pr¢xima cor                          ³
+ ³      cmp     cl,10000b   ; ops... ultrapassou?!                 ³
+ ³      jb      @@1         ; n„o... ent„o permanece no loop.      ³
+ ³      mov     cl,1000b    ; ajusta p/ cor inicial.               ³
+ ³      add     di,LINE_LENGTH ; pr¢xima linha                     ³
+ ³      inc     bl          ; incrementa contador de linhas        ³
+ ³      cmp     bl,8        ; chegou na linha 8?                   ³
+ ³      jb      @@1         ; n„o... continua no loop.             ³
+ ³                                                                 ³
+ ³      sub     ah,ah       ; espera tecla, sen„o n„o tem gra‡a!   ³
+ ³      int     16h                                                ³
+ ³                                                                 ³
+ ³      mov     ax,3        ; volta ao modo texto...               ³
+ ³      int     10h                                                ³
+ ³                                                                 ³
+ ³      int     20h         ; fim do programa.                     ³
+ ³  end start                                                      ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esse modo parece mais f cil  que os demais, n„o?!  Aparentemente
+‚... mas tenha em mente que os outros modos de  escrita  tamb‚m  tˆm
+suas vantagens.
+
+
+    ş E os modos de leitura?!
+
+    Na  grande maioria das vezes n„o ‚ vantajoso lermos os dados que
+est„o nos planos de bits...  Isso  porque  a mem¢ria de v¡deo ‚ mais
+lenta que a mem¢ria do sistema (mesmo a mem¢ria do sistema associada
+… placa VGA ‚ mais lenta que o resto da mem¢ria  do  seu  PC...  por
+causa  dos WAIT STATES que a placa VGA adiciona para n„o se perder -
+a velocidade da CPU ‚ maior  que  a  do circuito de v¡deo!).
+
+    Para  encerrarmos  os  modos  de  16 cores ‚ interessante vermos
+alguma coisa sobre o modo  de  leitura  0,  que  ‚ o modo default da
+placa VGA.
+
+    No modo de leitura 0 devemos ler um plano de bits por vez... n„o
+‚ poss¡vel ler mais que um plano ao mesmo tempo... e ainda,  MapMask
+n„o ‚ respons vel pela habilita‡„o dos planos de bits.  Nesse caso a
+leitura ‚ feita atrav‚s de uma ramifica‡„o do circuito de v¡deo... a
+escrita ‚ feita por  outra.   O  registrador  BitMask tamb‚m n„o tem
+nenhum efeito na leitura.  Por isso a sele‡„o dos bits fica por  sua
+conta (atrav‚s de instru‡”es AND).
+
+    A  sele‡„o  do  plano  de  bits  que  ser   lido  ‚  feito  pelo
+registrador ReadMap que ‚ descrito abaixo:
+
+        ¯ Registrador READMAP
+
+                7 6 5 4 3 2 1 0
+               ÉÍÑÍÑÍÑÍÑÍÑÍÑÍÑÍ»
+               º?³?³?³?³?³?³ ³ º
+               ÈÍÏÍÏÍÏÍÏÍÏÍÏÍÏÍ¼
+                            ³ ³
+                            ÀÄÁÄÄÄÄÄ Sele‡„o do plano de bits
+
+    ReadMap  tamb‚m  faz  parte do circuito GC...  Ent„o ‚ acess¡vel
+via endere‡os de I/O 3CEh  e  3CFh,  da  mesma forma que BitMask e o
+registro de MODE, s¢ que seu ¡ndice ‚ 4.
+
+    Uma nota importante ‚ a de que, embora a leitura seja feita  por
+uma ramifica‡„o diferente (por isso a existˆncia de ReadMap), quando
+fazemos   uma   leitura   dos   planos   de  bits,  os  latches  s„o
+automaticamente carregados... e  os  latches pertencem … ramifica‡„o
+do  circuito  de escrita (somente os latches dos planos selecionados
+por MapMask s„o carregados, lembra?!).
+
+    E z‚ fini... pelo menos at‚ o pr¢ximo texto! :)
+

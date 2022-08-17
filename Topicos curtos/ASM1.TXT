@@ -1,0 +1,210 @@
+
+                               úAúSúSúEúMúBúLúYú
+                   Introdu‡„o, defini‡„o e bases de c lculos
+                                Aula nr. 1 de 26
+
+    A linguagem ASSEMBLY (e n„o  assemblER!) d  medo em muita gente!
+S¢ n„o sei porque!  As liguagens ditas de  "alto  n¡vel"  s„o  MUITO
+mais  complexas  que  o  assembly!   O  programador assembly tem que
+saber, antes de mais nada, como est  organizada a mem¢ria da m quina
+em que trabalha, a  disponibilidade  de rotinas pr‚-definidas na ROM
+do  micro  (que facilita muito a vida de vez em quando!) e os demais
+recursos que a m quina oferece.
+
+    Uma  grande  desvantagem  do  assembly  com  rela‡„o  as  outras
+linguagens ‚ que  n„o  existe  tipagem  de  dados como, por exemplo,
+ponto-flutuante...  O  programador  ter   que  desenvolver  as  suas
+pr¢prias rotinas ou lan‡ar mao do co-processador matem tico (o TURBO
+ASSEMBLER,   da   Borland,   fornece   uma   maneira   de  emular  o
+co-processador).  N„o existem fun‡”es de entrada-sa¡da como PRINT do
+BASIC  ou  o  Write() do PASCAL...  N„o existem rotinas que imprimam
+dados num‚ricos ou strings na  tela...  Enfim...  n„o existe nada de
+£til!  (Ser ?!  hehehe)
+
+    Pra que serve o  assembly  ent„o?   A  resposta ‚: Para que vocˆ
+possa desenvolver as suas pr¢prias rotinas, sem ter  que  topar  com
+bugs  ou  limita‡”es  de rotinas j  existentes na ROM-BIOS ou no seu
+compilador  "C",  "PASCAL"  ou  qualquer  outro...   Cabe  aqui  uma
+considera‡„o  interessante:    muito  mais  produtivo  usarmos  uma
+liguagem de alto n¡vel juntamente com nossas rotinas em  assembly...
+Evita-se a "reinven‡„o da roda" e n„o temos que desenvolver TODAS as
+rotinas  necess rias  para  os  nossos  programas.  Em particular, o
+assembly ‚ muito £til quando  queremos criar rotinas que n„o existem
+na liguagem de alto-n¡vel  nativa!   Uma rotina ASM bem desenvolvida
+pode nos dar a vantagem da velocidade ou do tamanho mais reduzido em
+nossos programas.
+
+    O  primeiro  passo  para  come‡ar  a  entender  alguma  coisa de
+assembly ‚ entender como a CPU organiza a mem¢ria.   Como  no  nosso
+caso a id‚ia ‚ entender os microprocessadores da  fam¡lia  80x86  da
+Intel (presentes em qualquer PC-Compat¡vel), vamos dar uma  olhadela
+no modelamento de mem¢ria usado pelos PCs, funcionando sob o  MS-DOS
+(Windows,  OS/2,  UNIX,  etc...   usam  outro tipo de modelamento...
+MUITO MAIS COMPLICADO!).
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ Modelamento REAL da mem¢ria - A segmenta‡„o ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    A mem¢ria de qualquer PC ‚ dividida em segmentos.  Cada segmento
+tem 64k bytes  de  tamanho  (65536  bytes)  e  por mais estranho que
+pare‡a  os  segmentos  n„o  s„o  organizados  de  forma   sequencial
+(o  segmento seguinte n„o come‡a logo ap¢s o anterior!).  Existe uma
+sobreposi‡ao.  De uma olhada:
+
+                               64k
+    ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+    ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄ¿
+    ³                                                     ³
+    ³      ³      ³                                       ³      ³
+    ³                                                     ³
+    ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÙ
+    0      1      2 <- Numero do segmento
+    ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÙ
+       16     16
+     bytes   bytes
+
+    O  segundo  segmento  come‡a   exatamente  16  bytes  depois  do
+primeiro.  Deu pra perceber que o inicio do  segundo  segmento  est 
+DENTRO do primeiro, j  que os segmentos tem 64k de tamanho!
+
+    Este  esquema  biruta  confunde  bastante os programadores menos
+experientes e,  at‚  hoje,  ninguem  sabe  porque  a  Intel resolveu
+utilizar essa coisa esquisita.  Mas, paciˆncia, ‚ assim que a  coisa
+funciona!
+
+    Para  encontrarmos  um  determinado  byte  dentro de um segmento
+precisamos  fornecer  o  OFFSET (deslocamento, em inglˆs) deste byte
+relativo ao inicio  do  segmento.   Assim,  se  queremos localizar o
+d‚cimo-quinto byte do segmento 0, basta especificar 0:15,  ou  seja,
+segmento 0 e offset 15.  Esta nota‡„o ‚ usada no restante deste e de
+outros artigos.
+
+    Na  realidade  a  CPU  faz  o  seguinte c lculo para encontrar o
+"endere‡o f¡sico" ou "endere‡o efetivo" na mem¢ria:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³         ENDERE€O-EFETIVO = (SEGMENTO * 16) + OFFSET             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Ilustrando  a  complexidade   deste  esquema  de  endere‡amento,
+podemos provar que existem  diversas  formas  de  especificarmos  um
+£nico "endere‡o  efetivo"  da  mem¢ria...   Por  exemplo, o endere‡o
+0:13Ah pode ser tamb‚m escrito como:
+
+    0001h:012Ah     0002h:011Ah     0003h:010Ah     0004h:00FAh
+    0005h:00EAh     0006h:00DAh     0007h:00CAh     0008h:00BAh
+    0009h:00AAh     000Ah:009Ah     000Bh:008Ah     000Ch:007Ah
+    000Dh:006Ah     000Eh:005Ah     000Fh:004Ah     0010h:003Ah
+    0011h:002Ah     0012h:001Ah     0013h:000Ah
+
+    Basta fazer as contas que vocˆ ver  que todas estas formas dar„o
+o   mesmo  resultado:  o  endere‡o-efetivo  0013Ah.   Generalizando,
+existem, no m ximo,  16  formas  de  especificarmos o mesmo endere‡o
+f¡sico!  As £nicas faixas de endere‡os que n„o tem equivalentes e s¢
+podem  ser  especificados  de  uma  £nica  forma  s„o  os  desesseis
+primeiros bytes do segmento  0  e  os  £ltimos  desesseis  bytes  do
+segmento 0FFFFh.
+
+    Normalmente o programador n„o tem que se preocupar com esse tipo
+de coisa.  O compilador toma conta da melhor forma de endere‡amento.
+Mas, como a toda regra existe uma excess„o, a informa‡„o acima  pode
+ser £til algum dia.
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ A BASE NUMRICA HEXADECIMAL E BINARIA (para os novatos...)        ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Alguns  talvez  n„o  tenham  conhecimento  sobre as demais bases
+num‚ricas usadas na  rea informata.    muito comum dizermos "c¢digo
+hexadecimal", mas o que significa?
+
+     bastante l¢gico que usemos o sistema decimal  como  base  para
+todos  os  c lculos  matem ticos  do  dia-a-dia pelo simples fato de
+temos DEZ dedos nas m„os...  fica  facil  contar  nos  dedos  quando
+precisamos (hehe).
+
+    Computadores usam o sistema bin rio por um outro motimo simples:
+Existem apenas dois n¡veis de tens„o presentes em todos os circuitos
+l¢gicos:  n¡veis  baixo  e  alto  (que  s„o  chamados  de  0 e 1 por
+conveniˆncia...  para podermos medi-los  sem  ter  que recorrer a um
+mult¡metro!).   O  sistema  hexadecimal  tamb‚m tem o seu lugar: ‚ a
+forma mais abreviada de escrever um conjunto de bits.
+
+    Em decimal, o n£mero 1994, por exemplo, pode ser escrito como:
+
+       1994 = (1 * 10^3) + (9 * 10^2) + (9 * 10^1) + (4 * 10^0)
+
+    Note a base 10  nas  potˆncias.   Fa‡o  agora uma pergunta: Como
+representariamos o mesmo n£mer se tivessemos 16 dedos nas m„os?
+
+    ş Primeiro teriamos que obter mais digitos...  0 at‚ 9  n„o  s„o
+      suficientes.   Pegaremos mais 6 letras do alfabeto para suprir
+      esta deficiencia.
+
+    ş Segundo,  Tomemos  como  inspira‡„o  um  od“metro (equipamento
+      dispon¡vel  em  qualquer  autom¢vel   -   ‚   o   medidor   de
+      quilometragem!):  Quando  o  algarismo mais a direita (o menos
+      significativo) chega a 9  e  ‚  incrementado, o que ocorre?...
+      Retorna a 0 e o pr¢ximo ‚ incrementado,  formando  o  10.   No
+      caso  do sistema hexadecimal, isto s¢ acontece quando o £ltimo
+      algarismo alcan‡a F e ‚  incrementado!   Depois  do 9 vem o A,
+      depois o B, depois o C, e assim por diante...   at‚  chegar  a
+      vez  do  F e saltar para 0, incrementando o pr¢ximo algarismo,
+      certo?
+
+    Como contar em base diferente  de  dez  ‚ uma situa‡„o n„o muito
+intuitiva, vejamos a regra de convers„o de bases.  Come‡aremos  pela
+base  decimal  para  a  hexadecimal.   Tomemos  o  n£mero  1994 como
+exemplo.   A  regra  ‚   simples:   Divide-se   1994  por  16  (base
+hexadecimal) at‚ que o quoeficiente seja zero...  toma-se os  restos
+e tem-se o n£mer convertido para hexadecimal:
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ 1994 / 16     -> Q=124, R=10      -> 10=A                     ³
+  ³ 124 / 16      -> Q=7, R=12        -> 12=C                     ³
+  ³ 7 / 16        -> Q=0, R=7         ->  7=7                     ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Toma-se ent„o os restos de baixo para cima, formando o n£mero em
+hexadecimal. Neste caso, 1994=7CAh
+
+    Acrescente um 'h' no fim do n£mero para sabermos que se trata da
+base  16,  do  contr rio,  se  olharmos  um  n£mero "7CA" poderiamos
+associa-lo a  qualquer  outra  base  num‚rica  (base octadecimal por
+exemplo!)...
+
+    O processo inverso,  hexa->decimal,  ‚  mais  simples...   basta
+escrever  o n£mer, multiplicando cada digito pela potˆncia correta,
+levando-se em conta a equivalencia das letras com a base decimal:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  7CAh = (7 * 16^2) + (C * 16^1) + (A * 16^0) =                  ³
+ ³         (7 * 16^2) + (12 * 16^1) + (10 * 16^0) =                ³
+ ³         1792 + 192 + 10 = 1994                                  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    As mesmas regras podem  ser  aplicadas  para a base bin ria (que
+tem apenas dois digitos: 0 e  1).   Por  exemplo,  o  n£mero  12  em
+bin rio fica:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  12 / 2      -> Q=6, R=0                                        ³
+ ³  6 / 2       -> Q=3, R=0                                        ³
+ ³  3 / 2       -> Q=1, R=1                                        ³
+ ³  1 / 2       -> Q=0, R=1                                        ³
+ ³                                                                 ³
+ ³  12 = 1100b                                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Cada digito na base bin ria ‚ conhecido como BIT (Binary digIT -
+ou  digito  bin rio,  em  inglˆs)!   Note  o  'b'  no  fim do n£mero
+convertido...
+
+    Fa‡a o processo inverso... Converta 10100110b para decimal.
+
+    A vantagem de usarmos um  n£mero  em base hexadecimal ‚ que cada
+digito hexadecimal equivale a exatamente  quatro  digitos  bin rios!
+Fa‡a  as  contas: Quatro bits podem conter apenas 16 n£meros (de 0 a
+15), que ‚ exatamente a quantidade de digitos na base hexadecimal.
+                                                    

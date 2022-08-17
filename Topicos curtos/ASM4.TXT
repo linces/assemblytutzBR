@@ -1,0 +1,266 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 1)
+                                Aula nr. 4 de 26
+
+    Come‡aremos a ver algumas instru‡”es  do  microprocessador  8086
+agora.  Existem os seguintes tipos de instru‡”es:
+
+    ş Instru‡”es Aritim‚ticas
+    ş Instru‡”es L¢gicas
+    ş Instru‡”es de Controle de Fluxo de Programa
+    ş Instru‡”es de manipula‡„o de flags
+    ş Instru‡”es de manipula‡„o da pilha
+    ş Instru‡”es de manipula‡„o de blocos
+    ş Instru‡”es de manipula‡„o de registradores/dados
+    ş Instru‡”es de Entrada/Sa¡da
+
+    Vamos   come‡ar   com   as   instru‡”es   de   manipula‡„o    de
+registradores/dados por serem estas as mais f ceis de entender.
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ Instru‡„o MOV ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    MOV tem a finalidade  de  MOVimentar  um  dado  de um lugar para
+outro.  Por exemplo, para carregar um registrador com um determinado
+valor.  Isto ‚ feito com MOV:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV AX,0001h                                                  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+     a mesma coisa que dizer: "AX = 1".  Na verdade, movimentamos o
+valor 1 para dentro do registrador AX.
+
+    Podemos mover o conte£do de um registrador para outro:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV BH,CL                                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+     a mesma coisa que "BH = CL"!
+
+    Os registradores de segmento n„o podem ser inicializados com MOV
+tomando um parametro imediato (num‚rico).  Esses  registradores  s„o
+inicializados indiretamente:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV DS,0    ; ERRADO!!!                                       ³
+ ³                                                                ³
+ ³  MOV AX,0                                                      ³
+ ³  MOV DS,AX   ; CORRETO!                                        ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Carregar um registrador com o conte£do (byte ou word, depende da
+instru‡„o!) armazenado em um segmento ‚ simples, basta especificar o
+offset  do  dado  entre  colchetes.  Aten‡„o que o segmento de dados
+(DS) ‚ assumido por default com algumas excess”es:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV AL,[0FFFFh]                                               ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A instru‡„o acima, pega o byte armazenado no endere‡o DS:FFFFh e
+coloca-o em  AL.   Sabemos  que  um  byte  vai  ser  lido  do offset
+especificado porque AL tem 8 bits de tamanho.
+    Ao  inv‚s  de  usarmos  um  offset  imediato  podemos  usar   um
+registrador:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV BX,0FFFFh                                                 ³
+ ³  MOV CH,[BX]                                                   ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Neste caso, BX cont‚m o offset e o  byte  no  endere‡o  DS:BX  ‚
+armazenado  em  CH.   Note  que  o  registrador  usado  como  indice
+obrigatoriamente deve ser de 16 bits.
+
+    Uma   observa‡„o   quanto   a  essa  modalidade:  Dependendo  do
+registrador usado como offset, o segmento default poder  ser  DS  ou
+SS.   Se  ao inv‚s de BX usassemos BP, o segmento default seria SS e
+n„o DS - de uma olhada no diagrama de distribui‡„o dos registradores
+no texto anterior.  BP foi colocado  no mesmo bloco de SP, indicando
+que ambos est„o relacionados com  SS  (Segmento  de pilha) - Eis uma
+tabela das modalidades e dos segmentos default que podem ser  usados
+como offset:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  Offset usando registros    ³    Segmento default             ³
+ ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ ³  [SI + deslocamento]        ³    DS                           ³
+ ³  [DI + deslocamento]        ³    DS                           ³
+ ³  [BP + deslocamento]        ³    SS                           ³
+ ³  [BX + deslocamento]        ³    DS                           ³
+ ³  [BX + SI + deslocamento]   ³    DS                           ³
+ ³  [BX + DI + deslocamento]   ³    DS                           ³
+ ³  [BP + SI + deslocamento]   ³    SS                           ³
+ ³  [BP + DI + deslocamento]   ³    SS                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O  "deslocamento"  pode  ser  suprimido  se  for 0.
+
+    Vocˆ  pode evitar o segmento default explicitando um registrador
+de segmento na instru‡„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV DH,ES:[BX]      ;Usa ES ao inv‚s de DS                    ³
+ ³  MOV AL,CS:[SI + 4]  ;Usa CS ao inv‚s de DS                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Repare que tenho usado os registradores de 8 bits para armazenar
+os dados... Pode-se usar os de 16 bits tamb‚m:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV ES:[BX],AX         ; Poe o valor de AX para ES:BX         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    S¢ que neste caso ser„o armazenados 2 bytes no  endere‡o  ES:BX.
+O  primeiro  byte  ‚  o  menos  significativo  e  o  segundo  o mais
+signigicativo.  Essa instru‡„o equivale-se a:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV ES:[BX],AL            ; Instru‡”ess que fazem a mesma     ³
+ ³  MOV ES:[BX + 1],AH        ;coisa que MOV ES:[BX],AX           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Repare tamb‚m que n„o ‚ poss¡vel mover o conte£do de uma posi‡„o
+da  mem¢ria  para  outra,  diretamente,  usando  MOV.   Existe outra
+instru‡„o que faz isso: MOVSB ou MOVSW.   Veremos  essas  instru‡”es
+mais tarde.
+
+    Regra geral: Um dos operandos TEM que ser um registrador!  Salvo
+no caso da movimenta‡„o de um imediato para uma posi‡„o de mem¢ria:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV [DI],[SI]       ; ERRO!                                  ³
+ ³  MOV [BX],0          ; OK!                                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Para ilustrar o uso da instru‡„o MOV, eis um  peda‡o  do  c¢digo
+usado  pela  ROM-BIOS  do  IBM  PS/2  Modelo  50Z  para  verificar a
+integridade dos registradores da CPU:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ...                                                           ³
+ ³  MOV AX,0FFFFh            ;Poe 0FFFFh em AX                    ³
+ ³  MOV DS,AX                                                     ³
+ ³  MOV BX,DS                                                     ³
+ ³  MOV ES,BX                                                     ³
+ ³  MOV CX,ES                                                     ³
+ ³  MOV SS,CX                                                     ³
+ ³  MOV DX,SS                                                     ³
+ ³  MOV SI,DX                                                     ³
+ ³  MOV DI,SI                                                     ³
+ ³  MOV BP,DI                                                     ³
+ ³  MOV SP,BP                                                     ³
+ ³  ...                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Se o conte£do de BP n„o  for  0FFFFh  ent„o a CPU est  com algum
+problema e o computador n„o pode funcionar!  Os flags  s„o  testados
+de uma outra forma...  :)
+
+
+ÕÍÍÍÍÍÍ¸
+³ XCHG ³
+ÔÍÍÍÍÍÍ¾
+
+    Esta instru‡„o serve para trocarmos o conte£do de um registrador
+pelo outro. Por exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  XCHG    AH,AL                                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Se  AH=1Ah  e  AL=6Dh,  ap¢s  esta instru‡„o AH=6Dh e AL=1Ah por
+causa da troca...
+
+    Pode-se  usar uma referˆncia … mem¢ria assim como em MOV...  com
+a  mesma  restri‡„o  de  que  um   dos  operandos  TEM  que  ser  um
+registrador.   N„o  h   possibilidade  de usar um operando imediato.
+
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ MOVSB e MOUSW ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    Essas  instru‡”es  suprem   a   deficiˆncia   de  MOV  quanto  a
+movimenta‡„o  de  dados  de  uma   posi‡„o  de  mem¢ria  para  outra
+diretamente.  Antes de ser chamada os  seguintes  registradores  tem
+que ser inicializados:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  DS:SI   <- DS e SI tˆm o endere‡o fonte                      ³
+ ³  ES:DI   <- ES e DI tˆm o endere‡o destino                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Dai podemos executar MOVSB ou MOVSW.
+
+    MOVSB move um byte, enquanto MOVSW move um word (16 bits).
+
+    Os registradores SI e  DI  sao incrementados ou decrementados de
+acordo com o flag D (Direction) - Veja discuss„o sobre os  flags  na
+mensagem  anterior.   No  caso de MOVSW, SI e DI serao incrementados
+(ou decrementados) de 2 posi‡”es de  forma que DS:SI e ES:DI apontem
+sempre para a pr¢xima word.
+
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ STOSB e STOSW ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    Essas  instru‡”es  servem para armazenar um valor que est  em AX
+ou AL  (dependendo  da  instru‡„o  usada)  no  endere‡o apontado por
+ES:DI.  Ent„o, antes de  ser  chamada,  os  seguintes  registradores
+devem ser inicializados:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  AX      -> Valor a ser armazenado se usarmos STOSW            ³
+ ³  AL      -> Valor a ser armazenado se usarmos STOSB            ³
+ ³  ES:DI   -> Endere‡o onde o dado ser  armazenado               ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Depois   da   execu‡„o   da  instru‡„o  o  registrador  DI  ser 
+incrementado ou decrementado de acordo com o flag D (Direction).  DI
+ser  incrementado de 2 no  case  de  usarmos STOSW, isto garante que
+ES:DI aponte para a proxima word.
+
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ LODSB e LODSW ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    Essas  instru‡”es  servem para ler um valor que est  no endere‡o
+apontado  por  DS:SI  e  armazen -lo  em  AX  ou  AL  (dependendo da
+instru‡„o  usada).   Ent„o,  antes  de  ser  chamada,  os  seguintes
+registradores devem ser inicializados:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  DS:SI   -> Endere‡o de onde o dado ser  lido                  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Depois   da   execu‡„o   da  instru‡„o  o  registrador  SI  ser 
+incrementado ou decrementado de acordo com o flag D (Direction).  No
+caso de usarmos LODSW, SI ser  incrementado de 2 para  garantir  que
+DS:SI aponte para a pr¢xima word.
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ Outras instru‡”es de manipula‡„o de registros/dados              ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    Existem ainda as instru‡”es LEA, LES e LDS.
+
+ ş LEA:
+
+    LEA ‚,  basicamente,  igual  a  instru‡„o  MOV,  com  apenas uma
+diferen‡a: o  operando  "fonte"  ‚  um  endere‡o  (precisamente:  um
+"offset").   LEA  simplesmente calcula o endere‡o e transfere para o
+operando  "destino",  de   forma   que   as  instru‡”es  abaixo  sao
+equivalentes:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV     BX,100h                                               ³
+ ³  LEA     BX,[100h]                                             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+                                        

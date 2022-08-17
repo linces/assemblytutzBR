@@ -1,0 +1,212 @@
+
+
+                               úAúSúSúEúMúBúLúYú
+                            Otimiza‡„o de C¢digos em C
+                                Aula nr. 19 de 26
+
+    Estou retomando  o  desenvolvimento  do  curso  de  assembly aos
+poucos  e na nova s‚rie:  Otimiza‡„o de c¢digo para programadores C.
+Well... v„o  algumas  das  rotinas  para  aumentar  a velocidade dos
+programas C que lidam com strings:
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³   strlen() ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A  rotina  strlen()  ‚  implementada  da  seguinte  maneira  nos
+compiladores C mais famosos:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  int strlen(const char *s)                                      ³
+ ³  {                                                              ³
+ ³      int i = 0;                                                 ³
+ ³      while (*s++) ++i;                                          ³
+ ³      return i;                                                  ³
+ ³  }                                                              ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Isso  gera  um  c¢digo  aproximadamente  equivalente,  no modelo
+small, a:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  PROC    _strlen NEAR                                    ³
+ ³  ARG     s:PTR                                           ³
+ ³      push    si                   ; precisamos preservar ³
+ ³      push    di                   ;  SI e DI.            ³
+ ³      xor     di,di                ; i = 0;               ³
+ ³      mov     si,s                                        ³
+ ³  @@_strlen_loop:                                         ³
+ ³      mov     al,[si]                                     ³
+ ³      or      al,al                ; *s == '\0'?          ³
+ ³      jz      @@_strlen_exit       ; sim... fim da rotina.³
+ ³      inc     si                   ; s++;                 ³
+ ³      inc     di                   ; ++i;                 ³
+ ³      jmp     short @@_strlen_loop ; retorna ao loop.     ³
+ ³  @@_strlen_exit:                                         ³
+ ³      mov     ax,si                ; coloca i em ax.      ³
+ ³      pop     si                   ; recupara SI e DI.    ³
+ ³      pop     di                                          ³
+ ³      ret                                                 ³
+ ³  ENDP                                                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Eis uma implementa‡„o mais eficaz:
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ #ifdef __TURBOC__                                                   ³
+³ #include <dos.h>      /* Inclui pseudo_registradores */             ³
+³ #define _asm  asm                                                   ³
+³ #endif                                                              ³
+³                                                                     ³
+³   int     Strlen(const char *s)                                     ³
+³   {                                                                 ³
+³       _asm push    es                                               ³
+³                                                                     ³
+³ #ifndef __TURBOC__                                                  ³
+³       _asm push    di                                               ³
+³ #endif                                                              ³
+³                                                                     ³
+³ #if defined(__LARGE__) || defined(__HUGE__) || defined(__COMPACT__) ³
+³       _asm les     di,s                                             ³
+³ #else                                                               ³
+³       _asm mov     di,ds                                            ³
+³       _asm mov     es,di                                            ³
+³       _asm mov     di,s                                             ³
+³ #endif                                                              ³
+³                                                                     ³
+³       _asm mov     cx,-1                                            ³
+³       _asm sub     al,al                                            ³
+³       _asm repne   scasb                                            ³
+³                                                                     ³
+³       _asm not     cx                                               ³
+³       _asm dec     cx                                               ³
+³       _asm mov     ax,cx                                            ³
+³                                                                     ³
+³ #ifndef __TURBOC__                                                  ³
+³       _asm pop     di                                               ³
+³ #endif                                                              ³
+³                                                                     ³
+³       _asm pop     es                                               ³
+³                                                                     ³
+³ #ifdef __TURBOC__                                                   ³
+³       return _AX;                                                   ³
+³ #endif                                                              ³
+³   }                                                                 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Essa nova Strlen() [Note que ‚ Strlen() e n„o strlen(), para n„o
+confundir com a fun‡„o que j  existe na biblioteca padr„o!]  ‚,  com
+certeza,  mais  r pida  que  strlen(),  pois  usa a instru‡„o "repne
+scasb" para varrer o vetor a  procura  de um caracter '\0', ao inv‚s
+de  recorrer  a  v rias instru‡”es em um loop.  Inicialmente, CX tem
+que ter o maior valor  poss¡vel  (-1  n„o sinalizado = 65535).  Essa
+fun‡„o  falha  no  caso  de  strings muito longas (maiores que 65535
+bytes), dai precisaremos usar strlen()!
+
+    Uma vez encontrado o caracter '\0' devemos  inverter  CX.   Note
+que se invertermos 65535 obteremos  0.  Acontece que o caracter '\0'
+tambem  ‚  contado...  dai,  depois  de  invertermos   CX,   devemos
+decrement -lo tamb‚m, excluindo o caracter nulo!
+
+    N„o se preocupe com DI se  vc usa algum compilador da BORLAND, o
+compilador trata de salv -lo e recuper -lo sozinho...
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³   strcpy() ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Embora alguns compiladores sejam espertos o suficiente para usar
+as intru‡”es de manipula‡„o de blocos a implementa‡„o mais comum  de
+strcpy ‚:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  char *strcpy(char *dest, const char *src)                      ³
+ ³  {                                                              ³
+ ³      char *ptr = dest;                                          ³
+ ³      while (*dest++ = *src++);                                  ³
+ ³      return ptr;                                                ³
+ ³  }                                                              ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Para maior compreen‡„o a linha:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      while (*dest++ = *src++);                                  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Pode ser expandida para:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      while ((*dest++ = *src++) != '\0');                        ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O c¢digo gerado, no modelo small, se assemelha a:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  PROC    _strcpy                                                 ³
+ ³  ARG     dest:PTR, src:PTR                                       ³
+ ³      push    si          ; Salva SI e DI                         ³
+ ³      push    di                                                  ³
+ ³                                                                  ³
+ ³      mov     si,[dest]  ; Carrega os pointers                    ³
+ ³                                                                  ³
+ ³      push    si                  ; salva o pointer dest          ³
+ ³                                                                  ³
+ ³      mov     di,[src]                                            ³
+ ³                                                                  ³
+ ³  @@_strcpy_loop:                                                 ³
+ ³      mov     al,byte ptr [di]    ; Faz *dest = *src;             ³
+ ³      mov     byte ptr [si],al                                    ³
+ ³                                                                  ³
+ ³      inc     di                  ; Incrementa os pointers        ³
+ ³      inc     si                                                  ³
+ ³                                                                  ³
+ ³      or      al,al               ; AL == 0?!                     ³
+ ³      jne     short @@_strcpy_loop ; N„o! Continua no loop!       ³
+ ³                                                                  ³
+ ³      pop     ax                  ; Devolve o pointer dest.       ³
+ ³                                                                  ³
+ ³      pop     di          ; Recupera DI e SI                      ³
+ ³      pop     si                                                  ³
+ ³                                                                  ³
+ ³      ret                                                         ³
+ ³  ENDP                                                            ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Este c¢digo foi  gerado  num  BORLAND  C++  4.02!  Repare que as
+instru‡”es:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      mov        al,byte ptr [di]    ; Faz *dest = *src;          ³
+ ³      mov        byte ptr [si],al                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Poderiam ser facilmente substituidas por um MOVSB se a ordem dos
+registradores  de   ¡ndice   n„o   estivesse   trocada.    Por‚m   a
+substitui‡„o,  neste  caso, causaria mais mal do que bem.  Num 386 as
+instru‡”es MOVSB,  MOVSW  e  MOVSD  consomem  cerca  de  7 ciclos de
+m quina.  No mesmo microprocessador, a instru‡„o MOV, movendo de  um
+registrador  para  a mem¢ria consome apenas 2 ciclos.  Perderiamos 3
+ciclos em cada itera‡„o (2 MOVS  =  4 ciclos).  Numa string de 60000
+bytes, perderiamos cerca de 180000 ciclos de  m quina...   Considere
+que  cada  ciclo de m quina NAO ‚ cada ciclo de clock.  Na realidade
+um £nico ciclo de m quina equivale  a alguns ciclos de clock - vamos
+pela m‚dia...  1 ciclo de m quina ÷ 2 ciclos de clock, no melhor dos
+casos!
+
+    Vamos dar uma olhada no mesmo c¢digo no modelo LARGE:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  PROC _strcpy                                                   ³
+ ³  ARG  dest:PTR, src:PTR                                         ³
+ ³  LOCAL temp:PTR                                                 ³
+ ³      mov        dx,[word high dest]                             ³
+ ³      mov        ax,[word low dest]                              ³
+ ³      mov        [word high temp],dx                             ³
+ ³      mov        [word low temp],ax                              ³
+ ³                                                                 ³
+ ³  @@_strcpy_loop:                                                ³
+ ³      les        bx,[src]                                        ³
+ ³                                                                 ³
+ ³      inc        [word low src]
+                                                                                       

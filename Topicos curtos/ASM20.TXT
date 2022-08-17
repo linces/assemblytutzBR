@@ -1,0 +1,221 @@
+
+                               úAúSúSúEúMúBúLúYú
+                     Como s„o feitos os Demos, Musicas, etc ..
+                                Aula nr. 20 de 26
+
+    Impressionante como as  demonstra‡”es gr ficas (DEMOS) conseguem
+ser  t„o  r pidas  com  todas  aquelas  transforma‡”es   geom‚tricas
+(objetos  movimentando-se  no  espa‡o  tridimensional),  musicas  em
+background, etc...  A complexidade sugere a utiliza‡„o de rotinas em
+ponto-flutuante    para    os    calculos    "cabeludos"...     Opa!
+Ponto-flutuante?!   Mas  isso ‚ muito lerdo!!!!  Toma muito tempo de
+CPU...  E nem sempre o  feliz propriet rio de um microcomputador tem
+um 486DX ou um 386 com  co-processador!   Como  ‚  que  esses  caras
+conseguem tanta velocidade?!
+
+    A  resposta pode estar num m‚todo conhecido como "aritim‚tica de
+ponto-fixo", que ‚ o objetivo deste texto!
+
+    Imagine que possamos  escrever  um  n£mero "quebrado" (com casas
+decimais) da seguinte maneira:
+
+  ÚÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄ¿
+  ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³ ³
+  ÀÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÙ
+           parte inteira          ³       parte fracion ria
+
+    A "casa" mais a esquerda ‚ o bit mais significativo, e a mais  a
+direita o menos significativo.  Assim os 16 bits mais significativos
+(parte  inteira)  nos diz a "parte inteira" do n£mero (l¢gico, n‚?).
+E os 16  bits  menos  significativos  (parte  fracion ria) nos diz a
+parte  fracion ria  do  n£mero (outra vez, l¢gico!).  De forma que o
+bit menos significativo destes 32  bits  ‚ equivalente a 2 elevado a
+potˆncia de -16 (ou seja: 1/65536). Eis um exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  0000000000000000.1000000000000000b = 0.5 = 1/2                 ³
+ ³  0000000000000000.0100000000000000b = 0.25 = 1/4                ³
+ ³  0000000000000000.0010000000000000b = 0.125 = 1/8               ³
+ ³  0000000000000000.1110000000000000b = 0.875                     ³
+ ³  0000000000000001.1000000000000000b = 1.5 = 1 + 1/2             ³
+ ³  0000000000000011.0010010000111111b =
+ (aprox.)                ³
+ ³  0000000000000000.1101110110110011b ÷ cos(
+/6) ÷ 0.866 (aprox.) ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    N„o sei se deu para entender, mas do bit menos significativo at‚
+o mais significativo, o expoente vai aumentando, s¢ que o bit  menos
+significativo  tem expoente -16.  Assim, o bit 1 tem expoente -15, o
+seguinte -14, etc...  at‚  o  £ltimo,  15.   O  ponto  entre os dois
+conjuntos  de  16  bits  foi  adicionado  apenas  para  facilitar  a
+visualiza‡„o no exemplo acima.
+
+    Ok... ent„o ‚ poss¡vel representar "n£meros quebrados"  em  dois
+conjuntos de 16 bits... a pergunta ‚: Pra que?!
+
+    Aritim‚tica  com  n£meros inteiros sempre ‚ mais r pida do que a
+aritim‚tica com n£meros em ponto-flutuante.  Tendo co-processador ou
+n„o!   Mesmo  que  vc  tenha   um  486DX4  100MHz,  os  calculos  em
+ponto-flutuante ser„o mais lerdamente efetuados  do  que  os  mesmos
+calculos  com  n£meros  inteiros  (usando os registradores da CPU!).
+Neste ponto entra a  aritim‚tica  de  ponto-fixo  (note que o "ponto
+decimal" n„o  muda  de  posi‡„o...).   Vejamos  o  que  acontece  se
+somarmos dois n£meros em ponto fixo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  0.25 + 1.75 = 2.0                                              ³
+ ³                                                                 ³
+ ³    0000000000000000.0100000000000000b =    0.25                 ³
+ ³  + 0000000000000001.1100000000000000b =  + 1.75                 ³
+ ³  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ   ÄÄÄÄÄÄÄÄ                ³
+ ³    0000000000000010.0000000000000000b =    2.00                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Realmente  simples...  ‚ apenas uma soma bin ria...  Suponha que
+tenhamos um n£mero em ponto fixo  no registrador EAX e outro no EDX.
+O c¢digo para somar os dois n£meros ficaria t„o simples quanto:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ADD     EAX,EDX                                                ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O  mesmo  ocorre na subtra‡„o...  L¢gicamente, a subtra‡„o ‚ uma
+adic„o com o segundo  operando  complementado (complemento 2), ent„o
+n„o h  problemas em fazer:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  SUB     EAX,EDX                                                ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A adi‡„o ou subtra‡„o de dois n£meros em ponto fixo consome de 1
+a  2  ciclos de m quina apenas, dependendo do processador... o mesmo
+n„o ocorre com aritim‚tica em ponto-flutuante!
+
+    A complica‡„o come‡a a surgir na multiplica‡„o e divis„o de dois
+n£meros em  ponto-fixo.   N„o  podemos  simplesmente  multiplicar ou
+dividir como fazemos com a soma:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³    0000000000000001.0000000000000000                             ³
+ ³  * 0000000000000001.0000000000000000                             ³
+ ³ ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ                            ³
+ ³    0000000000000000.0000000000000000 + carry                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Nultiplicando 1 por 1 deveriamos  obter  1,  e n„o 0.  Vejamos a
+multiplica‡„o de dois valores menores que 1 e maiores que 0:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³    0000000000000000.100000000000000     0.5                      ³
+ ³  * 0000000000000000.100000000000000   * 0.5                      ³
+ ³ ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ ÄÄÄÄÄÄÄ                     ³
+ ³    0100000000000000.000000000000000  16384.0                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Hummm...  o  resultado  deveria  dar  0.25.   Se  dividirmos   o
+resultado por 65536 (2^16) obteremos o resultado correto:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³    0100000000000000.000000000000000 >> 16 =                      ³
+ ³    0000000000000000.010000000000000       = 0.25                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Ahhh...  mas, e como ficam os n£meros maiores ou iguais a 1?!  A
+instru‡„o IMUL dos microprocessadores  386  ou superiores permitem a
+multiplica‡„o de dois inteiros de 32 bits resultando num inteiro  de
+64  bits  (o  resultado  ficar   em  dois  registradores  de 32 bits
+separados!).  Assim, para multiplicarmos  dois n£meros em ponto fixo
+estabelecemos a seguinte regra:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  resultado = (n1 * n2) / 65536           ou                     ³
+ ³  resultado = (n1 * n2) >> 16                                    ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Assim, retornando ao primeiro caso de multiplica‡„o (em  nota‡„o
+hexa agora!):
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³   0001.0000h * 0001.0000h = 000000010000.0000h                   ³
+³                                                                  ³
+³   Efetuando o shift de 16 bits para a direita:                   ³
+³                                                                  ³
+³   00010000.0000h >> 16 = 0001.0000h                              ³
+³                                                                  ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Em assembly isso seria t„o simples como:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  PROC    FixedMul                                               ³
+ ³  ARG     m1:DWORD, m2:DWORD                                     ³
+ ³                                                                 ³
+ ³      mov     eax,m1                                             ³
+ ³      mov     ebx,m2                                             ³
+ ³      imul    ebx                                                ³
+ ³      shrd    eax,edx,16                                         ³
+ ³      ret                                                        ³
+ ³                                                                 ³
+ ³  ENDP                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A instru‡„o IMUL, e  n„o  MUL,  foi  usada  porque os n£meros de
+ponto fixo s„o sinalizados (o bit mais significativo  ‚  o  sinal!).
+Vale  aqui a mesma regra de sinaliza‡„o para n£meros inteiros:  Se o
+bit mais significativo  estiver  setado  o  n£mero  ‚ negativo e seu
+valor absoluto ‚ obtido atrav‚s do seu complemento (complemento  2).
+Quanto a manipula‡„o dos sinais numa multiplica‡„o... deixe isso com
+o IMUL! :)
+
+    A divis„o tamb‚m tem as  suas complica‡”es... suponha a seguinte
+divis„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³   0001.0000h                                                     ³
+ ³  ÄÄÄÄÄÄÄÄÄÄÄÄ = 0000.0000h (resto = 0001.000h)                   ³
+ ³   0002.0000h                                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A explica‡„o deste resultado ‚ simples:  estamos fazendo divis„o
+de dois n£meros inteiros...  Na  aritim‚tica inteira a divis„o com o
+dividendo menor que o divisor sempre resulta num quociente zero!
+
+    Eis  a  solu‡„o:   Se  o  divisor  est   deslocado  16 bits para
+esquerda  (20000h  ‚  diferente  de  2,  certo!?),  ent„o precisamos
+deslocar o dividendo 16 bits  para  esquerda  antes  de  fazermos  a
+divis„o!   Felizmente  os  processadores  386  e superiores permitem
+divis”es com dividendos de 64bits  e  divisores de 32bits.  Assim, o
+deslocamento  de  16  bits  para  esquerda  do   dividendo   n„o   ‚
+problem tica!
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  0001.0000h << 16 = 00010000.0000h                               ³
+ ³                                                                  ³
+ ³  00010000.0000h / 0002.0000h = 0000.8000h                        ³
+ ³                                                                  ³
+ ³      ou seja:                                                    ³
+ ³                                                                  ³
+ ³  1 / 2 = 0.5                                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Eis a rotina em assembly que demonstra esse algorritmo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  PROC    FixedDiv                                               ³
+ ³  ARG     d1:DWORD, d2:DWORD                                     ³
+ ³                                                                 ³
+ ³      mov     eax,d1      ; pega dividendo                       ³
+ ³      mov     ebx,d2      ; pega divisor                         ³
+ ³                                                                 ³
+ ³      sub     edx,edx                                            ³
+ ³                                                                 ³
+ ³      shld    edx,eax,16                                         ³
+ ³      shl     eax,16                                             ³
+ ³                                                                 ³
+ ³      idiv    ebx                                                ³
+ ³      ret                                                        ³
+ ³                                                                 ³
+ ³  ENDP                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+                                                                                                          

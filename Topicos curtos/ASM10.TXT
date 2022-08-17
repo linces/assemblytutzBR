@@ -1,0 +1,133 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 6)
+                                Aula nr. 10 de 26
+
+    Mais  instru‡”es  l¢gicas...   Falta-nos  ver  as  intru‡”es  de
+deslocamento de bits: SHL, SHR, SAL, SAR, ROL, ROR, RCL e RCR.
+
+    A £ltima letra  nas  instru‡”es  acima  especifica  o sentido de
+rota‡„o (R = Right -> direita, L = Left -> esquerda).
+
+    Para exemplificar a mecƒnica do funcionamento dessas  instru‡”es
+recorrerei a graficos (fica mais f cil assim).
+
+    ÖÄÄÄÄÄÄÄÄÄÄÄ·
+    º SHL e SHR º
+    ÓÄÄÄÄÄÄÄÄÄÄÄ½
+
+        SHL:
+      ÚÄÄÄÄÄ¿     ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+      ³Carry³<ÄÄÄÄ³                  ³<ÄÄÄÄÄ 0
+      ÀÄÄÄÄÄÙ     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+                 msb                lsb
+
+
+        SHR:
+                  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿      ÚÄÄÄÄÄ¿
+           0 ÄÄÄÄ>³                  ³ÄÄÄÄÄ>³Carry³
+                  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ      ÀÄÄÄÄÄÙ
+                 msb                lsb
+
+    SHR e SHL fazem o deslocamento dos bits em dire‡„o ao flag Carry
+e  acrescentam  0  no  lugar  do £ltimo bit que foi deslocado.  Essa
+opera‡„o tem o mesmo efeito  de  multiplicar  por 2 (SHL) ou dividir
+por 2 (SHR) um valor.  Com a vantagem  de  n„o  gastar  tanto  tempo
+quanto as instru‡”es DIV e MUL.
+
+    SHR ‚ a abrevia‡„o de  SHift  Right,  enquando  SHL ‚ a de SHift
+Left.
+
+
+    ÖÄÄÄÄÄÄÄÄÄÄÄ·
+    º SAL e SAR º
+    ÓÄÄÄÄÄÄÄÄÄÄÄ½
+
+    SAL funciona da mesma maneira que SHL.
+
+        SAR: ÚÄÄÄÄÄ¿
+             ³    ÚÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿      ÚÄÄÄÄÄ¿
+             ÀÄÄÄ>³                  ³ÄÄÄÄÄ>³Carry³
+                  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ      ÀÄÄÄÄÄÙ
+                 msb                lsb
+
+    SAR  desloca todos os bits para a direita (o lsb vai para o flag
+carry) e repete o conte£do do antigo £ltimo bit (que foi deslocado).
+
+    SAR  ‚  a  abrevia‡„o  de  SHift  Arithmetic  Right.   Sendo  um
+deslocamento aritim‚tico, n„o  poderia  de  desconsiderar o sinal do
+dado deslocado (dai o motivo de repetir o bit mais significativo!).
+
+
+    ÖÄÄÄÄÄÄÄÄÄÄÄ·
+    º ROL e ROR º
+    ÓÄÄÄÄÄÄÄÄÄÄÄ½
+
+        ROL:
+           ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+           ³                                        ³
+           ³    ÚÄÄÄÄÄ¿     ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿    ³
+           ÀÄÄÄÄ´Carry³<ÄÄÄÄ³                  ³<ÄÄÄÙ
+                ÀÄÄÄÄÄÙ     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+                           msb                lsb
+
+
+        ROR:
+            ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+            ³                                      ³
+            ³   ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿      ÚÄÄÄÄÄ¿  ³
+            ÀÄÄ>³                  ³ÄÄÄÄÄ>³CarryÃÄÄÙ
+                ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ      ÀÄÄÄÄÄÙ
+               msb                lsb
+
+    ROR  e  ROL  rotacionam  o  dado  "passando  pelo  carry".  Isto
+significa que o bit  menos  significativo  (no  caso  de  ROR)  ser 
+colocado  no  flag  de carry e que o conte£do antigo deste flag ser 
+colocado no bit mais significativo do dado.
+
+
+    ÖÄÄÄÄÄÄÄÄÄÄÄ·
+    º RCL e RCR º
+    ÓÄÄÄÄÄÄÄÄÄÄÄ½
+
+        RCL:
+                          ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+                          ³                         ³
+                ÚÄÄÄÄÄ¿   ³ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿    ³
+                ³Carry³<ÄÄÁÄ³                  ³<ÄÄÄÙ
+                ÀÄÄÄÄÄÙ     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+                           msb                lsb
+
+
+        RCR:
+            ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+            ³                         ³
+            ³   ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿  ³   ÚÄÄÄÄÄ¿
+            ÀÄÄ>³                  ³ÄÄÁÄÄ>³Carry³
+                ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ      ÀÄÄÄÄÄÙ
+               msb                lsb
+
+    Neste caso o dado  ‚  rotacionado  corretamente, ficando o carry
+com uma c¢pia do bit mais  extremo,  de  acordo  com  o  sentido  de
+rota‡„o.
+
+    Sinceramente nunca pode pensar em uma aplica‡„o pr tica para ROR
+e  ROL.   Mas  as  instru‡”es  est„o dispon¡veis para as mentes mais
+previlegiadas que a minha! :)
+
+    A sintaxe dessas instru‡”es ‚ a seguinte:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  SHL AX,1                                                       ³
+ ³  SHR BL,1                                                       ³
+ ³  RCL DX,CL                                                      ³
+ ³  ROL ES:[DI],CL                                                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Note que o segundo operando ‚  um contador do n£mero de rota‡”es
+ou shifts ser„o efetuadas.  Nos microprocessadores 80286  em  diante
+pode-se usar um valor diferente de 1, no 8088/8086 n„o pode!
+
+    Repare  tamb‚m  que  podemos  usar  APENAS o registrador CL como
+operando da direita se quisermos usar algum registrador!
+                                                                                                                  

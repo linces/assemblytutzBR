@@ -1,0 +1,146 @@
+
+                               úAúSúSúEúMúBúLúYú
+                    N£meros bin rios, l¢gica Booleana e soma
+                                Aula nr. 2 de 26
+
+    Mais  alguns  conceitos  s„o  necess rios  para  que  o pretenso
+programador ASSEMBLY  saiba  o  que  est   fazendo.   Em  eletr“nica
+digital  estuda-se  a  algebra  booleana  e  aritim‚tica com n£meros
+bin rios.  Aqui esses conceitos  tamb‚m  s„o  importantes...   Vamos
+come‡ar pela aritim‚tica bin ria:
+
+    A  primeira  opera‡„o  b sica  -   a   soma  -  n„o  tem  muitos
+mist‚rios...  basta recorrer ao equivalente decimal.  Quando somamos
+dois n£meros  decimais,  efetuamos  a  soma  de  cada  algarismo  em
+separado,  prestando  aten‡„o  aos  "vai  um"  que  ocorrem entre um
+algarismo e outro. Em bin rio fazemos o mesmo:
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ 1010b + 0110b = ?                                             ³
+  ³                                                               ³
+  ³    111         <- "Vai uns"                                   ³
+  ³     1010b                                                     ³
+  ³   + 0110b                                                     ³
+  ³   ÄÄÄÄÄÄÄÄÄ                                                   ³
+  ³    10000b                                                     ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Ora, na base decimal, quando se soma - por exemplo - 9 e 2, fica
+1 e "vai um"...  Tomemos o  exemplo do od“metro (aquele indicador de
+quilometragem do carro!): 09 -> 10 -> 11
+
+    Enquanto  na  base  decimal  existem 10 algarismos (0 at‚ 9), na
+base bin ria temos 2 (0 e 1).  O od“metro ficaria assim:
+00b -> 01b -> 10b -> 11b
+
+    Portanto, 1b + 1b = 10b ou, ainda, 0b e "vai um".
+
+    A  subtra‡„o  ‚  mais complicada de entender...  Na base decimal
+existem os n£meros  negativos...   em  bin rio nao!  (Veremos depois
+como  "representar" um n£mero negativo em bin rio!).  Assim, 1b - 1b
+= 0b (l¢gico), 1b - 0b  =  1b  (outra  vez, evidente!), 0b - 0b = 0b
+(hehe...  vocˆ deve estar achando que eu estou te sacaneando,  n‚?),
+mas e 0b - 1b = ?????
+
+    A solu‡„o ‚ a  seguinte:  Na  base  decimal quando subtraimos um
+algarismo menor de outro maior costumamos "tomar um emprestado" para
+que a conta fique correta.  Em bin rio a  coisa  funciona  do  mesmo
+jeito,  mas  se  n„o  tivermos de onde "tomar um emprestado" devemos
+indicar que foi tomado um de qualquer forma:
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ 0b - 1b = ?                                                   ³
+  ³                                                               ³
+  ³     1         <- Tomamos esse um emprestado de algum lugar!   ³
+  ³      0b                            (n„o importa de onde!)     ³
+  ³   -  1b                                                       ³
+  ³   ÄÄÄÄÄÄ                                                      ³
+  ³      1b                                                       ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esse "1" que apareceu por m gica ‚ conhecido como BORROW.  Em um
+n£mero bin rio maior basta usar o mesmo artificio:
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ 1010b - 0101b = ?                                             ³
+  ³                                                               ³
+  ³      1 1         <- Os "1"s que foram tomados emprestados s„o ³
+  ³      1010b          subtra¡dos no proximo digito.             ³
+  ³    - 0101b                                                    ³
+  ³   ÄÄÄÄÄÄÄÄÄ                                                   ³
+  ³      0101b                                                    ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Fa‡a  a  conta:  0000b   -   0001b,   vai  acontecer  uma  coisa
+interessante!  Fa‡a a mesma conta usando um programa, ou calculadora
+cientifica,  que  manipule  n£meros bin rios...  O resultado vai ser
+ligairamente diferente por causa da limita‡„o dos digitos suportados
+pelo software (ou calculadora).  Deixo  a  conclus„o  do  "por  que"
+desta diferen‡a para vocˆ...   (Uma  dica,  fa‡a  a conta com os "n"
+digitos suportados pela calculadora e ter  a explica‡„o!).
+
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³ Representando n£meros negativos em bin rio                       ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+    Um artificio da algebra  booleana  para  representar  um  n£mero
+interiro  negativo  ‚  usar  o £ltimo bit como indicador do sinal do
+n£mero.  Mas, esse  artificio  gera  uma segunda complica‡„o...
+
+    Limitemos esse estudo ao tamanho  de  um  byte (8 bits)...  Se o
+bit 7 (a contagem come‡a pelo bit 0 - mais a direita) for 0 o n£mero
+representado ‚ positivo, se for 1, ‚ negativo.  Essa ‚  a  diferen‡a
+entre um "char" e um "unsigned char" na linguagem C - ou um "char" e
+um  "byte"  em  PASCAL (Note que um "unsigned char" pode variar de 0
+at‚ 255 - 00000000b at‚ 11111111b  -  e um "signed char" pode variar
+de -128 at‚ 127 - exatamenta a mesma faixa, por‚m um tem sinal  e  o
+outro n„o!).
+
+    A complica‡„o que falei acima  ‚ com rela‡„o … representa‡„o dos
+n£meros  negativos.   Quando  um  n£mero  n„o  ‚   nagativo,   basta
+convertˆ-lo para base decimal que vocˆ saber  qual ‚ esse n£mero, no
+entanto,  n£meros  negativos  precisam ser "complementados" para que
+saibamos o n£mero que est  sendo representado.  A coisa NO funciona
+da seguinte forma:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  00001010b   =   10                                            ³
+ ³  10001010b   =  -10     (ERRADO)                               ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    N„o basta "esquecermos" o bit 7  e lermos o restante do byte.  O
+procedimento  correto  para   sabermos   que   n£mero   est    sendo
+representado negativamente no segundo exemplo ‚:
+
+    ş Inverte-se todos os bits
+    ş Soma-se 1 ao resultado
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ 10001010b   ->  01110101b + 00000001b   ->  01110110b         ³
+  ³ 01110110b   =   118                                           ³
+  ³ Logo:                                                         ³
+  ³ 10001010b   =  -118                                           ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Com isso podemos explicar a diferen‡a entre os extremos da faixa
+de um "signed char":
+
+    ş Os  n£meros positivos contam  de 00000000b at‚ 01111111b, isto
+      ‚, de 0 at‚ 127.
+    ş Os n£meros negativos  contam  de 10000000b at‚ 11111111b, isto
+      ‚, de -128 at‚ -1.
+
+    Em "C" (ou PASCAL), a mesma l¢gica pode ser aplicada aos "int" e
+"long" (ou INTEGER e  LONGINT),  s¢  que  a  quantidade de bits ser 
+maior ("int" tem 16 bits de tamanho e "long" tem 32).
+
+    N„o se preocupe MUITO com a representa‡„o de  n£meros  negativos
+em bin rio...  A CPU toma conta de tudo  isso  sozinha...   mas,  as
+vezes,  vocˆ  tem  que  saber que resultado poder  ser obtido de uma
+opera‡„o aritim‚tica em seus programas, ok?
+
+    As outras duas opera‡”es matem ticas  b sicas  (multiplica‡„o  e
+divis„o) tanb‚m est„o presentes nos processadores 80x86...  Mas, n„o
+necessitamos ver como o processo ‚ feito a n¡vel bin rio.  Confie na
+CPU!  :)
+                                                                                                       

@@ -1,0 +1,142 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 5)
+                                Aula nr. 8 de 26
+
+    Veremos agora as instru‡”es de controle de fluxo de programa.
+
+    A CPU sempre executa instru‡”es em  sequˆncia,  a  n„o  ser  que
+encontre instru‡”es que "saltem" para outra posi‡„o na mem¢ria.
+
+    Existem  diversas  formas   de   "saltar"  para  um  determinado
+endere‡o:
+
+ þ Salto incondicional:
+
+    A instru‡„o JMP simplesmente salta  para onde se quer.  Antes de
+apresentar a sintaxe, um  detalhe  sobre  codifica‡ao: O operando da
+instru‡„o JMP ‚ um endere‡o na mem¢ria, mas, como usaremos sempre um
+compilador assembly, necessitamos criar um "rotulo" ou "label"  para
+onde  o  salto  ser   efetuado...   O compilador trata de calcular o
+endere‡o pra gente.
+
+    Eis a sintaxe de JMP:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      JMP Aqui2                                                  ³
+ ³ Aqui1:                                                          ³
+ ³      JMP Aqui3                                                  ³
+ ³ Aqui2:                                                          ³
+ ³      JMP Aqui1                                                  ³
+ ³ Aqui3:                                                          ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Os "labels" s„o sempre seguidos de dois-pontos.  Note, no peda‡o
+de c¢digo acima, a quebra da sequˆncia de execu‡„o.
+
+
+ þ Salto Condicional:
+
+    Diferente de JMP, temos instru‡”es que realizam um salto somente
+se uma condi‡„o  for  satisfeita.   Para  isso,  usa-se os flags.  A
+sintaxe dessas instru‡”es depende da condi‡„o do flag  que  se  quer
+testar. Eis a listagem dessas instru‡”es:
+
+    - JZ "label"  -> Salta se flag Z=1
+    - JNZ "label" -> Salta se flag Z=0
+    - JC "label"  -> Salta se flag C=1
+    - JNC "label" -> Salta se flag C=0
+    - JO "label"  -> Salta se flag O=1
+    - JNO "label" -> Salta se flag O=0
+    - JPO "label" -> Salta se flag P=0 (paridade impar)
+    - JPE "label" -> Salta se flag P=1 (paridade par)
+    - JS "label"  -> Salta se flag S=1
+    - JNS "label" -> Salta se flag S=0
+
+    Existem  ainda mais saltos condicionais para facilitar a vida do
+programador:
+
+    - JE "label"  -> Jump if Equal (mesmo que JZ)
+    - JNE "label" -> Jump if Not Equal (mesmo que JNZ)
+    - JA "label"  -> Jump if Above (salta se acima)
+    - JB "label"  -> Jump if Below (salta se abaixo)
+    - JAE "label" -> Jump if Above or Equal (salta se acima ou =)
+    - JBE "label" -> Jump if Below of Equal (salta se abaixo ou =)
+    - JG "label"  -> Jump if Greater than (salta se >)
+    - JL "label"  -> Jump if Less than (salta se <)
+    - JGE "label" -> Jump if Greater than or Equal (salta se >=)
+    - JLE "label" -> Jump if Less or Equal (salta se <=)
+
+    A diferen‡a entre JG e JA, JL e JB ‚:
+
+    - JA e JB s„o relativos a compara‡”es sem sinal.
+    - JG e JL s„o relativos a compara‡”es com sinal.
+
+    Os  saltos  condicionais  tˆm  uma  desvantagem  com rela‡„o aos
+saltos incondicionais: O deslocamento ‚ relativo a posi‡„o corrente,
+isto ‚, embora no nosso c¢digo o salto se dˆ na posi‡„o do "label" o
+assembler traduz esse salto para  uma  posi‡„o "x" bytes para frente
+ou para tras em rela‡„o a posi‡„o da instru‡„o de salto...   e  esse
+n£mero  "x"  est   na  faixa de -128 a 127 (traduzindo isso tudo pra
+quem n„o entendeu: N„o ‚ poss¡vel saltos muito longos com instru‡”es
+de salto condicionais...   salvo  em  casos especiais que explicarei
+mais tarde!).
+
+    Existe ainda a  instru‡„o  JCXZ.   Essa  instru‡„o  salta  se  o
+registrador CX for 0.
+
+    Mais uma instru‡„o: LOOP
+
+    A  instru‡„o  LOOP  salta  para  um  determinado  endere‡o  se o
+registrador CX for diferente de zero e, antes de saltar,  decrementa
+CX. Um exemplo do uso desta instru‡„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      SUB AL,AL       ;AL = 0                                    ³
+ ³      SUB DI,DI       ;DI = 0                                    ³
+ ³      MOV CX,1000     ;CX = 1000                                 ³
+ ³  Loop1:                                                         ³
+ ³      MOV BYTE PTR ES:[DI],0  ;Poe 0 em ES:DI                    ³
+ ³      INC DI          ;Incrementa o offset (DI)                  ³
+ ³      LOOP Loop1      ;Repete ate' que CX seja 0                 ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Essa  rotina  preenche  os  1000 bytes a partir de ES:0 com 0. O
+modificador "BYTE PTR" na frente de ES:[DI] resolve uma ambiguidade:
+Como podemos saber se a  instru‡„o "MOV ES:[DI],0" escrever  um byte
+ou um word?  Por default, o compilador assume word, por  isso  temos
+que usar o modificador indicando que queremos byte.
+
+    Repare que o peda‡o entre "Loop1" e o final da rotina equivale a
+uma instru‡„o "REP STOSB".
+
+    Podemos tamb‚m especificar uma instru‡„o LOOP condicional, basta
+acrescentar  'Z'  ou  'NZ'  (ou os equivalentes 'E' ou 'NE') no fim.
+Isto quer dizer: Salte  ENQUANTO  CX  for  ZERO  (Z) ou NŽO for ZERO
+(NZ).  A instru‡„o LOOP sem condi‡„o ‚ a mesma coisa que  LOOPNZ  ou
+LOOPNE!
+
+
+ þ Chamadas a sub-rotinas:
+
+    A instru‡„o CALL funciona como se fosse  a  instru‡„o  GOSUB  do
+velho BASIC.  Ela  salta  para  a  posi‡„o  especificada  e quando a
+instru‡„o RET for encontrada na sub-rotina a CPU salta de volta para
+a pr¢xima instru‡„o que segue o CALL. A sintaxe:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  CALL "label"                                                   ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Eis um exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      MOV AL,9        ;Poe numero em AL                          ³
+ ³      CALL ShowNumber ;Salta para a subrotina                    ³
+ ³      ...                                                        ³
+ ³                                                                 ³
+ ³  ShowNumber:                                                    ³
+ ³      ...                                                        ³
+ ³      RET     ;Retorna                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+                               

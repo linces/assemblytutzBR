@@ -1,0 +1,164 @@
+
+                               úAúSúSúEúMúBúLúYú
+                          Placas de v¡deo e programa‡„o
+                                Aula nr. 22 de 26
+
+    Alguma vez aconteceu de vocˆ ter aquela rotina quase conclu¡da e
+quando foi test -la viu  que  estava faltando alguma coisa?!  Bem...
+se n„o aconteceu vocˆ ‚ um sortudo...  Quando eu estava come‡ando  a
+entender  o funcionamento da placa VGA me dispus a construir rotinas
+b sicas de  tra‡agem  de  linhas  horizontais  e verticais... por‚m,
+quando tinha algum bitmap atr s da linha acontecia  uma  desgra‡a!!!
+Parte do bitmap sumia ou era substitu¡do por uma sujeirinha chata!
+
+    Obviamente  eu  ainda  n„o  tinha  dominado  o  funcionamento da
+placa... por isso, vamos continuar com os nossos estudos...
+
+
+    ş A mascara de bits e os LATCHES da VGA.
+
+    Existe uma maneira  de  n„o  alterarmos  bits indesej veis em um
+byte de cada plano...  Suponha que queiramos modificar apenas o  bit
+mais  significativo  de  um  byte  nos  planos  de  bits, deixando o
+restante exatamente como estavam antes!
+
+    Well...  Isso pode ser feito  de  duas formas:  Primeiro lemos o
+byte de um plano, realizamos um OR ou um AND com esse byte e o  byte
+com  o  bit  a  ser alterado (zerando-o ou setando-o de acordo com a
+modifica‡„o que faremos...  veja  as  instru‡”es  AND  e  OR num dos
+textos iniciais do curso de ASM para ter um  exemplo  de  como  isso
+pode  ser feito!)... depois da opera‡„o l¢gica, escrevemos o byte na
+mesma posi‡„o... Essa ‚ a maneira mais dispendiosa!
+
+    A placa  VGA  permite  que  criemos  uma  mascara  de  bits para
+podermos alterar apenas aqueles bits desejados...  Isso ‚ feito pelo
+registrador BitMask.  Mas, antes temos que  ler  o  byte  inteiro...
+hummm...  acontece que existe um registrador intermedi rio, interno,
+que ret‚m o £ltimo byte lido de um plano de bits... esse registrador
+‚ conhecido como LATCH.
+
+    Basta ler um byte da mem¢ria  do sistema que os bytes dos quatro
+planos de bits v„o para seus LATCHES...  Depois precisamos  mascarar
+os  bits  que  n„o queremos modificar no registrador BitMask para s¢
+ent„o escrever na mem¢ria  do  sistema  (no  plano de bits!)...  N„o
+esquecendo de setar os planos  de  bits  que  queremos  alterar  via
+MapMask, como visto no £ltimo texto!
+
+    O  funcionamento  dos  latches  em  conjunto  com  BitMask  ‚  o
+seguinte:   Uma vez carregados os latches, apenas os bits ZERADOS de
+BitMask ser„o copiados de volta  para os planos de bits selecionados
+por  MapMask.   Em  contrapartida,  os  bits  SETADOS   em   BitMask
+correspondem  aos  bits  vindos  da  mem¢ria  do  sistema,  que  s„o
+fornecidos  pela  CPU.   Dessa  maneira  a  nossa rotina n„o tem que
+propriamente ler o conte£do de  um  plano  de bits (ali s, o que for
+lido pela CPU pode muito bem ser ignorado!)... n„o necessitamos  nem
+ao  menos  efetuar  opera‡”es  l¢gicas  para  setar  ou  resetar  um
+determinado bit do byte que ser  escrito num plano de bits!
+
+    V¡mos  no  £ltimo  texto  que  o  registro  MapMask faz parte do
+circuito SEQUENCIADOR da VGA.  O registro BitMask est  localizado em
+outro circuito.  Mais  exatamente  no  controlador gr fico (Graphics
+Controller  - que chamaremos de GC)...  O funcionamento ‚ o mesmo do
+que o circuito sequenciador, em  termos  de endere‡os de I/O, citado
+no £ltimo texto:  Primeiro devemos informar o n£mero do  registro  e
+depois  o valor.  O GC pode ser acessado a partir do endere‡o de I/O
+03CEh e o n£mero do registro BitMask ‚ 8.
+
+    Eis nosso segundo exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ; VGA2.ASM                                                     ³
+ ³  ; Compile com:                                                 ³
+ ³  ;                                                              ³
+ ³  ;   TASM vga2                                                  ³
+ ³  ;   TLINK /x/t vga2                                            ³
+ ³  ;                                                              ³
+ ³  ideal                                                          ³
+ ³  model tiny                                                     ³
+ ³  locals                                                         ³
+ ³  jumps                                                          ³
+ ³                                                                 ³
+ ³  codeseg                                                        ³
+ ³                                                                 ³
+ ³  org 100h                                                       ³
+ ³  start:                                                         ³
+ ³      mov     ax,12h      ; Poe no modo 640x480                  ³
+ ³      int     10h                                                ³
+ ³                                                                 ³
+ ³      mov     ax,0A000h   ; Faz ES = 0A000h                      ³
+ ³      mov     es,ax                                              ³
+ ³      sub     bx,bx       ; BX ser  o offset!                    ³
+ ³                                                                 ³
+ ³      mov     dx,03C4h    ; Seleciona planos 0 e 2...            ³
+ ³                                                                 ³
+ ³      mov     ax,0502h    ; ¡dem a fazer: mov al,2               ³
+ ³                          ;               mov ah,0101b           ³
+ ³                                                                 ³
+ ³      out     dx,ax                                              ³
+ ³                                                                 ³
+ ³      mov     dx,03CEh    ; Mascara todos os bits,               ³
+ ³      mov     ax,8008h    ;  exceto o bit 7                      ³
+ ³      out     dx,ax                                              ³
+ ³                                                                 ³
+ ³      mov     al,[byte es:bx]     ; carrega os latches da VGA    ³
+ ³                                  ;  note que AL n„o nos         ³
+ ³                                  ;  interessa!!!                ³
+ ³      mov     [byte es:bx],0FFh   ; Escreve 0FFh                 ³
+ ³                                                                 ³
+ ³      sub     ah,ah       ; Espera uma tecla!                    ³
+ ³      int     16h         ; ... sen„o n„o tem gra‡a!!! :)        ³
+ ³                                                                 ³
+ ³      mov     ax,3        ; Volta p/ modo texto 80x25            ³
+ ³      int     10h                                                ³
+ ³                                                                 ³
+ ³      int     20h         ; Fim do prog                          ³
+ ³                                                                 ³
+ ³  end start                                                      ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Temos algumas novidades aqui...  Primeiro:  ‚ poss¡vel  escrever
+o  n£mero  de um registro e o dado quase que ao mesmo tempo... basta
+usar a instrun‡„o OUT DX,AX - recorra a textos anteriores para ver o
+funcionamento dessa  instru‡„o!.   Segundo:   mesmo  escrevendo 0FFh
+(todos os bits setados) na mem¢ria do sistema, apenas o bit que  n„o
+est  mascarado ser  modificado, gra‡as ao BitMask!!  Terceiro:  Mais
+de  um  plano  de  bits  pode ser alterado ao mesmo tempo!  Note que
+nesse c¢digo escrevemos na  mem¢ria  de  v¡deo  apenas  uma vez e os
+planos 0 e 2 foram alterados (continua a cor MAGENTA, n„o?!).
+
+
+    ş Problemas … vista!
+
+    Ok... aparentemente a  coisa  funciona  bem...  dai  eu fa‡o uma
+simples  pergunta:   O que aconteceria se o ponto em (0,0) estivesse
+inicialmente "branco" e usassemos a rotina acima?!
+
+    Hummmm...  Se o ponto ‚  branco,  a  cor  ‚ 15...  15 ‚ 1111b em
+bin rio, ou seja, todos os planos de bits teriam o bit 7 do primeiro
+byte setados...  A rotina acima "seta" os bits 7  do  primeiro  byte
+dos planos 0 e 2... assim  a  cor CONTINUARIA branca!!  MAS COMO SOU
+TEIMOSO, EU QUERO MAGENTA!!!
+
+    A solu‡„o seria colocar as seguintes linhas antes  da  instru‡„o
+"sub ah,ah" na listagem acima:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  mov     dx,03C4h    ; Seleciona os planos 1 e 3                 ³
+ ³  mov     ax,0A02h                                                ³
+ ³  out     dx,ax                                                   ³
+ ³                                                                  ³
+ ³  mov     [byte es:bx],0 ; escreve 0 nos planos 1 e 3             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Precisamos zerar os bits 7  dos  planos  1  e 3...  Note que nas
+linhas acima n„o carreguei os latches da VGA atrav‚s  de  leitura...
+ali s... n„o carreguei de forma  alguma.   N„o preciso fazer isso os
+latches dos planos 1 e 3 n„o foram  alterados  desde  a  sua  £ltima
+leitura...   repare  que  n„o  "desmascarei"  os  bits  no  registro
+BitMask... dai n„o ter  a  necessidade  de mascar -los de novo... s¢
+preciso escrever 0 nos planos 1 e 3 para que o bit 7 seja alterado.
+
+    Puts... que  m„o-de-obra!!...   Felizmente  existem  meios  mais
+simples  de  fazer  isso tudo...  Ahhhhhh, mas ‚ claro que isso fica
+pra um pr¢ximo texto! :))
+                                                              

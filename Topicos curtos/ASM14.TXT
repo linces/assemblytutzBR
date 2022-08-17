@@ -1,0 +1,186 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         TASM: Turbo Assembler (Parte 1/2)
+                                Aula nr. 14 de 26
+
+    Aqui  estou  eu   novamente!!!    Nos  textos  de  "SoundBlaster
+Programming" a gente vai precisar  entender  um  pouquinho  sobre  o
+TURBO ASSEMBLER, ent„o ‚ disso que vou tratar aqui, ok?
+
+    Well...     O   TURBO   ASSEMBLER   'compila'   arquivos   .ASM,
+transformando-os em  .OBJ  (sorry  "C"zeiros,  mas os "PASCAL"zeiros
+talvez n„o estejam familiarizados  com  isso!).   Os  arquivos  .OBJ
+devem  ser linkados com os demais m¢dulos para formar o arquivo .EXE
+final.   Precisamos  ent„o conhecer como criar um .OBJ que possa ser
+linkado com c¢digos em "C" e  "PASCAL".  Eis um exemplo de um m¢dulo
+em ASSEMBLY compat¡vel com as duas linguagens:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  IDEAL               ; Poe TASM no modo IDEAL                  ³
+ ³  MODEL LARGE,PASCAL  ; Modelo de mem¢ria...                    ³
+ ³  LOCALS                                                        ³
+ ³  JUMPS                                                         ³
+ ³                                                                ³
+ ³  GLOBAL  ZeraAX : PROC   ; ZeraAX ‚ p£blico aos outros m¢dulos ³
+ ³                                                                ³
+ ³  CODESEG     ; Inicio do (segmento de) c¢digo                  ³
+ ³                                                                ³
+ ³  PROC    ZeraAX          ; Inicio de um PROCedimento.          ³
+ ³          sub     ax,ax                                         ³
+ ³          ret                                                   ³
+ ³  ENDP                    ; Fim do PROCedimento.                ³
+ ³                                                                ³
+ ³  END     ; Fim do m¢dulo .ASM                                  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    As duas linhas iniciais  informam  ao  TURBO ASSEMBLER o modo de
+opera‡„o (IDEAL), o modelamento de mem¢ria (LARGE -  veja  discuss„o
+abaixo!) e o  m‚todo  de  passagem  de  parametros  para  uma fun‡„o
+(PASCAL).
+
+    O modo IDEAL ‚  um  dos  estilos  de  programa‡„o  que  o  TURBO
+ASSEMBLER suporta (o outro ‚ o  modo  MASM), e ‚ o meu preferido por
+um certo n£mero de raz”es.  O modelo LARGE e a parametriza‡„o PASCAL
+tamb‚m s„o minhas preferidas  porque  no  modelo  LARGE  ‚  poss¡vel
+termos  mais  de  um  segmento  de  dados e de c¢digo (podemos criar
+programas  realmente  GRANDES   e   com   MUITA   informa‡„o  a  ser
+manipulada!).   PASCAL  deixa  o  c¢digo  mais  limpo com rela‡„o ao
+conte£do dos registradores  ap¢s  o  retorno  de  uma fun‡„o (alguns
+compiladores C, em algumas circunstancias, tˆm a mania de  modificar
+o  conte£do  de  CX  no  retorno!).  Fora isso PASCAL tamb‚m limpa a
+pilha ANTES do retorno da  procedure/fun‡„o.  Mas, isso tudo tem uma
+pequena desvantagem: Usando-se PASCAL, n„o podemos passar um  n£mero
+vari vel  de  parametros pela pilha (os trˆs pontos da declara‡„o de
+uma fun‡„o C: void f(char *, ...); )!
+
+    Ahhh...   Vocˆ  deve  estar  se  perguntando  o que ‚ o LOCALS e
+JUMPS.  LOCALS diz ao compilador  que qualquer label come‡ado por @@
+‚ local ao PROC  atual  (n„o  ‚  visivel em outros PROCs!)...  Assim
+podemos usar labels com mesmo  nome  dentro  de  v rias  PROCs,  sem
+causar nenhuma confus„o:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ; modelamento, modo, etc...                                   ³
+ ³  LOCALS                                                        ³
+ ³                                                                ³
+ ³  PROC    F1                                                    ³
+ ³          mov cx,1000                                           ³
+ ³  @@Loop1:                                                      ³
+ ³          dec cx                                                ³
+ ³          jnz @@Loop1                                           ³
+ ³          ret                                                   ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  PROC    F2                                                    ³
+ ³          mov cx,3000                                           ³
+ ³  @@Loop1:                                                      ³
+ ³          dec cx                                                ³
+ ³          jnz @@Loop1                                           ³
+ ³          ret                                                   ³
+ ³  ENDP                                                          ³
+ ³  ;... O resto...                                               ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Repare  que  F1 e F2 usam o mesmo label (@@Loop1), mas o fato da
+diretiva LOCALS estar  presente  informa  ao  assembler que elas s„o
+diferentes!
+
+    J    JUMPS   resolve   alguns  problemas  para  n¢s:  Os  saltos
+condicionais  (JZ, JNZ, JC, JS, etc..) s„o relativos a posi‡„o atual
+(tipo: salte para frente tantas posi‡”es a partir de onde  est !)...
+Em  alguns  casos  isso  pode causar alguns erros de compila‡„o pelo
+fato do salto n„o poder  ser  efetuado  na faixa que queremos...  ai
+entra  o  JUMPS...   Ele resolve isso alterando o c¢digo para que um
+salto incondicional seja efetuado.   Em  exmplo: Suponha que o label
+@@Loop2 esteja muito longe do ponto atual e o salto abaixo n„o possa
+ser efetuado:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      JNZ     @@Loop2                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O assembler substitui, caso JUMPS esteja presente, por:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³      JZ      @@P1                                              ³
+ ³      JMP     @@Loop2     ; Salto absoluto se NZ!               ³
+ ³  @@P1:                                                         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    A linha seguinte do exemplo inicial informa ao assembler  que  o
+PROCedimento  ZeraAX  ‚  p£blico, ou GLOBAL (vis¡vel por qualquer um
+dos m¢dulos que o queira!).  Logo ap¢s, a diretiva CODESEG informa o
+inicio de um segmento de c¢digo.
+
+    Entre  as  diretivas  PROC  e  ENDP vem o corpo de uma rotina em
+assembly.  PROC precisa apenas do  nome da fun‡„o (ou PROCedimento).
+Mais detalhes sobre PROC abaixo.
+
+    Finalizamos a listagem com END, marcando  o  fim  do  m¢dulo  em
+.ASM.
+
+    Simples, n‚?!  Suponha agora que vocˆ queira passar um parametro
+para um PROC. Por exemplo:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ; Equivalente a:                                              ³
+ ³  ;   void pascal SetAX(unsigned v) { _AX = v; }                ³
+ ³  ;   PROCEDURE SetAX(V:WORD) BEGIN regAX := V; END;            ³
+ ³  IDEAL                                                         ³
+ ³  MODEL LARGE,PASCAL                                            ³
+ ³  LOCALS                                                        ³
+ ³  JUMPS                                                         ³
+ ³                                                                ³
+ ³  GLOBAL SetAX : PROC                                           ³
+ ³                                                                ³
+ ³  PROC    SetAX                                                 ³
+ ³  ARG     V : WORD                                              ³
+ ³          mov     ax,[V]                                        ³
+ ³          ret                                                   ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  END                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Hummmm...   Surgiu uma diretiva nova.  ARG especifica a lista de
+parametros que dever   estar  na  pilha  ap¢s  a  chamada  de  SetAX
+(ARGumentos de SetAX).  Note que V est  entre colchetes na instru‡„o
+'mov'...   isso porque V ‚, na verdade, uma referˆncia … mem¢ria (na
+pilha!)  e  toda  referˆncia  …  mem¢ria  precisa  ser  cercada  com
+colchetes (sen„o  d   um  baita  erro  de  sintaxe  no modo IDEAL!).
+Depois da compila‡„o o assembler substitui V pela referˆncia certa.
+
+    Os  tipos,  b sicos,  v lidos  para o assembler s„o: BYTE, WORD,
+DWORD...  N„o existe INTEGER,  CHAR  como  em PASCAL (INTEGER = WORD
+com sinal; assim como CHAR = BYTE com sinal!).
+
+    Para  finalizar:  Em um £nico m¢dulo podem existir v rios PROCs:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  IDEAL               ; modo IDEAL do TASM                      ³
+ ³  MODEL LARGE, PASCAL ; modelamento de mem¢ria...               ³
+ ³  LOCALS                                                        ³
+ ³  JUMPS                                                         ³
+ ³                                                                ³
+ ³  ; ... aqui entra os GLOBALS para os PROCs que vc queira que   ³
+ ³  ;     sejam p£blicos!                                         ³
+ ³                                                                ³
+ ³  CODESEG     ; Come‡o do segmento de c¢digo...                 ³
+ ³                                                                ³
+ ³  PROC    P1                                                    ³
+ ³      ; ... Corpo do PROC P1                                    ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  PROC    P2                                                    ³
+ ³      ; ... Corpo do PROC P2                                    ³
+ ³  ENDP                                                          ³
+ ³                                                                ³
+ ³  ;... outros PROCs...                                          ³
+ ³                                                                ³
+ ³  END     ; Fim da listagem                                     ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Existem MUITOS outros detalhes  com  rela‡„o do TASM...  mas meu
+objetivo no curso de ASM ‚  a  mixagem  de  c¢digo...   pls,  alguma
+d£vida, mandem mensagem para c  ou via netmail p/ mim em 12:2270/1.
+                                                    

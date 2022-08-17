@@ -1,0 +1,139 @@
+
+                               úAúSúSúEúMúBúLúYú
+                             Modo de escrita na tela
+                                Aula nr. 24 de 26
+
+    At‚  agora  vimos  os  registradores  MapMask,  BitMask, "Enable
+Set/Reset" e Set/Reset.  Vimos tamb‚m que  MapMask  permite  ou  n„o
+mudan‡as  nos  quatro  planos  de  bits  idependentemente.   BitMask
+mascara os bits n„o desej veis (e esses s„o lidos dos latches quando
+escrevemos  na  mem¢ria).   Ainda  por  cima,  vimos  que ‚ poss¡vel
+atualizar  os  quatro  planos  de  bits  ao  mesmo  tempo  com  bits
+diferentes usando "Enable Set/Reset"  e Set/Reset.  Isso tudo usando
+o modo de escrita 0!
+
+
+    ş Modo de escrita 1
+
+    O modo de escrita 1  lida  somente  com os latches da placa VGA.
+Com esse modo podemos copiar o conte£do dos quatro planos de bits de
+uma posi‡„o para outra com uma £nica instru‡„o em assembly!
+
+    Como  j   vimos,  os  latches  dos  quatro planos s„o carregados
+sempre que fazemos uma leitura  na  mem¢ria  do sistema (em todos os
+modos de escrita!).  No modo 1 isso tamb‚m vale.  S¢ que nesse  modo
+n„o ‚ poss¡vel  escrever  nada  nos  planos de bits!!  Simplesmente,
+quanto mandamos escrever numa  determinada  posi‡„o  da  mem¢ria  do
+sistema,  os  latches  ‚ que atualizar„o essa posi‡„o.  No modo 1 os
+registros Set/Reset, "Enable Set/Reset" e BitMask n„o funcionam para
+nada. Assim, depois de setado o modo 1, podemos usar:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  REP MOVSB                                                      ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Para copiarmos bytes dos quatro  planos  de v¡deo de uma posi‡„o
+da tela para outra.  E RAPIDO!  S¢  que  tem  um  pequeno  problema:
+Podemos  copiar  BYTES  e  n„o pixeis individuais!  Lembre-se que um
+byte cont‚m oito pixeis (com  cada  bit  de  um pixel em um plano de
+bits!).  Se sua inten‡„o ‚ copiar um bloco inteiro,  por‚m  alinhado
+por  BYTE, ent„o o modo 1 ‚ a escolha mais sensata.  Caso contr rio,
+use outro modo de escrita (o modo 0, por exemplo!).
+
+    Ahhh... podemos conseguir o mesmo efeito do modo de escrita 1 no
+modo de escrita 0!  Basta zerarmos  todos os bits de BitMask!  Pense
+bem:  Se BitMask est  completamente zerado,  ent„o  os  dados  vir„o
+apenas  dos  latches!   O  que  nos  deixa  com  um  modo de escrita
+obsoleto, j  que podemos fazer o mesmo trabalho no modo 0! :)
+
+
+    ş O registrador MODE
+
+    Para  ajustar o modo de escrita precisamos de um registrador.  O
+registrador MODE ‚ descrito abaixo:
+
+                            7 6 5 4 3 2 1 0
+                           ÉÍÑÍÑÍÑÍÑÍÑÍÑÍÑÍ»
+                           º?³ ³ ³ ³ ³?³ ³ º
+                           ÈÍÏÍÏÍÏÍÏÍÏÍÏÍÏÍ¼
+                              ³ ³ ³ ³   ³ ³
+                              ÀÄ´ ³ ³   ÀÄÁÄÄÄÄÄ Modo de escrita
+                                ³ ³ ÀÄÄÄÄÄÄÄÄÄÄÄ Modo de leitura
+                                ³ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄ Odd/Even
+                                ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ Deslocamento
+
+    O  £nico  campo  que  nos  interessa  no  momento  ‚  o "Modo de
+escrita".  Por isso, para  modificar  o  modo,  precisaremos  ler  o
+registro  MODE,  setar  o  modo de escrita, e depois reescrevˆ-lo...
+para que n„o fa‡amos mudan‡as nos  demais bits.  Os modos de escrita
+v lidos s„o os citados anteriormente (repare que esse  campo  tem  2
+bits de tamanho!).
+
+    O  registrador  MODE  faz  parte  do  circuito  GC  (o  mesmo de
+BitMask, "Enable Set/Reset" e Set/Reset)  da placa VGA, seu ¡ndice ‚
+5.
+
+    Well... j  que o  modo  1  ‚  obsoleto,  vou colocar aqui alguns
+macros para facilitar o entendimento dos pr¢ximos c¢digos-fonte, ok?
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ; VGA.INC                                                      ³
+ ³  ; Macros para VGA!                                             ³
+ ³  ; Todos os macros alteram dx e ax                              ³
+ ³                                                                 ³
+ ³  ; Macro: Ajusta o modo de escrita                              ³
+ ³  macro   SetWriteMode    mode                                   ³
+ ³          ifdifi <mode>,<ah>                                     ³
+ ³              mov     ah,mode                                    ³
+ ³          endif                                                  ³
+ ³          mov     dx,3CEh                                        ³
+ ³          mov     al,5                                           ³
+ ³          out     dx,al                                          ³
+ ³          inc     dx                                             ³
+ ³          in      al,dx                                          ³
+ ³          and     ax,1111111100b                                 ³
+ ³          or      al,ah                                          ³
+ ³          out     dx,al                                          ³
+ ³  endm                                                           ³
+ ³                                                                 ³
+ ³  ; Macro: Habilita/Mascara os planos de v¡deo                   ³
+ ³  macro   MapMask plane                                          ³
+ ³          ifdifi  <plane>,<ah>                                   ³
+ ³              mov     ah,plane                                   ³
+ ³          endif                                                  ³
+ ³          mov     al,2                                           ³
+ ³          mov     dx,3C4h                                        ³
+ ³          out     dx,ax                                          ³
+ ³  endm                                                           ³
+ ³                                                                 ³
+ ³  ; Macro: Habilita os bits                                      ³
+ ³  macro   BitMask bit                                            ³
+ ³          ifdifi  <bit>,<ah>                                     ³
+ ³              mov     ah,bit                                     ³
+ ³          endif                                                  ³
+ ³          mov     al,8                                           ³
+ ³          mov     dx,3CEh                                        ³
+ ³          out     dx,ax                                          ³
+ ³  endm                                                           ³
+ ³                                                                 ³
+ ³  ; Macro: Altera "Enable Set/Reset"                             ³
+ ³  macro EnableSetReset    bitmsk                                 ³
+ ³          ifdifi  <bitmsk>,<ah>                                  ³
+ ³              mov     ah,bitmsk                                  ³
+ ³          endif                                                  ³
+ ³          mov     al,1                                           ³
+ ³          mov     dx,3CEh                                        ³
+ ³          out     dx,ax                                          ³
+ ³  endm                                                           ³
+ ³                                                                 ³
+ ³  ; Macro: Ajusta Set/Reset                                      ³
+ ³  macro SetReset value                                           ³
+ ³          ifdifi  <value>,<ah>                                   ³
+ ³              mov     ah,value                                   ³
+ ³          endif                                                  ³
+ ³          sub     al,al       ; altera tb os flags..             ³
+ ³          mov     dx,3CEh                                        ³
+ ³          out     dx,ax                                          ³
+ ³  endm                                                           ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+                                                                                                            

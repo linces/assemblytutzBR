@@ -1,0 +1,227 @@
+
+                               úAúSúSúEúMúBúLúYú
+                          Placas de v¡deo e programa‡„o
+                                Aula nr. 21 de 26
+
+    Ol !!...  Acho que vocˆ concorda comigo que essa s‚rie de textos
+n„o estaria completa se eu  n„o  falasse  alguma coisa a respeito de
+progrma‡„o da placa de v¡deo VGA, n‚?!  Acho que n¢s temos raz„o  em
+pensar assim! :)
+
+    Inicialmente come‡arei a descrever  a  placa  VGA, depois vem as
+descri‡”es da SVGA e VESA.  N„o pretendo gastar "trocentas" horas de
+digita‡„o e depura‡„o de c¢digo na descri‡„o desses padr”es..  quero
+apenas dar uma id‚ia geral do funcionamento desses dispositivos para
+que vocˆ possa caminhar com as pr¢prias pernas mais tarde...
+
+
+    ş Video Graphics Array
+
+    O  padr„o  VGA ‚ o sucessor dos padr”es EGA e CGA, todos criados
+pela IBM...  A diferen‡a  b sica  do  VGA  para  os  outros dois ‚ o
+aumento da resolu‡„o e de cores.  Eis uma compara‡„o  dos  modos  de
+maior  resolu‡„o  e  cores  desses trˆs padr”es (aqui est„o listados
+apenas os modos gr ficos!):
+
+     ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄ¿
+     ³                    ³   CGA    ³    EGA     ³   VGA     ³
+     ÆÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍµ
+     ³ Maior resolu‡„o    ³ 640x200  ³   640x350  ³  640x480  ³
+     ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ´
+     ³  Maior n£mero de   ³    4     ³     16     ³    16     ³
+     ³       cores        ³(320x200) ³  (640x350) ³ (640x480) ³
+     ³                    ³          ³            ³           ³
+     ³                    ³          ³            ³    256    ³
+     ³                    ³          ³            ³ (320x200) ³
+     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    O  padr„o  VGA  suporta  at‚ 256 cores simultanemente no modo de
+v¡deo 13h (320x200x256).  E no modo de mais alta resolu‡„o suporta o
+mesmo n£mero de cores que a EGA, que s„o apenas 16.
+
+    Quanto ao  n£mero  de  cores,  as  placas  EGA  e  VGA  s„o mais
+flex¡veis  que  a  irm„   mais   velha   (a   CGA).   As  cores  s„o
+"reprogram veis", isto ‚, de uma palette de 256k cores (256 * 1024 =
+262144 cores), na VGA, podemos escolher 256...  Duma palette  de  64
+cores  podemos  usar  16, na EGA...  A VGA ‚, sem sombra de d£vidas,
+superior!
+
+    A  forma como podemos selecionar essas cores todas ser  mostrada
+mais abaixo (Como  sempre  as  coisas  boas  s„o sempre deixadas pra
+depois, n‚?! hehe).
+
+    Em tempo:  O modo 640x480 (16 cores) ser  usado como exemplo nas
+pr¢ximas listagens dos textos daqui pra frente...  O modo gr fico de
+320x200 com 256 cores ser  discutido em outra oportunidade, bem como
+o famoso MODE X (modo de v¡deo n„o documentado da VGA - e largamente
+descrito por Michael Abrash em  seus  artigos  para  a  revista  Dr.
+Dobb's).
+
+
+    ş Mem¢ria de v¡deo
+
+    Existe  um  grande  obst culo  com  rela‡„o  a modos gr ficos de
+resolu‡”es altas:   A  segmenta‡„o  de  mem¢ria!   Lembre-se  que os
+processadores Intel enxergam  a  mem¢ria  como  blocos  de  64k  n„o
+sequenciados  (na  verdade,  sobrepostos!)...   No  modo  gr fico de
+resolu‡„o 640x480 da VGA (que  suporta  16 cores no m ximo), suponha
+que cada byte da mem¢ria de v¡deo armazenasse  2  pixeis  (16  cores
+poderia  equivaler a 4 bits, n„o poderia?!)...  Well isso nos d  320
+bytes por linha (meio byte por pixel -> 640 / 2 = 320!).
+
+    Com os 320 bytes por  linha  e  480 linhas teriamos 153600 bytes
+numa tela cheia!  Ocupando  3  segmentos  da  mem¢ria  de  v¡deo  (2
+segmentos  cont¡guos  completos  e mais 22528 bytes do terceiro!)...
+Puts...  Imagine a complexidade  do  algoritmo que escreve apenas um
+ponto no v¡deo!  Seria necess rio selecionarmos o segmento do  pixel
+e  o  offset...  isso  pra  aplicativos gr ficos de alta performance
+seria um desastre!
+
+    A  IBM  resolveu  esse  tipo  de  problema  criando  "planos" de
+mem¢ria...  Cada plano equivale a um bit de um pixel.  Dessa  forma,
+se  em  um  byte  temos  oito  bits e cada plano armazena 1 bit de 1
+pixel... em um byte de  cada  plano  teremos  os 8 bits de 8 pixeis.
+Algo como:  O byte no plano 0 tem os oito bits 0 de  oito  pixeis...
+no  plano  1  temos  os  oito  bits  1 de oito pixeis... e assim por
+diante.  De forma que o  circuito  da VGA possa "sobrepor" os planos
+para formar os quatro bits de um  £nico  pixel...   A  representa‡„o
+gr fica abaixo mostra a sobreposi‡„o dos planos:
+
+            ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+          ÚÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿ ³
+        ÚÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿ ³ ³
+      ÚÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿ ³ ³ ³
+      ³                                            ³ ³ ³ ³
+      ³                                            ³ ³ ³ ³
+      ³                                            ³ ³ ³3³
+      ³                                            ³ ³2ÃÄÙ
+      ³                                            ³1ÃÄÙ
+      ³                                          0 ÃÄÙ
+      ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esses  s„o  os  quatro  planos  da mem¢ria de v¡deo.  O plano da
+frente ‚  o  plano  0,  incrementando  nos  planos  mais interiores.
+Suponha que na posi‡„o inicial de cada plano tenhamos  os  sequintes
+bytes:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  Plano 0: 00101001b                                             ³
+ ³  Plano 1: 10101101b                                             ³
+ ³  Plano 2: 11010111b                                             ³
+ ³  Plano 3: 01010100b                                             ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Os  bits  mais  significativos  de  cada  plano formam um pixel:
+(0110b), os  bits  seguintes  o  segundo  pixel  (0011b), o terceiro
+(1100b), e assim por diante at‚ o oitavo pixel (1110b).  Como  temos
+16 cores no modo 640x480, cada pixel tem 4 bits de tamanho.
+
+    Com  esse  esquema  biruta temos um espa‡o de apenas 38400 bytes
+sendo usados para cada plano  de  v¡deo...   Se cada byte suporta um
+bit de cada pixel ent„o temos que uma linha tem 80 bytes de  tamanho
+(640 / 8).  Se temos 480 linhas, teremos 38400 bytes por plano.
+
+    Tome  nota  de duas coisas... estamos usando um modo de 16 cores
+como exemplo para facilitar  o  entendimento  (os modos de 256 cores
+s„o mais complexos!) e esses 38400 bytes em cada plano de bits ‚  um
+espa‡o  de  mem¢ria  que pertence … placa de v¡deo e ‚ INACESS¡VEL a
+CPU!!!!  Apenas a placa de v¡deo pode ler e gravar nessa mem¢ria.  A
+placa VGA (e  tamb‚m  a  EGA)  usam  a  mem¢ria  RAM do sistema para
+saberem quais  posi‡”es  de  um  (ou  mais)  planos  de  bits  ser„o
+afetados.  Isso ‚ assunto para o pr¢ximo t¢pico:
+
+
+    ş A mem¢ria do sistema:
+
+    Os  adaptadores  VGA  usam  o  espa‡o  de "mem¢ria linear" entre
+0A0000h  e  0BFFFFh  (todo  o  segmento  0A000h  e  todo  o segmento
+0B000h)...  Essa mem¢ria ‚ apenas uma  rea de  rascunho,  j   que  a
+placa  VGA  tem  mem¢ria  pr¢pria...   A  CPU precisa de uma mem¢ria
+fisicamente presente  para  que  possa  escrever/ler  dados... da¡ a
+existencia desses dois segmentos cont¡guos de mem¢ria, mas a VGA n„o
+os usa da mesma forma que a CPU!
+
+    Citei dois segmentos cont¡guos... mas n„o existe a limita‡„o  de
+apenas  um  segmento?!   Well... existe... o segmento 0B000h ‚ usado
+apenas nos modos-texto (onde o  segmento 0B800h ‚ usado...  0B000h ‚
+para o adaptador monocrom tico - MDA)... os modos-gr ficos  utilizam
+o  segmento 0A000h (a n„o ser aqueles modos gr ficos compat¡veis com
+a CGA!).
+
+    A mem¢ria do sistema ‚ usada  como rascunho pela VGA (e pela EGA
+tamb‚m!!)...  A VGA colhe  as  modifica‡”es  feitas  na  mem¢ria  do
+sistema e transfere para a mem¢ria de v¡deo.  A forma com que isso ‚
+feito  depende  do  modo  com  que programamos a placa de v¡deo para
+fazˆ-lo... podemos modificar  um  plano  de  bits  por vez ou v rios
+planos, um bit por vez, v rios bits de uma vez, etc.  Na  realidade,
+dependendo  do  modo  com que os dados s„o enviados para a placa VGA
+n„o precisamos  nem  ao  menos  saber  O  QUE  estamos escrevendo na
+mem¢ria do sistema, a VGA toma conta de ajustar a mem¢ria  de  v¡deo
+por  si  s¢,  usando apenas o endere‡o fornecido pela CPU para saber
+ONDE deve fazer a modifica‡„o!
+
+
+    ş Selecionando os planos de bits...
+
+    Em todos os modos de  escrita precisamos selecionar os planos de
+bits que ser„o afetados...  Isso ‚ feito atrav‚s de  um  registrador
+da  placa  VGA:   MapMask...  Por‚m, antes de sairmos futucando tudo
+quanto ‚ endere‡o de I/O da  placa VGA precisamos saber COMO devemos
+us -los!
+
+    A maioria dos registradores da placa VGA  est„o  dispon¡veis  da
+seguinte  maneira:  Primeiro informamos … placa qual ‚ o registrador
+que queremos acessar e  depois  informamos  o  dado a ser escrito ou
+lido...  A t‚cnica ‚ a seguinte:  escrevemos num endere‡o de  I/O  o
+n£mero  do  registrador... no endere‡o seguinte o dado pode ser lido
+ou escrito...
+
+    No caso de MapMask, este  registrador  ‚  o n£mero 2 do CIRCUITO
+SEQUENCIADOR  da  placa  VGA.   O  circuito  sequenciador  pode  ser
+acessado pelos endere‡os de I/O 3C4h e 3C5h (3C4h conter   o  n£mero
+do registro e 3C5h o dado!).  Eis a estrutura do registro MapMask:
+
+                            7 6 5 4 3 2 1 0
+                           ÉÍÑÍÑÍÑÍÑÍÑÍÑÍÑÍ»
+                           º?³?³?³?³ ³ ³ ³ º
+                           ÈÍÏÍÏÍÏÍÏÍÏÍÏÍÏÍ¼
+                                    ³ ³ ³ ³
+                                    ³ ³ ³ ÀÄÄ plano 0
+                                    ³ ³ ÀÄÄÄÄ plano 1
+                                    ³ ÀÄÄÄÄÄÄ plano 2
+                                    ÀÄÄÄÄÄÄÄÄ plano 3
+
+    De  acordo  com  o  desenho  acima...  os quatro bits inferiores
+informam a placa VGA qual dos planos ser  modificado.  Lembre-se que
+cada plano tem um bit de um pixel (sendo o plano 0 o propriet rio do
+bit menos significativo).  Vamos a nossa primeira rotina:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ; VGA1.ASM                                                     ³
+ ³  ; Compile com:                                                 ³
+ ³  ;                                                              ³
+ ³  ;   TASM vga1                                                  ³
+ ³  ;   TLINK /x/t vga1                                            ³
+ ³  ;                                                              ³
+ ³  ideal                                                          ³
+ ³  model tiny                                                     ³
+ ³  locals                                                         ³
+ ³  jumps                                                          ³
+ ³                                                                 ³
+ ³  codeseg                                                        ³
+ ³                                                                 ³
+ ³  org 100h                                                       ³
+ ³  start:                                                         ³
+ ³      mov     ax,12h      ; Poe no modo 640x480                  ³
+ ³      int     10h                                                ³
+ ³                                                                 ³
+ ³      mov     ax,0A000h   ; Faz ES = 0A000h                      ³
+ ³      mov     es,ax                                              ³
+ ³      sub     bx,bx       ; BX ser  o offset!                    ³
+ ³                                                                 ³
+ ³      mov     dx,03C4h    ; Aponta para o registro               ³
+ ³      mov     al,2        ; "MapMask"                            ³
+ ³      out     dx,al                                              ³
+ ³                                                                 ³
+ ³      inc
+                                           

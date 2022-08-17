@@ -1,0 +1,98 @@
+
+                               úAúSúSúEúMúBúLúYú
+                         Comandos e Instru‡”es (Parte 7)
+                                Aula nr. 11 de 26
+
+    Mais instru‡”es de compara‡„o...
+
+ ş CMPSB e CMPSW
+
+    Essas instru‡”es comparam (da mesma forma que CMP) o conte£do da
+mem¢ria apontada  por  DS:SI  com  o  conte£do  apontado  por ES:DI,
+afetando os flags.  Com isso, soluciona-se a limita‡„o da  instru‡„o
+CMP com rela‡„o aos dois operandos como referˆncias … mem¢ria!
+
+    Lembre-se que DS:SI ‚ o operando implicito FONTE, enquanto ES:DI
+‚  o  destino.   A compara‡„o ‚ feita de ES:DI para DS:SI.  A rotina
+abaixo ‚ equivalente  a  CMPSB:
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  MOV AL,ES:[DI]                                                 ³
+ ³  CMP AL,[SI]                                                    ³
+ ³  INC SI                                                         ³
+ ³  INC DI                                                         ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Existe um pequenino erro de l¢gica na rotina  acima,  mas  serve
+aos nossos prop¢sitos de ilustrar o que ocorre em CMPSB.
+
+    SI  e  DI ser„o incrementados (ou decrementados, depende do flag
+de dire‡„o)  depois  da  opera‡„o,  e  o  incremento (ou decremento)
+depender  da instru‡„o...  Lembre-se que CMPSB compara Bytes e CMPSW
+compara Words.
+
+
+ ş SCASB e SCASW
+
+    Essas  instru‡”es servem para comparar (da mesma forma que CMP o
+faz) o conte£do da mem¢ria  apontado  por DS:SI com o registrador AL
+(no caso de SCASB) ou AX (no caso de SCASW).  Os flags s„o  afetados
+e SI ‚ incrementado (ou decrementado)  de  acordo  com  a  instru‡„o
+usada.
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³Comparando blocos de mem¢ria:                                     ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Podemos usar CMPS?  e SCAS?  (onde ?  e' B ou W) em conjunto com
+REP  para  compararmos blocos (CMPS?) ou procurar por um determinado
+dado num bloco (SCAS?).  A diferen‡a aqui ‚ que podemos fornecer uma
+condi‡„o de compara‡„o ou busca.
+
+    Acrescentando o modigicador REP,  precisamos  dizer … uma dessas
+instru‡”es a quantidades de dados que queremos manipular...  fazemos
+isso atrav‚s do registrador CX (assim  como  fizemos  com  LODS?   e
+STOS?):
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³  ;Certifica-se do sentido crescente!                           ³
+ ³  CLD                                                           ³
+ ³                                                                ³
+ ³  ;Obt‚m o segmento da linha de comando e coloca em DS          ³
+ ³  MOV   AX,SEG LINHA_DE_COMANDO                                 ³
+ ³  MOV   DS,AX                                                   ³
+ ³                                                                ³
+ ³  ;Obt‚m o offset inicial da linha de comando                   ³
+ ³  MOV   SI,OFFSET LINHA_DE_COMANDO                              ³
+ ³                                                                ³
+ ³  ;Procura, no m ximo por 128 bytes                             ³
+ ³  MOV   CX,128                                                  ³
+ ³                                                                ³
+ ³  ;Procuraremos por um espa‡o.                                  ³
+ ³  MOV   AL,' '                                                  ³
+ ³                                                                ³
+ ³  REPNE SCASB                                                   ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+    Esse  fragmento  de c¢digo ilustra o uso de SCASB com blocos.  O
+modificador  REPNE  significa  (REPete  while  Not  Equal  -  Repete
+enquanto n„o for igual).  REPNE garante que o byte vai ser procurado
+por  toda  a  linha  de  comando  at‚  que  o  primeiro  espa‡o seja
+encontrado.  Se n„o houver espa‡os na linha, ent„o,  depois  de  128
+bytes  de  procura,  o  registrador  CX  estar   zerado  (j   que  ‚
+decrementado a cada byte comparado).
+
+    Esta  ‚ outra caracter¡stica das instru‡”es que manipulam blocos
+(as que  s„o  precedidas  de  REP,  REPNE  ou  REPE):  O  contador ‚
+decrementado a cada opera‡„o da instru‡„o associada (no  nosso  caso
+SCASB), bem como os demais operandos implicitos (SI no caso acima) ‚
+incrementado a cada passo.
+
+    Se  quisermos  encontrar  o primeiro byte DIFERENTE de espa‡o na
+rotina acima,  basta  trocar  REPNE  por  REPE  (Repete enquanto for
+IGUAL).
+
+    REPE e REPNE n„o foram mencionados antes  porque  n„o  funcionam
+com LODS? e STOS?.
+                                                               
